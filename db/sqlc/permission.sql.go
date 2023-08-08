@@ -14,13 +14,13 @@ INSERT INTO permissions (
   name
 ) VALUES (
   $1
-) RETURNING id, name
+) RETURNING id, name, created_at
 `
 
 func (q *Queries) CreatePermission(ctx context.Context, name string) (Permission, error) {
 	row := q.db.QueryRow(ctx, createPermission, name)
 	var i Permission
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
 	return i, err
 }
 
@@ -34,19 +34,19 @@ func (q *Queries) DeletePermission(ctx context.Context, id int64) error {
 }
 
 const getPermission = `-- name: GetPermission :one
-SELECT id, name FROM permissions
+SELECT id, name, created_at FROM permissions
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetPermission(ctx context.Context, id int64) (Permission, error) {
 	row := q.db.QueryRow(ctx, getPermission, id)
 	var i Permission
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
 	return i, err
 }
 
 const listPermissions = `-- name: ListPermissions :many
-SELECT id, name FROM permissions
+SELECT id, name, created_at FROM permissions
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -66,7 +66,7 @@ func (q *Queries) ListPermissions(ctx context.Context, arg ListPermissionsParams
 	items := []Permission{}
 	for rows.Next() {
 		var i Permission
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.CreatedAt); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -81,7 +81,7 @@ const updatePermission = `-- name: UpdatePermission :one
 UPDATE permissions
 SET name = $2
 WHERE id = $1
-RETURNING id, name
+RETURNING id, name, created_at
 `
 
 type UpdatePermissionParams struct {
@@ -92,6 +92,6 @@ type UpdatePermissionParams struct {
 func (q *Queries) UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error) {
 	row := q.db.QueryRow(ctx, updatePermission, arg.ID, arg.Name)
 	var i Permission
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.CreatedAt)
 	return i, err
 }

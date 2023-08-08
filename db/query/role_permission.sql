@@ -11,15 +11,18 @@ SELECT * FROM role_permissions
 WHERE role_id = $1 AND permission_id = $2
 LIMIT 1;
 
--- name: ListRolePermissions :many
-SELECT * FROM role_permissions;
+-- name: ListRolePermissionByRoleId :many
+SELECT * FROM role_permissions
+WHERE role_id = $1;
 
--- name: UpdateRolePermission :one
-UPDATE role_permissions
-SET role_id = $1, permission_id = $2
-WHERE role_id = $3 AND permission_id = $4
-RETURNING *;
+-- name: ListRolePermissionByPermissionId :many
+SELECT * FROM role_permissions
+WHERE permission_id = $1;
 
--- name: DeleteRolePermission :exec
+-- name: DeleteRolePermissionByRoleId :exec
 DELETE FROM role_permissions
-WHERE role_id = $1 AND permission_id = $2;
+WHERE role_id = $1;
+
+-- name: DeleteRolePermissionByPermissionId :exec
+DELETE FROM role_permissions
+WHERE permission_id = $1;

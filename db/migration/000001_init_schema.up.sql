@@ -1,12 +1,14 @@
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "name" varchar UNIQUE NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "roles" (
   "id" bigserial PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL,
-  "status" int NOT NULL DEFAULT 1
+  "status" int NOT NULL DEFAULT 1,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "admin_users" (

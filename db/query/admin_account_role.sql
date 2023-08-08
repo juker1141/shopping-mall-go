@@ -12,15 +12,18 @@ SELECT * FROM admin_user_roles
 WHERE admin_user_id = $1 AND role_id = $2
 LIMIT 1;
 
--- name: ListAdminUserRoles :many
-SELECT * FROM admin_user_roles;
+-- name: ListAdminUserRoleByRoleId :many
+SELECT * FROM admin_user_roles
+WHERE role_id = $1;
 
--- name: UpdateAdminUserRole :one
-UPDATE admin_user_roles
-SET admin_user_id = $1, role_id = $2
-WHERE admin_user_id = $3 AND role_id = $4
-RETURNING *;
+-- name: ListAdminUserRoleByAdminUserId :many
+SELECT * FROM admin_user_roles
+WHERE admin_user_id = $1;
 
--- name: DeleteAdminUserRole :exec
+-- name: DeleteAdminUserRoleByRoleId :exec
 DELETE FROM admin_user_roles
-WHERE admin_user_id = $1 AND role_id = $2;
+WHERE role_id = $1;
+
+-- name: DeleteAdminUserRoleByAdminUserId :exec
+DELETE FROM admin_user_roles
+WHERE admin_user_id = $1;

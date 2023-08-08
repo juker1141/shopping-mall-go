@@ -33,18 +33,23 @@ func (q *Queries) CreateAdminUserRole(ctx context.Context, arg CreateAdminUserRo
 	return i, err
 }
 
-const deleteAdminUserRole = `-- name: DeleteAdminUserRole :exec
+const deleteAdminUserRoleByAdminUserId = `-- name: DeleteAdminUserRoleByAdminUserId :exec
 DELETE FROM admin_user_roles
-WHERE admin_user_id = $1 AND role_id = $2
+WHERE admin_user_id = $1
 `
 
-type DeleteAdminUserRoleParams struct {
-	AdminUserID pgtype.Int4 `json:"admin_user_id"`
-	RoleID      pgtype.Int4 `json:"role_id"`
+func (q *Queries) DeleteAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) error {
+	_, err := q.db.Exec(ctx, deleteAdminUserRoleByAdminUserId, adminUserID)
+	return err
 }
 
-func (q *Queries) DeleteAdminUserRole(ctx context.Context, arg DeleteAdminUserRoleParams) error {
-	_, err := q.db.Exec(ctx, deleteAdminUserRole, arg.AdminUserID, arg.RoleID)
+const deleteAdminUserRoleByRoleId = `-- name: DeleteAdminUserRoleByRoleId :exec
+DELETE FROM admin_user_roles
+WHERE role_id = $1
+`
+
+func (q *Queries) DeleteAdminUserRoleByRoleId(ctx context.Context, roleID pgtype.Int4) error {
+	_, err := q.db.Exec(ctx, deleteAdminUserRoleByRoleId, roleID)
 	return err
 }
 
@@ -66,12 +71,13 @@ func (q *Queries) GetAdminUserRole(ctx context.Context, arg GetAdminUserRolePara
 	return i, err
 }
 
-const listAdminUserRoles = `-- name: ListAdminUserRoles :many
+const listAdminUserRoleByAdminUserId = `-- name: ListAdminUserRoleByAdminUserId :many
 SELECT admin_user_id, role_id FROM admin_user_roles
+WHERE admin_user_id = $1
 `
 
-func (q *Queries) ListAdminUserRoles(ctx context.Context) ([]AdminUserRole, error) {
-	rows, err := q.db.Query(ctx, listAdminUserRoles)
+func (q *Queries) ListAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) ([]AdminUserRole, error) {
+	rows, err := q.db.Query(ctx, listAdminUserRoleByAdminUserId, adminUserID)
 	if err != nil {
 		return nil, err
 	}
@@ -90,28 +96,27 @@ func (q *Queries) ListAdminUserRoles(ctx context.Context) ([]AdminUserRole, erro
 	return items, nil
 }
 
-const updateAdminUserRole = `-- name: UpdateAdminUserRole :one
-UPDATE admin_user_roles
-SET admin_user_id = $1, role_id = $2
-WHERE admin_user_id = $3 AND role_id = $4
-RETURNING admin_user_id, role_id
+const listAdminUserRoleByRoleId = `-- name: ListAdminUserRoleByRoleId :many
+SELECT admin_user_id, role_id FROM admin_user_roles
+WHERE role_id = $1
 `
 
-type UpdateAdminUserRoleParams struct {
-	AdminUserID   pgtype.Int4 `json:"admin_user_id"`
-	RoleID        pgtype.Int4 `json:"role_id"`
-	AdminUserID_2 pgtype.Int4 `json:"admin_user_id_2"`
-	RoleID_2      pgtype.Int4 `json:"role_id_2"`
-}
-
-func (q *Queries) UpdateAdminUserRole(ctx context.Context, arg UpdateAdminUserRoleParams) (AdminUserRole, error) {
-	row := q.db.QueryRow(ctx, updateAdminUserRole,
-		arg.AdminUserID,
-		arg.RoleID,
-		arg.AdminUserID_2,
-		arg.RoleID_2,
-	)
-	var i AdminUserRole
-	err := row.Scan(&i.AdminUserID, &i.RoleID)
-	return i, err
+func (q *Queries) ListAdminUserRoleByRoleId(ctx context.Context, roleID pgtype.Int4) ([]AdminUserRole, error) {
+	rows, err := q.db.Query(ctx, listAdminUserRoleByRoleId, roleID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []AdminUserRole{}
+	for rows.Next() {
+		var i AdminUserRole
+		if err := rows.Scan(&i.AdminUserID, &i.RoleID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
