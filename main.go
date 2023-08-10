@@ -7,16 +7,17 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/juker1141/shopping-mall-go/api"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
+	"github.com/juker1141/shopping-mall-go/util"
 	_ "github.com/lib/pq"
 )
 
-const (
-	DB_SOURCE     = "postgresql://postgres:password@localhost:5432/shopping_mall?sslmode=disable"
-	serverAddress = "0.0.0.0:8080"
-)
-
 func main() {
-	connPool, err := pgxpool.New(context.Background(), DB_SOURCE)
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db.", err)
 	}
@@ -24,7 +25,7 @@ func main() {
 	store := db.NewStore(connPool)
 	server := api.NewServer(store)
 
-	err = server.Start(serverAddress)
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server:", err)
 	}

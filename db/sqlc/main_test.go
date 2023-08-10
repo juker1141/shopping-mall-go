@@ -7,17 +7,18 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/juker1141/shopping-mall-go/util"
 	_ "github.com/lib/pq"
-)
-
-const (
-	DB_SOURCE = "postgresql://postgres:password@localhost:5432/shopping_mall?sslmode=disable"
 )
 
 var testQueries *Queries
 
 func TestMain(m *testing.M) {
-	connPool, err := pgxpool.New(context.Background(), DB_SOURCE)
+	config, err := util.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db.", err)
 	}
