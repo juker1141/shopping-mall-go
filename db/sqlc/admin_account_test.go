@@ -19,6 +19,7 @@ func createRandomAdminUser(t *testing.T) AdminUser {
 		Account:        util.RandomAccount(),
 		FullName:       util.RandomName(),
 		HashedPassword: hashedPassword,
+		Status:         1,
 	}
 
 	adminUser, err := testQueries.CreateAdminUser(context.Background(), arg)

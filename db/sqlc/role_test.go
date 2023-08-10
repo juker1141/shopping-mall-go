@@ -12,13 +12,17 @@ import (
 )
 
 func createRandomRole(t *testing.T) Role {
-	name := util.RandomRole()
+	arg := CreateRoleParams{
+		Name:   util.RandomRole(),
+		Status: 1,
+	}
 
-	role, err := testQueries.CreateRole(context.Background(), name)
+	role, err := testQueries.CreateRole(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 
-	require.Equal(t, name, role.Name)
+	require.Equal(t, arg.Name, role.Name)
+	require.Equal(t, arg.Status, role.Status)
 	require.NotZero(t, role.ID)
 	require.NotZero(t, role.CreatedAt)
 

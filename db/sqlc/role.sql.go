@@ -13,14 +13,20 @@ import (
 
 const createRole = `-- name: CreateRole :one
 INSERT INTO roles (
-  name
+  name,
+  status
 ) VALUES (
-  $1
+  $1, $2
 ) RETURNING id, name, status, created_at
 `
 
-func (q *Queries) CreateRole(ctx context.Context, name string) (Role, error) {
-	row := q.db.QueryRow(ctx, createRole, name)
+type CreateRoleParams struct {
+	Name   string `json:"name"`
+	Status int32  `json:"status"`
+}
+
+func (q *Queries) CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error) {
+	row := q.db.QueryRow(ctx, createRole, arg.Name, arg.Status)
 	var i Role
 	err := row.Scan(
 		&i.ID,

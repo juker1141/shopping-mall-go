@@ -1,8 +1,9 @@
 -- name: CreateRole :one
 INSERT INTO roles (
-  name
+  name,
+  status
 ) VALUES (
-  $1
+  $1, $2
 ) RETURNING *;
 
 -- name: GetRole :one

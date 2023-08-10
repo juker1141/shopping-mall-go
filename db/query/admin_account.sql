@@ -2,9 +2,10 @@
 INSERT INTO admin_users (
   account,
   full_name,
-  hashed_password
+  hashed_password,
+  status
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 ) RETURNING *;
 
 -- name: GetAdminUser :one

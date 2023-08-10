@@ -15,9 +15,10 @@ const createAdminUser = `-- name: CreateAdminUser :one
 INSERT INTO admin_users (
   account,
   full_name,
-  hashed_password
+  hashed_password,
+  status
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 ) RETURNING id, account, full_name, hashed_password, status, password_changed_at, created_at
 `
 
@@ -25,10 +26,16 @@ type CreateAdminUserParams struct {
 	Account        string `json:"account"`
 	FullName       string `json:"full_name"`
 	HashedPassword string `json:"hashed_password"`
+	Status         int32  `json:"status"`
 }
 
 func (q *Queries) CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) (AdminUser, error) {
-	row := q.db.QueryRow(ctx, createAdminUser, arg.Account, arg.FullName, arg.HashedPassword)
+	row := q.db.QueryRow(ctx, createAdminUser,
+		arg.Account,
+		arg.FullName,
+		arg.HashedPassword,
+		arg.Status,
+	)
 	var i AdminUser
 	err := row.Scan(
 		&i.ID,

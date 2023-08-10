@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -44,6 +43,7 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 // RoleTxParams contains the input parameters of the role create
 type RoleTxParams struct {
 	Name          string  `json:"name"`
+	Status        int32   `json:"status"`
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
@@ -54,49 +54,52 @@ type RoleTxResult struct {
 
 // TransferTx performs a money transfer from one account to the other.
 // It creates a transfer record, add account entries, and update accounts' balance within a single database trasaction
-func (store *Store) RoleTx(ctx context.Context, arg RoleTxParams) (RoleTxResult, error) {
-	var result RoleTxResult
+// func (store *Store) RoleTx(ctx context.Context, arg RoleTxParams) (RoleTxResult, error) {
+// 	var result RoleTxResult
 
-	err := store.execTx(ctx, func(q *Queries) error {
-		var err error
-		var permissionList []Permission
+// 	err := store.execTx(ctx, func(q *Queries) error {
+// 		var err error
+// 		var permissionList []Permission
 
-		if len(arg.PermissionsID) <= 0 {
-			err = fmt.Errorf("at least one permission is required")
-			return err
-		}
+// 		if len(arg.PermissionsID) <= 0 {
+// 			err = fmt.Errorf("at least one permission is required")
+// 			return err
+// 		}
 
-		result.Role, err = q.CreateRole(ctx, arg.Name)
-		if err != nil {
-			return err
-		}
+// 		result.Role, err = q.CreateRole(ctx, CreateRoleParams{
+// 			Name:   arg.Name,
+// 			Status: int32(arg.Status),
+// 		})
+// 		if err != nil {
+// 			return err
+// 		}
 
-		for _, permissionId := range arg.PermissionsID {
-			_, err := q.CreateRolePermission(ctx, CreateRolePermissionParams{
-				RoleID: pgtype.Int4{
-					Int32: int32(result.Role.ID),
-					Valid: true,
-				},
-				PermissionID: pgtype.Int4{
-					Int32: int32(permissionId),
-					Valid: true,
-				},
-			})
-			if err != nil {
-				return err
-			}
+// 		for _, permissionId := range arg.PermissionsID {
+// 			_, err := q.CreateRolePermission(ctx, CreateRolePermissionParams{
+// 				RoleID: pgtype.Int4{
+// 					Int32: int32(result.Role.ID),
+// 					Valid: true,
+// 				},
+// 				PermissionID: pgtype.Int4{
+// 					Int32: int32(permissionId),
+// 					Valid: true,
+// 				},
+// 			})
+// 			if err != nil {
+// 				return err
+// 			}
 
-			permission, err := q.GetPermission(ctx, permissionId)
-			if err != nil {
-				return err
-			}
-			permissionList = append(permissionList, permission)
-		}
+// 			permission, err := q.GetPermission(ctx, permissionId)
+// 			if err != nil {
+// 				return err
+// 			}
+// 			permissionList = append(permissionList, permission)
+// 		}
 
-		result.PermissionList = permissionList
+// 		result.PermissionList = permissionList
 
-		return nil
-	})
+// 		return nil
+// 	})
 
-	return result, err
-}
+// 	return result, err
+// }
