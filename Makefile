@@ -33,4 +33,7 @@ test:
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc test server
+mock:
+	mockgen -build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/juker1141/shopping-mall-go/db/sqlc Store
+
+.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc test server mock
