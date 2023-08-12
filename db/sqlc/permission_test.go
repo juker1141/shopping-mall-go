@@ -13,7 +13,7 @@ import (
 func createRandomPermission(t *testing.T) Permission {
 	name := util.RandomPermission()
 
-	permission, err := testQueries.CreatePermission(context.Background(), name)
+	permission, err := testStore.CreatePermission(context.Background(), name)
 	require.NoError(t, err)
 	require.NotEmpty(t, permission)
 
@@ -30,7 +30,7 @@ func TestCreatePermission(t *testing.T) {
 
 func TestGetPermission(t *testing.T) {
 	permission1 := createRandomPermission(t)
-	permission2, err := testQueries.GetPermission(context.Background(), permission1.ID)
+	permission2, err := testStore.GetPermission(context.Background(), permission1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, permission2)
 
@@ -48,7 +48,7 @@ func TestUpdatePermission(t *testing.T) {
 		Name: util.RandomPermission(),
 	}
 
-	permission2, err := testQueries.UpdatePermission(context.Background(), arg)
+	permission2, err := testStore.UpdatePermission(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, permission2)
 
@@ -61,10 +61,10 @@ func TestUpdatePermission(t *testing.T) {
 
 func TestDeletePermission(t *testing.T) {
 	permission1 := createRandomPermission(t)
-	err := testQueries.DeletePermission(context.Background(), permission1.ID)
+	err := testStore.DeletePermission(context.Background(), permission1.ID)
 	require.NoError(t, err)
 
-	permission2, err := testQueries.GetPermission(context.Background(), permission1.ID)
+	permission2, err := testStore.GetPermission(context.Background(), permission1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, pgx.ErrNoRows.Error())
 	require.Empty(t, permission2)
@@ -80,7 +80,7 @@ func TestListPermission(t *testing.T) {
 		Offset: 5,
 	}
 
-	permissions, err := testQueries.ListPermissions(context.Background(), arg)
+	permissions, err := testStore.ListPermissions(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, permissions, 5)
 

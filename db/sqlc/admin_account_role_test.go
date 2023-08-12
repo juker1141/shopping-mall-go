@@ -24,7 +24,7 @@ func createRandomAdminUserRole(t *testing.T) AdminUserRole {
 		},
 	}
 
-	adminUserRole, err := testQueries.CreateAdminUserRole(context.Background(), arg)
+	adminUserRole, err := testStore.CreateAdminUserRole(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, adminUserRole)
 
@@ -52,7 +52,7 @@ func TestGetAdminUserRole(t *testing.T) {
 		},
 	}
 
-	adminUserRole2, err := testQueries.GetAdminUserRole(context.Background(), arg)
+	adminUserRole2, err := testStore.GetAdminUserRole(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, adminUserRole2)
 }
@@ -60,10 +60,10 @@ func TestGetAdminUserRole(t *testing.T) {
 func TestDeleteAdminUserRoleByRoleId(t *testing.T) {
 	adminUserRole1 := createRandomAdminUserRole(t)
 
-	err := testQueries.DeleteAdminUserRoleByRoleId(context.Background(), adminUserRole1.RoleID)
+	err := testStore.DeleteAdminUserRoleByRoleId(context.Background(), adminUserRole1.RoleID)
 	require.NoError(t, err)
 
-	adminUserRole2, err := testQueries.GetAdminUserRole(context.Background(), GetAdminUserRoleParams{
+	adminUserRole2, err := testStore.GetAdminUserRole(context.Background(), GetAdminUserRoleParams{
 		RoleID: pgtype.Int4{
 			Int32: adminUserRole1.RoleID.Int32,
 			Valid: true,
@@ -81,10 +81,10 @@ func TestDeleteAdminUserRoleByRoleId(t *testing.T) {
 func TestDeleteAdminUserRoleByAdminUserId(t *testing.T) {
 	adminUserRole1 := createRandomAdminUserRole(t)
 
-	err := testQueries.DeleteAdminUserRoleByAdminUserId(context.Background(), adminUserRole1.AdminUserID)
+	err := testStore.DeleteAdminUserRoleByAdminUserId(context.Background(), adminUserRole1.AdminUserID)
 	require.NoError(t, err)
 
-	adminUserRole2, err := testQueries.GetAdminUserRole(context.Background(), GetAdminUserRoleParams{
+	adminUserRole2, err := testStore.GetAdminUserRole(context.Background(), GetAdminUserRoleParams{
 		RoleID: pgtype.Int4{
 			Int32: adminUserRole1.RoleID.Int32,
 			Valid: true,
@@ -103,7 +103,7 @@ func TestListAdminUserRoleByRoleId(t *testing.T) {
 	role := createRandomRole(t)
 	for i := 0; i < 5; i++ {
 		adminUser := createRandomAdminUser(t)
-		testQueries.CreateAdminUserRole(context.Background(), CreateAdminUserRoleParams{
+		testStore.CreateAdminUserRole(context.Background(), CreateAdminUserRoleParams{
 			RoleID: pgtype.Int4{
 				Int32: int32(role.ID),
 				Valid: true,
@@ -115,7 +115,7 @@ func TestListAdminUserRoleByRoleId(t *testing.T) {
 		})
 	}
 
-	adminUserRoles, err := testQueries.ListAdminUserRoleByRoleId(context.Background(), pgtype.Int4{
+	adminUserRoles, err := testStore.ListAdminUserRoleByRoleId(context.Background(), pgtype.Int4{
 		Int32: int32(role.ID),
 		Valid: true,
 	})
@@ -131,7 +131,7 @@ func TestListAdminUserRoleByAdminUserId(t *testing.T) {
 	adminUser := createRandomAdminUser(t)
 	for i := 0; i < 5; i++ {
 		role := createRandomRole(t)
-		testQueries.CreateAdminUserRole(context.Background(), CreateAdminUserRoleParams{
+		testStore.CreateAdminUserRole(context.Background(), CreateAdminUserRoleParams{
 			RoleID: pgtype.Int4{
 				Int32: int32(role.ID),
 				Valid: true,
@@ -143,7 +143,7 @@ func TestListAdminUserRoleByAdminUserId(t *testing.T) {
 		})
 	}
 
-	adminUserRoles, err := testQueries.ListAdminUserRoleByAdminUserId(context.Background(), pgtype.Int4{
+	adminUserRoles, err := testStore.ListAdminUserRoleByAdminUserId(context.Background(), pgtype.Int4{
 		Int32: int32(adminUser.ID),
 		Valid: true,
 	})

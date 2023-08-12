@@ -13,7 +13,7 @@ func createRandomRolePermission(t *testing.T) RolePermission {
 	permission := createRandomPermission(t)
 	role := createRandomRole(t)
 
-	rolePermission, err := testQueries.CreateRolePermission(context.Background(), CreateRolePermissionParams{
+	rolePermission, err := testStore.CreateRolePermission(context.Background(), CreateRolePermissionParams{
 		PermissionID: pgtype.Int4{
 			Int32: int32(permission.ID),
 			Valid: true,
@@ -50,7 +50,7 @@ func TestGetRolePermission(t *testing.T) {
 		},
 	}
 
-	rolePermission2, err := testQueries.GetRolePermission(context.Background(), arg)
+	rolePermission2, err := testStore.GetRolePermission(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, rolePermission2)
 }
@@ -58,10 +58,10 @@ func TestGetRolePermission(t *testing.T) {
 func TestDeleteRolePermissionByPermissionId(t *testing.T) {
 	rolePermission1 := createRandomRolePermission(t)
 
-	err := testQueries.DeleteRolePermissionByPermissionId(context.Background(), rolePermission1.PermissionID)
+	err := testStore.DeleteRolePermissionByPermissionId(context.Background(), rolePermission1.PermissionID)
 	require.NoError(t, err)
 
-	rolePermission2, err := testQueries.GetRolePermission(context.Background(), GetRolePermissionParams{
+	rolePermission2, err := testStore.GetRolePermission(context.Background(), GetRolePermissionParams{
 		RoleID: pgtype.Int4{
 			Int32: rolePermission1.RoleID.Int32,
 			Valid: true,
@@ -79,10 +79,10 @@ func TestDeleteRolePermissionByPermissionId(t *testing.T) {
 func TestDeleteRolePermissionByRoleId(t *testing.T) {
 	rolePermission1 := createRandomRolePermission(t)
 
-	err := testQueries.DeleteRolePermissionByRoleId(context.Background(), rolePermission1.RoleID)
+	err := testStore.DeleteRolePermissionByRoleId(context.Background(), rolePermission1.RoleID)
 	require.NoError(t, err)
 
-	rolePermission2, err := testQueries.GetRolePermission(context.Background(), GetRolePermissionParams{
+	rolePermission2, err := testStore.GetRolePermission(context.Background(), GetRolePermissionParams{
 		RoleID: pgtype.Int4{
 			Int32: rolePermission1.RoleID.Int32,
 			Valid: true,
@@ -101,7 +101,7 @@ func TestListRolePermissionByPermissionId(t *testing.T) {
 	permission := createRandomPermission(t)
 	for i := 0; i < 5; i++ {
 		role := createRandomRole(t)
-		testQueries.CreateRolePermission(context.Background(), CreateRolePermissionParams{
+		testStore.CreateRolePermission(context.Background(), CreateRolePermissionParams{
 			PermissionID: pgtype.Int4{
 				Int32: int32(permission.ID),
 				Valid: true,
@@ -113,7 +113,7 @@ func TestListRolePermissionByPermissionId(t *testing.T) {
 		})
 	}
 
-	rolePermissions, err := testQueries.ListRolePermissionByPermissionId(context.Background(), pgtype.Int4{
+	rolePermissions, err := testStore.ListRolePermissionByPermissionId(context.Background(), pgtype.Int4{
 		Int32: int32(permission.ID),
 		Valid: true,
 	})
@@ -129,7 +129,7 @@ func TestListRolePermissionByRoleId(t *testing.T) {
 	role := createRandomRole(t)
 	for i := 0; i < 5; i++ {
 		permission := createRandomPermission(t)
-		testQueries.CreateRolePermission(context.Background(), CreateRolePermissionParams{
+		testStore.CreateRolePermission(context.Background(), CreateRolePermissionParams{
 			PermissionID: pgtype.Int4{
 				Int32: int32(permission.ID),
 				Valid: true,
@@ -141,7 +141,7 @@ func TestListRolePermissionByRoleId(t *testing.T) {
 		})
 	}
 
-	rolePermissions, err := testQueries.ListRolePermissionByRoleId(context.Background(), pgtype.Int4{
+	rolePermissions, err := testStore.ListRolePermissionByRoleId(context.Background(), pgtype.Int4{
 		Int32: int32(role.ID),
 		Valid: true,
 	})

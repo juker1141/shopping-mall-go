@@ -20,6 +20,8 @@ func NewServer(store db.Store) *Server {
 	router.GET("/admin/permissions", server.listPermission)
 	router.GET("/admin/permission/:id", server.getPermission)
 
+	router.POST("/admin/roles", server.createRole)
+
 	server.router = router
 	return server
 }

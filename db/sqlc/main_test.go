@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var testQueries *Queries
+var testStore Store
 
 func TestMain(m *testing.M) {
 	config, err := util.LoadConfig("../..")
@@ -24,7 +24,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("cannot connect to db.", err)
 	}
 
-	testQueries = New(connPool)
+	testStore = NewStore(connPool)
 
 	os.Exit(m.Run())
 	// 開始單元測試，通過 m.Run()

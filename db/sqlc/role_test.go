@@ -17,7 +17,7 @@ func createRandomRole(t *testing.T) Role {
 		Status: 1,
 	}
 
-	role, err := testQueries.CreateRole(context.Background(), arg)
+	role, err := testStore.CreateRole(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 
@@ -35,7 +35,7 @@ func TestCreateRole(t *testing.T) {
 
 func TestGetRole(t *testing.T) {
 	role1 := createRandomRole(t)
-	role2, err := testQueries.GetRole(context.Background(), role1.ID)
+	role2, err := testStore.GetRole(context.Background(), role1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, role2)
 
@@ -62,7 +62,7 @@ func TestUpdateRole(t *testing.T) {
 		},
 	}
 
-	role2, err := testQueries.UpdateRole(context.Background(), arg)
+	role2, err := testStore.UpdateRole(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, role2)
 
@@ -74,10 +74,10 @@ func TestUpdateRole(t *testing.T) {
 
 func TestDeleteRole(t *testing.T) {
 	role1 := createRandomRole(t)
-	err := testQueries.DeleteRole(context.Background(), role1.ID)
+	err := testStore.DeleteRole(context.Background(), role1.ID)
 	require.NoError(t, err)
 
-	role2, err := testQueries.GetRole(context.Background(), role1.ID)
+	role2, err := testStore.GetRole(context.Background(), role1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, pgx.ErrNoRows.Error())
 	require.Empty(t, role2)
@@ -93,7 +93,7 @@ func TestListRole(t *testing.T) {
 		Offset: 5,
 	}
 
-	roles, err := testQueries.ListRoles(context.Background(), arg)
+	roles, err := testStore.ListRoles(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, roles, 5)
 

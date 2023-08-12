@@ -22,7 +22,7 @@ func createRandomAdminUser(t *testing.T) AdminUser {
 		Status:         1,
 	}
 
-	adminUser, err := testQueries.CreateAdminUser(context.Background(), arg)
+	adminUser, err := testStore.CreateAdminUser(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, adminUser)
 
@@ -43,7 +43,7 @@ func TestCreateAdminUser(t *testing.T) {
 func TestGetAdminUser(t *testing.T) {
 	adminUser1 := createRandomAdminUser(t)
 
-	adminUser2, err := testQueries.GetAdminUser(context.Background(), adminUser1.ID)
+	adminUser2, err := testStore.GetAdminUser(context.Background(), adminUser1.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, adminUser2)
 
@@ -61,7 +61,7 @@ func TestUpdateAdminUserOnlyFullName(t *testing.T) {
 	oldAdminUser := createRandomAdminUser(t)
 
 	newFullName := util.RandomName()
-	updateAdminUser, err := testQueries.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
+	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
 		ID: oldAdminUser.ID,
 		FullName: pgtype.Text{
 			String: newFullName,
@@ -82,7 +82,7 @@ func TestUpdateAdminUserOnlyStatus(t *testing.T) {
 	oldAdminUser := createRandomAdminUser(t)
 
 	newStatus := int32(0)
-	updateAdminUser, err := testQueries.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
+	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
 		ID: oldAdminUser.ID,
 		Status: pgtype.Int4{
 			Int32: newStatus,
@@ -107,7 +107,7 @@ func TestUpdateAdminUserOnlyPassword(t *testing.T) {
 	newHashedPassword, err := util.HashedPassword(newPassword)
 	require.NoError(t, err)
 
-	updateAdminUser, err := testQueries.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
+	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
 		ID: oldAdminUser.ID,
 		HashedPassword: pgtype.Text{
 			String: newHashedPassword,
@@ -134,7 +134,7 @@ func TestUpdateAdminUserAllFields(t *testing.T) {
 	newHashedPassword, err := util.HashedPassword(newPassword)
 	require.NoError(t, err)
 
-	updateAdminUser, err := testQueries.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
+	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
 		ID: oldAdminUser.ID,
 		FullName: pgtype.Text{
 			String: newFullName,
@@ -166,10 +166,10 @@ func TestUpdateAdminUserAllFields(t *testing.T) {
 func TestDeleteAdminUser(t *testing.T) {
 	adminUser1 := createRandomAdminUser(t)
 
-	err := testQueries.DeleteAdminUser(context.Background(), adminUser1.ID)
+	err := testStore.DeleteAdminUser(context.Background(), adminUser1.ID)
 	require.NoError(t, err)
 
-	adminUser2, err := testQueries.GetAdminUser(context.Background(), adminUser1.ID)
+	adminUser2, err := testStore.GetAdminUser(context.Background(), adminUser1.ID)
 	require.Error(t, err)
 	require.EqualError(t, err, pgx.ErrNoRows.Error())
 	require.Empty(t, adminUser2)
@@ -185,7 +185,7 @@ func TestListAdminUser(t *testing.T) {
 		Offset: 5,
 	}
 
-	adminUsers, err := testQueries.ListAdminUsers(context.Background(), arg)
+	adminUsers, err := testStore.ListAdminUsers(context.Background(), arg)
 	require.NoError(t, err)
 	require.Len(t, adminUsers, 5)
 
