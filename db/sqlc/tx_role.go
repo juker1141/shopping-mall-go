@@ -5,13 +5,11 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/juker1141/shopping-mall-go/val"
 )
 
 // RoleTxParams contains the input parameters of the role create
 type CreateRoleTxParams struct {
 	Name          string  `json:"name"`
-	Status        int32   `json:"status"`
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
@@ -33,10 +31,7 @@ func (store *SQLStore) CreateRoleTx(ctx context.Context, arg CreateRoleTxParams)
 			return err
 		}
 
-		result.Role, err = q.CreateRole(ctx, CreateRoleParams{
-			Name:   arg.Name,
-			Status: arg.Status,
-		})
+		result.Role, err = q.CreateRole(ctx, arg.Name)
 		if err != nil {
 			return err
 		}
@@ -74,7 +69,6 @@ func (store *SQLStore) CreateRoleTx(ctx context.Context, arg CreateRoleTxParams)
 type UpdateRoleTxParams struct {
 	ID            int64   `json:"role_id"`
 	Name          string  `json:"name"`
-	Status        int32   `json:"status"`
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
@@ -98,13 +92,6 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			updateRoleArg.Name = pgtype.Text{
 				String: arg.Name,
 				Valid:  true,
-			}
-		}
-
-		if val.IsValidStatus(int(arg.Status)) {
-			updateRoleArg.Status = pgtype.Int4{
-				Int32: arg.Status,
-				Valid: true,
 			}
 		}
 

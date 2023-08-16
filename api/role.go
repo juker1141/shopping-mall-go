@@ -6,12 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
-	"github.com/juker1141/shopping-mall-go/val"
 )
 
 type createRoleRequest struct {
 	Name          string  `json:"name" binding:"required"`
-	Status        int32   `json:"status" binding:"required"`
 	PermissionsID []int64 `json:"permissions_id" binding:"required"`
 }
 
@@ -24,7 +22,6 @@ func (server *Server) createRole(ctx *gin.Context) {
 
 	arg := db.CreateRoleTxParams{
 		Name:          req.Name,
-		Status:        req.Status,
 		PermissionsID: req.PermissionsID,
 	}
 
@@ -43,7 +40,6 @@ type updateRoleRequestQuery struct {
 
 type updateRoleRequest struct {
 	Name          string  `json:"name"`
-	Status        int32   `json:"status"`
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
@@ -67,9 +63,7 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	if len(req.Name) != 0 {
 		arg.Name = req.Name
 	}
-	if val.IsValidStatus(int(req.Status)) {
-		arg.Status = req.Status
-	}
+
 	if len(req.PermissionsID) != 0 || req.PermissionsID != nil {
 		arg.PermissionsID = req.PermissionsID
 	}

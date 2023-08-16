@@ -12,17 +12,13 @@ import (
 )
 
 func createRandomRole(t *testing.T) Role {
-	arg := CreateRoleParams{
-		Name:   util.RandomRole(),
-		Status: 1,
-	}
+	name := util.RandomRole()
 
-	role, err := testStore.CreateRole(context.Background(), arg)
+	role, err := testStore.CreateRole(context.Background(), name)
 	require.NoError(t, err)
 	require.NotEmpty(t, role)
 
-	require.Equal(t, arg.Name, role.Name)
-	require.Equal(t, arg.Status, role.Status)
+	require.Equal(t, name, role.Name)
 	require.NotZero(t, role.ID)
 	require.NotZero(t, role.CreatedAt)
 
@@ -41,24 +37,18 @@ func TestGetRole(t *testing.T) {
 
 	require.Equal(t, role1.ID, role2.ID)
 	require.Equal(t, role1.Name, role2.Name)
-	require.Equal(t, role1.Status, role2.Status)
 	require.WithinDuration(t, role1.CreatedAt, role2.CreatedAt, time.Second)
 }
 
 func TestUpdateRole(t *testing.T) {
 	role1 := createRandomRole(t)
 
-	newRole := util.RandomRole()
-	newStatus := int32(0)
+	newRoleName := util.RandomRole()
 	arg := UpdateRoleParams{
 		ID: role1.ID,
 		Name: pgtype.Text{
-			String: newRole,
+			String: newRoleName,
 			Valid:  true,
-		},
-		Status: pgtype.Int4{
-			Int32: newStatus,
-			Valid: true,
 		},
 	}
 
@@ -67,8 +57,7 @@ func TestUpdateRole(t *testing.T) {
 	require.NotEmpty(t, role2)
 
 	require.Equal(t, role1.ID, role2.ID)
-	require.Equal(t, newRole, role2.Name)
-	require.Equal(t, newStatus, role2.Status)
+	require.Equal(t, newRoleName, role2.Name)
 	require.WithinDuration(t, role1.CreatedAt, role2.CreatedAt, time.Second)
 }
 

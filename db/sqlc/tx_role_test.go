@@ -10,14 +10,12 @@ import (
 
 func createRandomRoleTx(t *testing.T) CreateRoleTxResult {
 	roleName := util.RandomName()
-	roleStatus := int32(1)
 
 	n := 5
 	permissionsID := CreateRandomPermissionList(t, n)
 
 	result, err := testStore.CreateRoleTx(context.Background(), CreateRoleTxParams{
 		Name:          roleName,
-		Status:        roleStatus,
 		PermissionsID: permissionsID,
 	})
 
@@ -27,7 +25,6 @@ func createRandomRoleTx(t *testing.T) CreateRoleTxResult {
 	role := result.Role
 	require.NotEmpty(t, role)
 	require.Equal(t, roleName, role.Name)
-	require.NotZero(t, role.Status)
 	require.NotZero(t, role.CreatedAt)
 	permissions := result.PermissionList
 	require.Len(t, permissions, n)
@@ -46,7 +43,6 @@ func TestUpdateRoleTx(t *testing.T) {
 	result, err := testStore.UpdateRoleTx(context.Background(), UpdateRoleTxParams{
 		ID:            roleTx.Role.ID,
 		Name:          util.RandomName(),
-		Status:        int32(0),
 		PermissionsID: permissionsID,
 	})
 
@@ -56,7 +52,6 @@ func TestUpdateRoleTx(t *testing.T) {
 	updatedRole := result.Role
 	require.NotEmpty(t, updatedRole)
 	require.NotEqual(t, roleTx.Role.Name, updatedRole.Name)
-	require.NotEqual(t, roleTx.Role.Status, updatedRole.Status)
 	require.NotZero(t, updatedRole.CreatedAt)
 	permissions := result.PermissionList
 	require.Len(t, permissions, n)

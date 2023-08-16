@@ -7,7 +7,6 @@ CREATE TABLE "permissions" (
 CREATE TABLE "roles" (
   "id" bigserial PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL,
-  "status" int NOT NULL DEFAULT 1,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
@@ -37,7 +36,6 @@ CREATE UNIQUE INDEX ON "role_permissions" ("role_id", "permission_id");
 
 CREATE UNIQUE INDEX ON "admin_user_roles" ("admin_user_id", "role_id");
 
-COMMENT ON COLUMN "roles"."status" IS 'must be either 0 or 1';
 
 COMMENT ON COLUMN "admin_users"."status" IS 'must be either 0 or 1';
 

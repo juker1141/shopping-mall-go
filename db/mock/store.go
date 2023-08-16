@@ -82,7 +82,7 @@ func (mr *MockStoreMockRecorder) CreatePermission(arg0, arg1 interface{}) *gomoc
 }
 
 // CreateRole mocks base method.
-func (m *MockStore) CreateRole(arg0 context.Context, arg1 db.CreateRoleParams) (db.Role, error) {
+func (m *MockStore) CreateRole(arg0 context.Context, arg1 string) (db.Role, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRole", arg0, arg1)
 	ret0, _ := ret[0].(db.Role)

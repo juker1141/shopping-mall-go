@@ -14,7 +14,7 @@ type Querier interface {
 	CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) (AdminUser, error)
 	CreateAdminUserRole(ctx context.Context, arg CreateAdminUserRoleParams) (AdminUserRole, error)
 	CreatePermission(ctx context.Context, name string) (Permission, error)
-	CreateRole(ctx context.Context, arg CreateRoleParams) (Role, error)
+	CreateRole(ctx context.Context, name string) (Role, error)
 	CreateRolePermission(ctx context.Context, arg CreateRolePermissionParams) (RolePermission, error)
 	DeleteAdminUser(ctx context.Context, id int64) error
 	DeleteAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) error

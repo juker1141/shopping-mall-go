@@ -33,10 +33,8 @@ type Permission struct {
 }
 
 type Role struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
-	// must be either 0 or 1
-	Status    int32     `json:"status"`
+	ID        int64     `json:"id"`
+	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

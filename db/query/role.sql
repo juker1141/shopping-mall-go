@@ -1,9 +1,8 @@
 -- name: CreateRole :one
 INSERT INTO roles (
-  name,
-  status
+  name
 ) VALUES (
-  $1, $2
+  $1
 ) RETURNING *;
 
 -- name: GetRole :one
@@ -20,8 +19,7 @@ OFFSET $2;
 -- name: UpdateRole :one
 UPDATE roles
 SET
-  name = COALESCE(sqlc.narg(name), name),
-  status = COALESCE(sqlc.narg(status), status)
+  name = COALESCE(sqlc.narg(name), name)
 WHERE
   id = sqlc.arg(id)
 RETURNING *;
