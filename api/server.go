@@ -19,8 +19,10 @@ func NewServer(store db.Store) *Server {
 	router.POST("/admin/permissions", server.createPermission)
 	router.GET("/admin/permissions", server.listPermission)
 	router.GET("/admin/permission/:id", server.getPermission)
+	router.PATCH("/admin/permission/:id", server.updatePermission)
 
 	router.POST("/admin/roles", server.createRole)
+	router.PATCH("admin/role/:id", server.updateRole)
 
 	server.router = router
 	return server
@@ -33,4 +35,8 @@ func (server *Server) Start(address string) error {
 
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
+}
+
+func errorResponseTrans(err map[string][]string) gin.H {
+	return gin.H{"error": err}
 }

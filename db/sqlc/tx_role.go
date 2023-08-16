@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/juker1141/shopping-mall-go/val"
 )
 
 // RoleTxParams contains the input parameters of the role create
@@ -89,23 +90,66 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 		var err error
 		var permissionList []Permission
 
-		result.Role, err = q.UpdateRole(context.Background(), UpdateRoleParams{
+		updateRoleArg := UpdateRoleParams{
 			ID: arg.ID,
-			Name: pgtype.Text{
+		}
+
+		if len(arg.Name) != 0 {
+			updateRoleArg.Name = pgtype.Text{
 				String: arg.Name,
 				Valid:  true,
-			},
-			Status: pgtype.Int4{
+			}
+		}
+
+		if val.IsValidStatus(int(arg.Status)) {
+			updateRoleArg.Status = pgtype.Int4{
 				Int32: arg.Status,
 				Valid: true,
-			},
-		})
+			}
+		}
+
+		result.Role, err = q.UpdateRole(context.Background(), updateRoleArg)
 		if err != nil {
 			return err
 		}
 
-		// 刪除角色舊的權限關聯
-		err = q.DeleteRolePermissionByRoleId(ctx, pgtype.Int4{
+		if len(arg.Name) != 0 {
+			updateRoleArg.Name = pgtype.Text{
+				String: arg.Name,
+				Valid:  true,
+			}
+		}
+
+		// 如果有要變更權限才去執行
+		if len(arg.PermissionsID) > 0 || arg.PermissionsID != nil {
+			// 刪除角色舊的權限關聯
+			err = q.DeleteRolePermissionByRoleId(ctx, pgtype.Int4{
+				Int32: int32(result.Role.ID),
+				Valid: true,
+			})
+			if err != nil {
+				return err
+			}
+
+			// 新增新的權限關聯
+			for _, permissionID := range arg.PermissionsID {
+				_, err = q.CreateRolePermission(ctx, CreateRolePermissionParams{
+					RoleID: pgtype.Int4{
+						Int32: int32(result.Role.ID),
+						Valid: true,
+					},
+					PermissionID: pgtype.Int4{
+						Int32: int32(permissionID),
+						Valid: true,
+					},
+				})
+				if err != nil {
+					return err
+				}
+			}
+		}
+
+		rolePermissions, err := q.ListRolePermissionByRoleId(ctx, pgtype.Int4{
 			Int32: int32(result.Role.ID),
 			Valid: true,
 		})
@@ -113,23 +157,8 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			return err
 		}
 
-		// 新增新的權限關聯
-		for _, permissionID := range arg.PermissionsID {
-			_, err = q.CreateRolePermission(ctx, CreateRolePermissionParams{
-				RoleID: pgtype.Int4{
-					Int32: int32(result.Role.ID),
-					Valid: true,
-				},
-				PermissionID: pgtype.Int4{
-					Int32: int32(permissionID),
-					Valid: true,
-				},
-			})
-			if err != nil {
-				return err
-			}
-
-			permission, err := q.GetPermission(ctx, permissionID)
+		for _, rolePermission := range rolePermissions {
+			permission, err := q.GetPermission(ctx, int64(rolePermission.PermissionID.Int32))
 			if err != nil {
 				return err
 			}
@@ -145,7 +174,7 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 }
 
 type DeleteRoleTxParams struct {
-	ID int64 `json:"role_id"`
+	ID int64 `json:"id"`
 }
 
 type DeleteRoleTxResult struct {

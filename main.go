@@ -22,6 +22,12 @@ func main() {
 		log.Fatal("cannot connect to db.", err)
 	}
 
+	// trans.Init()
+	// if err := trans.Init(); err != nil {
+	// 	log.Fatalf("init trans failed, err:%v\n", err)
+	// 	return
+	// }
+
 	store := db.NewStore(connPool)
 	server := api.NewServer(store)
 

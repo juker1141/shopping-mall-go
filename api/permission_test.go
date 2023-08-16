@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v5"
 	mockdb "github.com/juker1141/shopping-mall-go/db/mock"
@@ -105,6 +106,342 @@ func TestGetPermissionAPI(t *testing.T) {
 	}
 }
 
+func TestCreatePermissionAPI(t *testing.T) {
+	permission := randomPermission()
+
+	testCases := []struct {
+		name          string
+		body          gin.H
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			body: gin.H{
+				"name": permission.Name,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreatePermission(gomock.Any(), gomock.Eq(permission.Name)).
+					Times(1).
+					Return(permission, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchPermission(t, recorder.Body, permission)
+			},
+		},
+		{
+			name: "InternalError",
+			body: gin.H{
+				"name": permission.Name,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreatePermission(gomock.Any(), gomock.Eq(permission.Name)).
+					Times(1).
+					Return(db.Permission{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidJSON",
+			body: gin.H{
+				"name": "",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreatePermission(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			// start test server and send request
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+
+			jsonData, err := json.Marshal(tc.body)
+			require.NoError(t, err)
+
+			url := "/admin/permissions"
+			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+func TestListPermissionsAPI(t *testing.T) {
+	n := 5
+	permissions := make([]db.Permission, n)
+	for i := 0; i < n; i++ {
+		permissions[i] = randomPermission()
+	}
+
+	type Query struct {
+		pageID   int
+		pageSize int
+	}
+
+	testCases := []struct {
+		name          string
+		query         Query
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			query: Query{
+				pageID:   1,
+				pageSize: n,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.ListPermissionsParams{
+					Limit:  int32(n),
+					Offset: 0,
+				}
+
+				store.EXPECT().
+					ListPermissions(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(permissions, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchListPermissions(t, recorder.Body, permissions)
+			},
+		},
+		{
+			name: "InternalError",
+			query: Query{
+				pageID:   1,
+				pageSize: n,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListPermissions(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return([]db.Permission{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidPageID",
+			query: Query{
+				pageID:   -1,
+				pageSize: n,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListPermissions(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidPageID",
+			query: Query{
+				pageID:   1,
+				pageSize: 10000,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					ListPermissions(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+
+			url := "/admin/permissions"
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			q := request.URL.Query()
+			q.Add("page_id", fmt.Sprintf("%d", tc.query.pageID))
+			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			request.URL.RawQuery = q.Encode()
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+func TestUpdatePermissionAPI(t *testing.T) {
+	permission := randomPermission()
+
+	updatedName := util.RandomName()
+	updatedPermission := db.Permission{
+		ID:   permission.ID,
+		Name: updatedName,
+	}
+
+	testCases := []struct {
+		name          string
+		arg           db.UpdatePermissionParams
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			arg: db.UpdatePermissionParams{
+				ID:   permission.ID,
+				Name: updatedName,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.UpdatePermissionParams{
+					ID:   permission.ID,
+					Name: updatedName,
+				}
+
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(updatedPermission, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchPermission(t, recorder.Body, updatedPermission)
+			},
+		},
+		{
+			name: "NotFound",
+			arg: db.UpdatePermissionParams{
+				ID:   permission.ID,
+				Name: updatedName,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.UpdatePermissionParams{
+					ID:   permission.ID,
+					Name: updatedName,
+				}
+
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(db.Permission{}, pgx.ErrNoRows)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError",
+			arg: db.UpdatePermissionParams{
+				ID:   permission.ID,
+				Name: updatedName,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.UpdatePermissionParams{
+					ID:   permission.ID,
+					Name: updatedName,
+				}
+
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(db.Permission{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidID",
+			arg: db.UpdatePermissionParams{
+				ID:   -1,
+				Name: updatedName,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidJSON",
+			arg: db.UpdatePermissionParams{
+				ID:   permission.ID,
+				Name: "",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
+
+			jsonData, err := json.Marshal(tc.arg)
+			require.NoError(t, err)
+
+			url := fmt.Sprintf("/admin/permission/%d", tc.arg.ID)
+			request, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(jsonData))
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
 func randomPermission() db.Permission {
 	return db.Permission{
 		ID:   util.RandomInt(1, 1000),
@@ -120,4 +457,14 @@ func requireBodyMatchPermission(t *testing.T, body *bytes.Buffer, permission db.
 	err = json.Unmarshal(data, &gotPermission)
 	require.NoError(t, err)
 	require.Equal(t, permission, gotPermission)
+}
+
+func requireBodyMatchListPermissions(t *testing.T, body *bytes.Buffer, permissions []db.Permission) {
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
+
+	var listPermisssions []db.Permission
+	err = json.Unmarshal(data, &listPermisssions)
+	require.NoError(t, err)
+	require.Equal(t, permissions, listPermisssions)
 }

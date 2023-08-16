@@ -16,6 +16,7 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+
 -- name: UpdateRole :one
 UPDATE roles
 SET

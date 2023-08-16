@@ -77,3 +77,43 @@ func (server *Server) getPermission(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, permission)
 }
+
+type updatePermissionQuery struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+type updatePermissionRequest struct {
+	Name string `json:"name" binding:"required"`
+}
+
+func (server *Server) updatePermission(ctx *gin.Context) {
+	var req updatePermissionRequest
+	var query updatePermissionQuery
+
+	if err := ctx.ShouldBindUri(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdatePermissionParams{
+		ID:   query.ID,
+		Name: req.Name,
+	}
+
+	permission, err := server.store.UpdatePermission(ctx, arg)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, permission)
+}

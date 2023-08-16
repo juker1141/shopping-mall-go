@@ -224,6 +224,21 @@ func (mr *MockStoreMockRecorder) DeleteRolePermissionByRoleId(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRolePermissionByRoleId", reflect.TypeOf((*MockStore)(nil).DeleteRolePermissionByRoleId), arg0, arg1)
 }
 
+// DeleteRoleTx mocks base method.
+func (m *MockStore) DeleteRoleTx(arg0 context.Context, arg1 db.DeleteRoleTxParams) (db.DeleteRoleTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteRoleTx", arg0, arg1)
+	ret0, _ := ret[0].(db.DeleteRoleTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteRoleTx indicates an expected call of DeleteRoleTx.
+func (mr *MockStoreMockRecorder) DeleteRoleTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRoleTx", reflect.TypeOf((*MockStore)(nil).DeleteRoleTx), arg0, arg1)
+}
+
 // GetAdminUser mocks base method.
 func (m *MockStore) GetAdminUser(arg0 context.Context, arg1 int64) (db.AdminUser, error) {
 	m.ctrl.T.Helper()
