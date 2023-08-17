@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	isValidAccount  = regexp.MustCompile(`^[a-z0-9]+$`).MatchString
-	isValidFullName = regexp.MustCompile(`^[a-zA-Z\s\p{Han}]+$`).MatchString
+	isValidAccount = regexp.MustCompile(`^[a-z0-9]+$`).MatchString
+	isValidName    = regexp.MustCompile(`^[a-zA-Z\s\p{Han}]+$`).MatchString
 )
 
 func ValidateString(value string, minLength, maxLength int) error {
@@ -28,11 +28,21 @@ func ValidateAccount(value string) error {
 	return nil
 }
 
+func ValidateName(value string) error {
+	if err := ValidateString(value, 2, 100); err != nil {
+		return err
+	}
+	if !isValidName(value) {
+		return fmt.Errorf("must only contain Chinese characters, English letters, or spaces")
+	}
+	return nil
+}
+
 func ValidateFullName(value string) error {
 	if err := ValidateString(value, 3, 100); err != nil {
 		return err
 	}
-	if !isValidFullName(value) {
+	if !isValidName(value) {
 		return fmt.Errorf("must only contain Chinese characters, English letters, or spaces")
 	}
 	return nil

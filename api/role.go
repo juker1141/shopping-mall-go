@@ -51,20 +51,17 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	}
 
 	var req updateRoleRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
+	ctx.BindJSON(&req)
 
 	arg := db.UpdateRoleTxParams{
 		ID: query.ID,
 	}
 
-	if len(req.Name) != 0 {
+	if req.Name != "" {
 		arg.Name = req.Name
 	}
 
-	if len(req.PermissionsID) != 0 || req.PermissionsID != nil {
+	if req.PermissionsID != nil {
 		arg.PermissionsID = req.PermissionsID
 	}
 

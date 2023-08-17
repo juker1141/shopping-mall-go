@@ -112,10 +112,10 @@ func (mr *MockStoreMockRecorder) CreateRolePermission(arg0, arg1 interface{}) *g
 }
 
 // CreateRoleTx mocks base method.
-func (m *MockStore) CreateRoleTx(arg0 context.Context, arg1 db.CreateRoleTxParams) (db.CreateRoleTxResult, error) {
+func (m *MockStore) CreateRoleTx(arg0 context.Context, arg1 db.CreateRoleTxParams) (db.RoleTxResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateRoleTx", arg0, arg1)
-	ret0, _ := ret[0].(db.CreateRoleTxResult)
+	ret0, _ := ret[0].(db.RoleTxResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -465,10 +465,10 @@ func (mr *MockStoreMockRecorder) UpdateRole(arg0, arg1 interface{}) *gomock.Call
 }
 
 // UpdateRoleTx mocks base method.
-func (m *MockStore) UpdateRoleTx(arg0 context.Context, arg1 db.UpdateRoleTxParams) (db.UpdateRoleTxResult, error) {
+func (m *MockStore) UpdateRoleTx(arg0 context.Context, arg1 db.UpdateRoleTxParams) (db.RoleTxResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UpdateRoleTx", arg0, arg1)
-	ret0, _ := ret[0].(db.UpdateRoleTxResult)
+	ret0, _ := ret[0].(db.RoleTxResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

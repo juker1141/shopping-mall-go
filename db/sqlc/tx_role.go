@@ -13,14 +13,14 @@ type CreateRoleTxParams struct {
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
-type CreateRoleTxResult struct {
+type RoleTxResult struct {
 	Role           Role         `json:"role"`
 	PermissionList []Permission `json:"permission_list"`
 }
 
 // It creates a role, rolePermission, and get all permissions name within a single database trasaction
-func (store *SQLStore) CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (CreateRoleTxResult, error) {
-	var result CreateRoleTxResult
+func (store *SQLStore) CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (RoleTxResult, error) {
+	var result RoleTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
@@ -72,13 +72,8 @@ type UpdateRoleTxParams struct {
 	PermissionsID []int64 `json:"permissions_id"`
 }
 
-type UpdateRoleTxResult struct {
-	Role           Role         `json:"role"`
-	PermissionList []Permission `json:"permission_list"`
-}
-
-func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (UpdateRoleTxResult, error) {
-	var result UpdateRoleTxResult
+func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (RoleTxResult, error) {
+	var result RoleTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
@@ -88,7 +83,7 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			ID: arg.ID,
 		}
 
-		if len(arg.Name) != 0 {
+		if arg.Name != "" {
 			updateRoleArg.Name = pgtype.Text{
 				String: arg.Name,
 				Valid:  true,
@@ -100,7 +95,7 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			return err
 		}
 
-		if len(arg.Name) != 0 {
+		if arg.Name != "" {
 			updateRoleArg.Name = pgtype.Text{
 				String: arg.Name,
 				Valid:  true,

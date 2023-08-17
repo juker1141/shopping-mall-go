@@ -10,8 +10,8 @@ import (
 // Store provides all functions to execute db queries and transactions
 type Store interface {
 	Querier
-	CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (CreateRoleTxResult, error)
-	UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (UpdateRoleTxResult, error)
+	CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (RoleTxResult, error)
+	UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (RoleTxResult, error)
 	DeleteRoleTx(ctx context.Context, arg DeleteRoleTxParams) (DeleteRoleTxResult, error)
 }
 

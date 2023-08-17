@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomRoleTx(t *testing.T) CreateRoleTxResult {
+func createRandomRoleTx(t *testing.T) RoleTxResult {
 	roleName := util.RandomName()
 
 	n := 5
