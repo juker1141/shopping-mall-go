@@ -29,5 +29,14 @@ WHERE
   id = sqlc.arg(id)
 RETURNING *;
 
+-- name: ListPermissionForAdminUser :many
+SELECT DISTINCT p.id, p.name, p.created_at
+FROM admin_users AS au
+JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
+JOIN roles AS r ON aur.role_id = r.id
+JOIN role_permissions AS rp ON r.id = rp.role_id
+JOIN permissions AS p ON rp.permission_id = p.id
+WHERE au.id = $1;
+
 -- name: DeleteAdminUser :exec
 DELETE FROM admin_users WHERE id = $1;

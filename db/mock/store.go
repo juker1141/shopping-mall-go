@@ -359,6 +359,21 @@ func (mr *MockStoreMockRecorder) ListAdminUsers(arg0, arg1 interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAdminUsers", reflect.TypeOf((*MockStore)(nil).ListAdminUsers), arg0, arg1)
 }
 
+// ListPermissionForAdminUser mocks base method.
+func (m *MockStore) ListPermissionForAdminUser(arg0 context.Context, arg1 int64) ([]db.Permission, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListPermissionForAdminUser", arg0, arg1)
+	ret0, _ := ret[0].([]db.Permission)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListPermissionForAdminUser indicates an expected call of ListPermissionForAdminUser.
+func (mr *MockStoreMockRecorder) ListPermissionForAdminUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPermissionForAdminUser", reflect.TypeOf((*MockStore)(nil).ListPermissionForAdminUser), arg0, arg1)
+}
+
 // ListPermissions mocks base method.
 func (m *MockStore) ListPermissions(arg0 context.Context, arg1 db.ListPermissionsParams) ([]db.Permission, error) {
 	m.ctrl.T.Helper()

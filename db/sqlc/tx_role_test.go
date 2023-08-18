@@ -12,7 +12,7 @@ func createRandomRoleTx(t *testing.T) RoleTxResult {
 	roleName := util.RandomName()
 
 	n := 5
-	permissionsID := CreateRandomPermissionList(t, n)
+	permissionsID := createRandomPermissionList(t, n)
 
 	result, err := testStore.CreateRoleTx(context.Background(), CreateRoleTxParams{
 		Name:          roleName,
@@ -38,7 +38,7 @@ func TestCreateRoleTx(t *testing.T) {
 func TestUpdateRoleTx(t *testing.T) {
 	roleTx := createRandomRoleTx(t)
 	n := 5
-	permissionsID := CreateRandomPermissionList(t, n)
+	permissionsID := createRandomPermissionList(t, n)
 
 	result, err := testStore.UpdateRoleTx(context.Background(), UpdateRoleTxParams{
 		ID:            roleTx.Role.ID,
@@ -70,7 +70,7 @@ func TestDeleteRoleTx(t *testing.T) {
 	require.Empty(t, role)
 }
 
-func CreateRandomPermissionList(t *testing.T, size int) []int64 {
+func createRandomPermissionList(t *testing.T, size int) []int64 {
 	var permissionsID []int64
 	for i := 0; i < size; i++ {
 		name := util.RandomPermission()
