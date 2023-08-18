@@ -36,7 +36,3 @@ func (server *Server) Start(address string) error {
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
 }
-
-func errorResponseTrans(err map[string][]string) gin.H {
-	return gin.H{"error": err}
-}
