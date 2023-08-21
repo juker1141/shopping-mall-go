@@ -183,6 +183,21 @@ func (mr *MockStoreMockRecorder) DeleteAdminUserRoleByRoleId(arg0, arg1 interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAdminUserRoleByRoleId", reflect.TypeOf((*MockStore)(nil).DeleteAdminUserRoleByRoleId), arg0, arg1)
 }
 
+// DeleteAdminUserTx mocks base method.
+func (m *MockStore) DeleteAdminUserTx(arg0 context.Context, arg1 db.DeleteAdminUserTxParams) (db.DeleteRoleTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAdminUserTx", arg0, arg1)
+	ret0, _ := ret[0].(db.DeleteRoleTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteAdminUserTx indicates an expected call of DeleteAdminUserTx.
+func (mr *MockStoreMockRecorder) DeleteAdminUserTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAdminUserTx", reflect.TypeOf((*MockStore)(nil).DeleteAdminUserTx), arg0, arg1)
+}
+
 // DeletePermission mocks base method.
 func (m *MockStore) DeletePermission(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()
@@ -477,6 +492,21 @@ func (m *MockStore) UpdateAdminUser(arg0 context.Context, arg1 db.UpdateAdminUse
 func (mr *MockStoreMockRecorder) UpdateAdminUser(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAdminUser", reflect.TypeOf((*MockStore)(nil).UpdateAdminUser), arg0, arg1)
+}
+
+// UpdateAdminUserTx mocks base method.
+func (m *MockStore) UpdateAdminUserTx(arg0 context.Context, arg1 db.UpdateAdminUserTxParams) (db.AdminUserTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAdminUserTx", arg0, arg1)
+	ret0, _ := ret[0].(db.AdminUserTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateAdminUserTx indicates an expected call of UpdateAdminUserTx.
+func (mr *MockStoreMockRecorder) UpdateAdminUserTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAdminUserTx", reflect.TypeOf((*MockStore)(nil).UpdateAdminUserTx), arg0, arg1)
 }
 
 // UpdatePermission mocks base method.

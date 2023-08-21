@@ -12,7 +12,7 @@ import (
 )
 
 func createRandomAdminUser(t *testing.T) AdminUser {
-	hashedPassword, err := util.HashedPassword(util.RandomString(6))
+	hashedPassword, err := util.HashPassword(util.RandomString(6))
 	require.NoError(t, err)
 
 	arg := CreateAdminUserParams{
@@ -104,7 +104,7 @@ func TestUpdateAdminUserOnlyPassword(t *testing.T) {
 	oldAdminUser := createRandomAdminUser(t)
 
 	newPassword := util.RandomString(6)
-	newHashedPassword, err := util.HashedPassword(newPassword)
+	newHashedPassword, err := util.HashPassword(newPassword)
 	require.NoError(t, err)
 
 	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
@@ -131,7 +131,7 @@ func TestUpdateAdminUserAllFields(t *testing.T) {
 	newFullName := util.RandomName()
 	newStatus := int32(0)
 	newPassword := util.RandomString(6)
-	newHashedPassword, err := util.HashedPassword(newPassword)
+	newHashedPassword, err := util.HashPassword(newPassword)
 	require.NoError(t, err)
 
 	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
