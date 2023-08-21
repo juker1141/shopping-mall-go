@@ -16,18 +16,18 @@ func NewServer(store db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
 
-	router.POST("/admin/permissions", server.createPermission)
+	router.POST("/admin/permission", server.createPermission)
 	router.GET("/admin/permissions", server.listPermission)
 	router.GET("/admin/permission/:id", server.getPermission)
 	router.PATCH("/admin/permission/:id", server.updatePermission)
 
-	router.POST("/admin/roles", server.createRole)
+	router.POST("/admin/role", server.createRole)
 	router.GET("/admin/roles", server.listRole)
 	router.GET("/admin/role/:id", server.getRole)
 	router.PATCH("/admin/role/:id", server.updateRole)
 	router.DELETE("/admin/role/:id", server.deleteRole)
 
-	router.POST("/admin/admin_users", server.createAdminUser)
+	router.POST("/admin/admin_user", server.createAdminUser)
 
 	server.router = router
 	return server

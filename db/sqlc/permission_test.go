@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/juker1141/shopping-mall-go/util"
 	"github.com/stretchr/testify/require"
 )
@@ -66,7 +65,7 @@ func TestDeletePermission(t *testing.T) {
 
 	permission2, err := testStore.GetPermission(context.Background(), permission1.ID)
 	require.Error(t, err)
-	require.EqualError(t, err, pgx.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 	require.Empty(t, permission2)
 }
 

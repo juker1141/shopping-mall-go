@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"math"
 	"testing"
 	"time"
 
@@ -17,12 +16,14 @@ func createRandomAdminUserTx(t *testing.T) AdminUserTxResult {
 	hashedPassword, err := util.HashPassword(util.RandomString(6))
 	require.NoError(t, err)
 
+	var roleList []Role
 	var rolesID []int64
 
 	n := 5
 	for i := 0; i < n; i++ {
-		roleTxResult := createRandomRoleTx(t)
-		rolesID = append(rolesID, roleTxResult.Role.ID)
+		role := createRandomRole(t)
+		roleList = append(roleList, role)
+		rolesID = append(rolesID, role.ID)
 	}
 
 	adArg := CreateAdminUserTxParams{
@@ -46,10 +47,9 @@ func createRandomAdminUserTx(t *testing.T) AdminUserTxResult {
 	require.Equal(t, status, createdAdminUser.Status)
 	require.NotZero(t, createdAdminUser.CreatedAt)
 
-	permissions := result.PermissionList
-
-	targetLen := int(math.Pow(float64(n), 2))
-	require.Len(t, permissions, targetLen)
+	roles := result.RoleList
+	require.Equal(t, roleList, roles)
+	require.Len(t, roles, n)
 
 	return result
 }
@@ -91,6 +91,9 @@ func TestUpdateAdminUserTx(t *testing.T) {
 	require.NotZero(t, updatedAdminUser.CreatedAt)
 
 	require.WithinDuration(t, newPasswordChangeAt, updatedAdminUser.PasswordChangedAt, time.Second)
+	roles := result.RoleList
+	require.NotEmpty(t, roles)
+	require.Len(t, roles, n)
 }
 
 func TestDeleteAdminUserTx(t *testing.T) {

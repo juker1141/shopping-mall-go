@@ -29,6 +29,13 @@ WHERE
   id = sqlc.arg(id)
 RETURNING *;
 
+-- name: ListRoleForAdminUser :many
+SELECT DISTINCT r.id, r.name, r.created_at
+FROM admin_users AS au
+JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
+JOIN roles AS r ON aur.role_id = r.id
+WHERE au.id = $1;
+
 -- name: ListPermissionForAdminUser :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM admin_users AS au

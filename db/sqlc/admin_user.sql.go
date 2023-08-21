@@ -159,6 +159,34 @@ func (q *Queries) ListPermissionForAdminUser(ctx context.Context, id int64) ([]P
 	return items, nil
 }
 
+const listRoleForAdminUser = `-- name: ListRoleForAdminUser :many
+SELECT DISTINCT r.id, r.name, r.created_at
+FROM admin_users AS au
+JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
+JOIN roles AS r ON aur.role_id = r.id
+WHERE au.id = $1
+`
+
+func (q *Queries) ListRoleForAdminUser(ctx context.Context, id int64) ([]Role, error) {
+	rows, err := q.db.Query(ctx, listRoleForAdminUser, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Role{}
+	for rows.Next() {
+		var i Role
+		if err := rows.Scan(&i.ID, &i.Name, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateAdminUser = `-- name: UpdateAdminUser :one
 UPDATE admin_users
 SET 

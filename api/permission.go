@@ -1,10 +1,10 @@
 package api
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 )
 
@@ -67,7 +67,7 @@ func (server *Server) getPermission(ctx *gin.Context) {
 
 	permission, err := server.store.GetPermission(ctx, req.ID)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
@@ -107,7 +107,7 @@ func (server *Server) updatePermission(ctx *gin.Context) {
 
 	permission, err := server.store.UpdatePermission(ctx, arg)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}

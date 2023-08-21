@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/juker1141/shopping-mall-go/util"
 	"github.com/stretchr/testify/require"
@@ -68,7 +67,7 @@ func TestDeleteRole(t *testing.T) {
 
 	role2, err := testStore.GetRole(context.Background(), role1.ID)
 	require.Error(t, err)
-	require.EqualError(t, err, pgx.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 	require.Empty(t, role2)
 }
 

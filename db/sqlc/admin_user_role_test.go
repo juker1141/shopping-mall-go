@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 )
@@ -74,7 +73,7 @@ func TestDeleteAdminUserRoleByRoleId(t *testing.T) {
 		},
 	})
 	require.Error(t, err)
-	require.EqualError(t, err, pgx.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 	require.Empty(t, adminUserRole2)
 }
 
@@ -95,7 +94,7 @@ func TestDeleteAdminUserRoleByAdminUserId(t *testing.T) {
 		},
 	})
 	require.Error(t, err)
-	require.EqualError(t, err, pgx.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 	require.Empty(t, adminUserRole2)
 }
 

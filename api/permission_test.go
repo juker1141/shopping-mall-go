@@ -12,7 +12,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/jackc/pgx/v5"
 	mockdb "github.com/juker1141/shopping-mall-go/db/mock"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
@@ -49,7 +48,7 @@ func TestGetPermissionAPI(t *testing.T) {
 				store.EXPECT().
 					GetPermission(gomock.Any(), gomock.Eq(permission.ID)).
 					Times(1).
-					Return(db.Permission{}, pgx.ErrNoRows)
+					Return(db.Permission{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -179,7 +178,7 @@ func TestCreatePermissionAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/admin/permissions"
+			url := "/admin/permission"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -357,7 +356,7 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				store.EXPECT().
 					UpdatePermission(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
-					Return(db.Permission{}, pgx.ErrNoRows)
+					Return(db.Permission{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)

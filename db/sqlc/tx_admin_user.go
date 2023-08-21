@@ -18,8 +18,8 @@ type CreateAdminUserTxParams struct {
 }
 
 type AdminUserTxResult struct {
-	AdminUser      AdminUser    `json:"admin_user"`
-	PermissionList []Permission `json:"permission_list"`
+	AdminUser AdminUser `json:"admin_user"`
+	RoleList  []Role    `json:"role_list"`
 }
 
 func (store *SQLStore) CreateAdminUserTx(ctx context.Context, arg CreateAdminUserTxParams) (AdminUserTxResult, error) {
@@ -61,7 +61,7 @@ func (store *SQLStore) CreateAdminUserTx(ctx context.Context, arg CreateAdminUse
 			}
 		}
 
-		result.PermissionList, err = q.ListPermissionForAdminUser(ctx, result.AdminUser.ID)
+		result.RoleList, err = q.ListRoleForAdminUser(ctx, result.AdminUser.ID)
 		if err != nil {
 			return err
 		}
@@ -150,12 +150,12 @@ func (store *SQLStore) UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUse
 			}
 		}
 
-		permissionList, err := q.ListPermissionForAdminUser(ctx, result.AdminUser.ID)
+		roleList, err := q.ListRoleForAdminUser(ctx, result.AdminUser.ID)
 		if err != nil {
 			return err
 		}
 
-		result.PermissionList = permissionList
+		result.RoleList = roleList
 
 		return nil
 	})

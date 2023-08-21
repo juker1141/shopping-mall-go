@@ -125,7 +125,7 @@ func TestCreateRole(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/admin/roles"
+			url := "/admin/role"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
