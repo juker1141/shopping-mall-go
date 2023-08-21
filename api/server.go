@@ -25,6 +25,7 @@ func NewServer(store db.Store) *Server {
 	router.GET("/admin/roles", server.listRole)
 	router.GET("/admin/role/:id", server.getRole)
 	router.PATCH("/admin/role/:id", server.updateRole)
+	router.DELETE("/admin/role/:id", server.deleteRole)
 
 	router.POST("/admin/admin_users", server.createAdminUser)
 
