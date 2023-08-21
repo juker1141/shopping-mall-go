@@ -47,6 +47,34 @@ func (q *Queries) GetRole(ctx context.Context, id int64) (Role, error) {
 	return i, err
 }
 
+const listPermissionForRole = `-- name: ListPermissionForRole :many
+SELECT DISTINCT p.id, p.name, p.created_at
+FROM roles AS r
+JOIN role_permissions AS rp ON r.id = rp.role_id
+JOIN permissions AS p ON rp.permission_id = p.id
+WHERE r.id = $1
+`
+
+func (q *Queries) ListPermissionForRole(ctx context.Context, id int64) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, listPermissionForRole, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Permission{}
+	for rows.Next() {
+		var i Permission
+		if err := rows.Scan(&i.ID, &i.Name, &i.CreatedAt); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listRoles = `-- name: ListRoles :many
 SELECT id, name, created_at FROM roles
 ORDER BY id

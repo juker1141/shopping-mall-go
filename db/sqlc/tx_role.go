@@ -77,7 +77,6 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
-		var permissionList []Permission
 
 		updateRoleArg := UpdateRoleParams{
 			ID: arg.ID,
@@ -93,13 +92,6 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 		result.Role, err = q.UpdateRole(context.Background(), updateRoleArg)
 		if err != nil {
 			return err
-		}
-
-		if arg.Name != "" {
-			updateRoleArg.Name = pgtype.Text{
-				String: arg.Name,
-				Valid:  true,
-			}
 		}
 
 		// 如果有要變更權限才去執行
@@ -131,23 +123,10 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			}
 		}
 
-		rolePermissions, err := q.ListRolePermissionByRoleId(ctx, pgtype.Int4{
-			Int32: int32(result.Role.ID),
-			Valid: true,
-		})
+		result.PermissionList, err = q.ListPermissionForRole(ctx, result.Role.ID)
 		if err != nil {
 			return err
 		}
-
-		for _, rolePermission := range rolePermissions {
-			permission, err := q.GetPermission(ctx, int64(rolePermission.PermissionID.Int32))
-			if err != nil {
-				return err
-			}
-			permissionList = append(permissionList, permission)
-		}
-
-		result.PermissionList = permissionList
 
 		return nil
 	})

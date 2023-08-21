@@ -15,6 +15,12 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: ListPermissionForRole :many
+SELECT DISTINCT p.id, p.name, p.created_at
+FROM roles AS r
+JOIN role_permissions AS rp ON r.id = rp.role_id
+JOIN permissions AS p ON rp.permission_id = p.id
+WHERE r.id = $1;
 
 -- name: UpdateRole :one
 UPDATE roles
