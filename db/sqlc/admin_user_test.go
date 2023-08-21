@@ -193,3 +193,11 @@ func TestListAdminUser(t *testing.T) {
 		require.NotEmpty(t, adminUser)
 	}
 }
+
+func TestGetAdminUsersCount(t *testing.T) {
+	createRandomAdminUser(t)
+
+	count, err := testStore.GetAdminUsersCount(context.Background())
+	require.NoError(t, err)
+	require.NotZero(t, count)
+}

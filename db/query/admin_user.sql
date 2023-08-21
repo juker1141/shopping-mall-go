@@ -38,5 +38,8 @@ JOIN role_permissions AS rp ON r.id = rp.role_id
 JOIN permissions AS p ON rp.permission_id = p.id
 WHERE au.id = $1;
 
+-- name: GetAdminUsersCount :one
+SELECT COUNT(*) FROM admin_users;
+
 -- name: DeleteAdminUser :exec
 DELETE FROM admin_users WHERE id = $1;

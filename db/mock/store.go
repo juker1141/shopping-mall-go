@@ -299,6 +299,21 @@ func (mr *MockStoreMockRecorder) GetAdminUserRole(arg0, arg1 interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdminUserRole", reflect.TypeOf((*MockStore)(nil).GetAdminUserRole), arg0, arg1)
 }
 
+// GetAdminUsersCount mocks base method.
+func (m *MockStore) GetAdminUsersCount(arg0 context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAdminUsersCount", arg0)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAdminUsersCount indicates an expected call of GetAdminUsersCount.
+func (mr *MockStoreMockRecorder) GetAdminUsersCount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdminUsersCount", reflect.TypeOf((*MockStore)(nil).GetAdminUsersCount), arg0)
+}
+
 // GetPermission mocks base method.
 func (m *MockStore) GetPermission(arg0 context.Context, arg1 int64) (db.Permission, error) {
 	m.ctrl.T.Helper()
@@ -342,6 +357,21 @@ func (m *MockStore) GetRolePermission(arg0 context.Context, arg1 db.GetRolePermi
 func (mr *MockStoreMockRecorder) GetRolePermission(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolePermission", reflect.TypeOf((*MockStore)(nil).GetRolePermission), arg0, arg1)
+}
+
+// GetRolesCount mocks base method.
+func (m *MockStore) GetRolesCount(arg0 context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetRolesCount", arg0)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetRolesCount indicates an expected call of GetRolesCount.
+func (mr *MockStoreMockRecorder) GetRolesCount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRolesCount", reflect.TypeOf((*MockStore)(nil).GetRolesCount), arg0)
 }
 
 // ListAdminUserRoleByAdminUserId mocks base method.

@@ -15,6 +15,9 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: GetRolesCount :one
+SELECT COUNT(*) FROM roles;
+
 -- name: ListPermissionForRole :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM roles AS r

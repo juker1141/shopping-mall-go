@@ -90,3 +90,11 @@ func TestListRole(t *testing.T) {
 		require.NotEmpty(t, role)
 	}
 }
+
+func TestGetRolesCount(t *testing.T) {
+	createRandomRole(t)
+
+	count, err := testStore.GetRolesCount(context.Background())
+	require.NoError(t, err)
+	require.NotZero(t, count)
+}

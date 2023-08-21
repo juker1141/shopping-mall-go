@@ -22,7 +22,11 @@ func NewServer(store db.Store) *Server {
 	router.PATCH("/admin/permission/:id", server.updatePermission)
 
 	router.POST("/admin/roles", server.createRole)
-	router.PATCH("admin/role/:id", server.updateRole)
+	router.GET("/admin/roles", server.listRole)
+	router.GET("/admin/role/:id", server.getRole)
+	router.PATCH("/admin/role/:id", server.updateRole)
+
+	router.POST("/admin/admin_users", server.createAdminUser)
 
 	server.router = router
 	return server

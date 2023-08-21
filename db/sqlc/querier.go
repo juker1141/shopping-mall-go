@@ -25,9 +25,11 @@ type Querier interface {
 	DeleteRolePermissionByRoleId(ctx context.Context, roleID pgtype.Int4) error
 	GetAdminUser(ctx context.Context, id int64) (AdminUser, error)
 	GetAdminUserRole(ctx context.Context, arg GetAdminUserRoleParams) (AdminUserRole, error)
+	GetAdminUsersCount(ctx context.Context) (int64, error)
 	GetPermission(ctx context.Context, id int64) (Permission, error)
 	GetRole(ctx context.Context, id int64) (Role, error)
 	GetRolePermission(ctx context.Context, arg GetRolePermissionParams) (RolePermission, error)
+	GetRolesCount(ctx context.Context) (int64, error)
 	ListAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) ([]AdminUserRole, error)
 	ListAdminUserRoleByRoleId(ctx context.Context, roleID pgtype.Int4) ([]AdminUserRole, error)
 	ListAdminUsers(ctx context.Context, arg ListAdminUsersParams) ([]AdminUser, error)

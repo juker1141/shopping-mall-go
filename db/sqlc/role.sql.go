@@ -47,6 +47,17 @@ func (q *Queries) GetRole(ctx context.Context, id int64) (Role, error) {
 	return i, err
 }
 
+const getRolesCount = `-- name: GetRolesCount :one
+SELECT COUNT(*) FROM roles
+`
+
+func (q *Queries) GetRolesCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, getRolesCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const listPermissionForRole = `-- name: ListPermissionForRole :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM roles AS r

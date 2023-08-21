@@ -78,6 +78,17 @@ func (q *Queries) GetAdminUser(ctx context.Context, id int64) (AdminUser, error)
 	return i, err
 }
 
+const getAdminUsersCount = `-- name: GetAdminUsersCount :one
+SELECT COUNT(*) FROM admin_users
+`
+
+func (q *Queries) GetAdminUsersCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, getAdminUsersCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const listAdminUsers = `-- name: ListAdminUsers :many
 SELECT id, account, full_name, hashed_password, status, password_changed_at, created_at FROM admin_users
 ORDER BY id
