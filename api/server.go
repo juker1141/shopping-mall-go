@@ -2,6 +2,8 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 )
 
@@ -14,6 +16,11 @@ type Server struct {
 // NewServer creates a new HTTP server and setup routing.
 func NewServer(store db.Store) *Server {
 	server := &Server{store: store}
+
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("fullName", validFullName)
+	}
+
 	router := gin.Default()
 
 	router.POST("/admin/permission", server.createPermission)

@@ -150,7 +150,7 @@ func TestCreateAdminUser(t *testing.T) {
 			name: "InvalidFullName",
 			body: gin.H{
 				"account":   adminUser.Account,
-				"full_name": "invalid123",
+				"full_name": "invalid_FullName#@",
 				"password":  password,
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,

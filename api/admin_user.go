@@ -12,7 +12,7 @@ import (
 
 type createAdminUserRequest struct {
 	Account  string  `json:"account" binding:"required,alphanum,min=8"`
-	FullName string  `json:"full_name" binding:"required,min=6"`
+	FullName string  `json:"full_name" binding:"required,min=2,fullName"`
 	Status   int32   `json:"status" binding:"required,number"`
 	Password string  `json:"password" binding:"required,min=8"`
 	RolesID  []int64 `json:"roles_id" binding:"required"`
