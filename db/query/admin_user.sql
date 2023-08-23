@@ -12,6 +12,10 @@ INSERT INTO admin_users (
 SELECT * FROM admin_users
 WHERE id = $1 LIMIT 1;
 
+-- name: GetAdminUserByAccount :one
+SELECT * FROM admin_users
+WHERE account = $1 LIMIT 1;
+
 -- name: ListAdminUsers :many
 SELECT * FROM admin_users
 ORDER BY id

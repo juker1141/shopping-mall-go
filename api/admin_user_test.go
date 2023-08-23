@@ -18,12 +18,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type eqCreateUserParamsMatcher struct {
+type eqCreateAdminUserParamsMatcher struct {
 	arg      db.CreateAdminUserTxParams
 	password string
 }
 
-func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
+func (e eqCreateAdminUserParamsMatcher) Matches(x interface{}) bool {
 	arg, ok := x.(db.CreateAdminUserTxParams)
 	if !ok {
 		return false
@@ -38,12 +38,12 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	return reflect.DeepEqual(e.arg, arg)
 }
 
-func (e eqCreateUserParamsMatcher) String() string {
+func (e eqCreateAdminUserParamsMatcher) String() string {
 	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
 }
 
-func EqCreateUserParams(arg db.CreateAdminUserTxParams, password string) gomock.Matcher {
-	return eqCreateUserParamsMatcher{arg, password}
+func EqCreateAdminUserParams(arg db.CreateAdminUserTxParams, password string) gomock.Matcher {
+	return eqCreateAdminUserParamsMatcher{arg, password}
 }
 
 func TestCreateAdminUser(t *testing.T) {
@@ -82,7 +82,7 @@ func TestCreateAdminUser(t *testing.T) {
 				}
 
 				store.EXPECT().
-					CreateAdminUserTx(gomock.Any(), EqCreateUserParams(arg, password)).
+					CreateAdminUserTx(gomock.Any(), EqCreateAdminUserParams(arg, password)).
 					Times(1).
 					Return(result, nil)
 			},
@@ -230,7 +230,7 @@ func TestCreateAdminUser(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)

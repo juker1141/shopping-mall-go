@@ -200,3 +200,20 @@ func TestGetAdminUsersCount(t *testing.T) {
 	require.NoError(t, err)
 	require.NotZero(t, count)
 }
+
+func TestGetAdminUserByAccount(t *testing.T) {
+	adminUser1 := createRandomAdminUser(t)
+
+	adminUser2, err := testStore.GetAdminUserByAccount(context.Background(), adminUser1.Account)
+	require.NoError(t, err)
+	require.NotEmpty(t, adminUser2)
+
+	require.Equal(t, adminUser1.ID, adminUser2.ID)
+	require.Equal(t, adminUser1.Account, adminUser2.Account)
+	require.Equal(t, adminUser1.FullName, adminUser2.FullName)
+	require.Equal(t, adminUser1.HashedPassword, adminUser2.HashedPassword)
+	require.Equal(t, adminUser1.Status, adminUser2.Status)
+
+	require.WithinDuration(t, adminUser1.PasswordChangedAt, adminUser2.PasswordChangedAt, time.Second)
+	require.WithinDuration(t, adminUser1.CreatedAt, adminUser2.CreatedAt, time.Second)
+}

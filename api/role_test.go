@@ -119,7 +119,7 @@ func TestCreateRole(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -266,7 +266,7 @@ func TestUpdateRole(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -281,6 +281,24 @@ func TestUpdateRole(t *testing.T) {
 		})
 	}
 }
+
+// func TestListRole(t *testing.T) {
+// 	n := 5
+// 	roles := make([]db.Role, n)
+// 	for i := 0; i < n; i++ {
+// 		roles[i] = randomRole()
+// 	}
+
+// 	type Query struct {
+// 		page     int
+// 		pageSize int
+// 	}
+
+// 	testCases := []struct {
+// 		name string
+// 		query
+// 	}{}
+// }
 
 func randomRole() db.Role {
 	return db.Role{

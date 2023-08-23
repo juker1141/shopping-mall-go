@@ -78,6 +78,26 @@ func (q *Queries) GetAdminUser(ctx context.Context, id int64) (AdminUser, error)
 	return i, err
 }
 
+const getAdminUserByAccount = `-- name: GetAdminUserByAccount :one
+SELECT id, account, full_name, hashed_password, status, password_changed_at, created_at FROM admin_users
+WHERE account = $1 LIMIT 1
+`
+
+func (q *Queries) GetAdminUserByAccount(ctx context.Context, account string) (AdminUser, error) {
+	row := q.db.QueryRow(ctx, getAdminUserByAccount, account)
+	var i AdminUser
+	err := row.Scan(
+		&i.ID,
+		&i.Account,
+		&i.FullName,
+		&i.HashedPassword,
+		&i.Status,
+		&i.PasswordChangedAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getAdminUsersCount = `-- name: GetAdminUsersCount :one
 SELECT COUNT(*) FROM admin_users
 `

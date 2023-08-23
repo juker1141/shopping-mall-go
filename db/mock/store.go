@@ -284,6 +284,21 @@ func (mr *MockStoreMockRecorder) GetAdminUser(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdminUser", reflect.TypeOf((*MockStore)(nil).GetAdminUser), arg0, arg1)
 }
 
+// GetAdminUserByAccount mocks base method.
+func (m *MockStore) GetAdminUserByAccount(arg0 context.Context, arg1 string) (db.AdminUser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAdminUserByAccount", arg0, arg1)
+	ret0, _ := ret[0].(db.AdminUser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAdminUserByAccount indicates an expected call of GetAdminUserByAccount.
+func (mr *MockStoreMockRecorder) GetAdminUserByAccount(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAdminUserByAccount", reflect.TypeOf((*MockStore)(nil).GetAdminUserByAccount), arg0, arg1)
+}
+
 // GetAdminUserRole mocks base method.
 func (m *MockStore) GetAdminUserRole(arg0 context.Context, arg1 db.GetAdminUserRoleParams) (db.AdminUserRole, error) {
 	m.ctrl.T.Helper()

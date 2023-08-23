@@ -32,19 +32,14 @@ type createAdminUserResponse struct {
 	RoleList  []db.Role         `json:"role_list"`
 }
 
-func newAdminUserResponse(result db.AdminUserTxResult) createAdminUserResponse {
-	adminUserRsp := adminUserResponse{
-		ID:                result.AdminUser.ID,
-		Account:           result.AdminUser.Account,
-		FullName:          result.AdminUser.FullName,
-		Status:            result.AdminUser.Status,
-		PasswordChangedAt: result.AdminUser.PasswordChangedAt,
-		CreatedAt:         result.AdminUser.CreatedAt,
-	}
-
-	return createAdminUserResponse{
-		AdminUser: adminUserRsp,
-		RoleList:  result.RoleList,
+func newAdminUserResponse(adminUser db.AdminUser) adminUserResponse {
+	return adminUserResponse{
+		ID:                adminUser.ID,
+		Account:           adminUser.Account,
+		FullName:          adminUser.FullName,
+		Status:            adminUser.Status,
+		PasswordChangedAt: adminUser.PasswordChangedAt,
+		CreatedAt:         adminUser.CreatedAt,
 	}
 }
 
@@ -84,7 +79,65 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := newAdminUserResponse(result)
+	rsp := createAdminUserResponse{
+		AdminUser: newAdminUserResponse(result.AdminUser),
+		RoleList:  result.RoleList,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type loginAdminUserRequest struct {
+	Account  string `json:"account" binding:"required,alphanum,min=8"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+type loginAdminUserResponse struct {
+	AccessToken    string            `json:"access_token"`
+	AdminUser      adminUserResponse `json:"admin_user"`
+	PermissionList []db.Permission   `json:"permission_list"`
+}
+
+func (server *Server) loginAdminUser(ctx *gin.Context) {
+	var req loginAdminUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	adminUser, err := server.store.GetAdminUserByAccount(ctx, req.Account)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = util.CheckPassword(req.Password, adminUser.HashedPassword)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	permissionList, err := server.store.ListPermissionForAdminUser(ctx, adminUser.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	accessToken, err := server.tokenMaker.CreateToken(adminUser.Account, server.config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := loginAdminUserResponse{
+		AccessToken:    accessToken,
+		AdminUser:      newAdminUserResponse(adminUser),
+		PermissionList: permissionList,
+	}
 
 	ctx.JSON(http.StatusOK, rsp)
 }
