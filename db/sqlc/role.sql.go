@@ -58,7 +58,7 @@ func (q *Queries) GetRolesCount(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-const listPermissionForRole = `-- name: ListPermissionForRole :many
+const listPermissionsForRole = `-- name: ListPermissionsForRole :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM roles AS r
 JOIN role_permissions AS rp ON r.id = rp.role_id
@@ -66,8 +66,8 @@ JOIN permissions AS p ON rp.permission_id = p.id
 WHERE r.id = $1
 `
 
-func (q *Queries) ListPermissionForRole(ctx context.Context, id int64) ([]Permission, error) {
-	rows, err := q.db.Query(ctx, listPermissionForRole, id)
+func (q *Queries) ListPermissionsForRole(ctx context.Context, id int64) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, listPermissionsForRole, id)
 	if err != nil {
 		return nil, err
 	}

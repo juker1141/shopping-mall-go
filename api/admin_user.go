@@ -121,7 +121,7 @@ func (server *Server) loginAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	permissionList, err := server.store.ListPermissionForAdminUser(ctx, adminUser.ID)
+	permissionList, err := server.store.ListPermissionsForAdminUser(ctx, adminUser.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

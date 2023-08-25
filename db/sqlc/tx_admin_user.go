@@ -61,7 +61,7 @@ func (store *SQLStore) CreateAdminUserTx(ctx context.Context, arg CreateAdminUse
 			}
 		}
 
-		result.RoleList, err = q.ListRoleForAdminUser(ctx, result.AdminUser.ID)
+		result.RoleList, err = q.ListRolesForAdminUser(ctx, result.AdminUser.ID)
 		if err != nil {
 			return err
 		}
@@ -150,7 +150,7 @@ func (store *SQLStore) UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUse
 			}
 		}
 
-		roleList, err := q.ListRoleForAdminUser(ctx, result.AdminUser.ID)
+		roleList, err := q.ListRolesForAdminUser(ctx, result.AdminUser.ID)
 		if err != nil {
 			return err
 		}

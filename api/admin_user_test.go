@@ -9,11 +9,13 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/juker1141/shopping-mall-go/db/mock"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
+	"github.com/juker1141/shopping-mall-go/token"
 	"github.com/juker1141/shopping-mall-go/util"
 	"github.com/stretchr/testify/require"
 )
@@ -61,6 +63,7 @@ func TestCreateAdminUser(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
@@ -72,6 +75,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"password":  password,
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.CreateAdminUserTxParams{
@@ -91,6 +97,26 @@ func TestCreateAdminUser(t *testing.T) {
 			},
 		},
 		{
+			name: "NoAuthorization",
+			body: gin.H{
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"roles_id":  rolesID,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateAdminUserTx(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
 			name: "InternalError",
 			body: gin.H{
 				"account":   adminUser.Account,
@@ -98,6 +124,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"password":  password,
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -118,6 +147,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAdminUserTx(gomock.Any(), gomock.Any()).
@@ -137,6 +169,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAdminUserTx(gomock.Any(), gomock.Any()).
@@ -154,6 +189,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"password":  password,
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -173,6 +211,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"status":    adminUser.Status,
 				"roles_id":  rolesID,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAdminUserTx(gomock.Any(), gomock.Any()).
@@ -191,6 +232,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"status":    "1",
 				"roles_id":  rolesID,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateAdminUserTx(gomock.Any(), gomock.Any()).
@@ -208,6 +252,9 @@ func TestCreateAdminUser(t *testing.T) {
 				"password":  password,
 				"status":    adminUser.Status,
 				"roles_id":  nil,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -239,6 +286,8 @@ func TestCreateAdminUser(t *testing.T) {
 			url := "/admin/admin_user"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
 
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(t, recorder)

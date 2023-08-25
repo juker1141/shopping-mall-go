@@ -47,21 +47,23 @@ func (server *Server) setupRouter() {
 	// 登入後台
 	router.POST("/admin/login", server.loginAdminUser)
 
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
 	// 權限
-	router.POST("/admin/permission", server.createPermission)
-	router.GET("/admin/permissions", server.listPermission)
-	router.GET("/admin/permission/:id", server.getPermission)
-	router.PATCH("/admin/permission/:id", server.updatePermission)
+	authRoutes.POST("/admin/permission", server.createPermission)
+	authRoutes.GET("/admin/permissions", server.listPermission)
+	authRoutes.GET("/admin/permission/:id", server.getPermission)
+	authRoutes.PATCH("/admin/permission/:id", server.updatePermission)
 
 	// 角色
-	router.POST("/admin/role", server.createRole)
-	router.GET("/admin/roles", server.listRole)
-	router.GET("/admin/role/:id", server.getRole)
-	router.PATCH("/admin/role/:id", server.updateRole)
-	router.DELETE("/admin/role/:id", server.deleteRole)
+	authRoutes.POST("/admin/role", server.createRole)
+	authRoutes.GET("/admin/roles", server.listRole)
+	authRoutes.GET("/admin/role/:id", server.getRole)
+	authRoutes.PATCH("/admin/role/:id", server.updateRole)
+	authRoutes.DELETE("/admin/role/:id", server.deleteRole)
 
 	// 使用者
-	router.POST("/admin/admin_user", server.createAdminUser)
+	authRoutes.POST("/admin/admin_user", server.createAdminUser)
 
 	server.router = router
 }

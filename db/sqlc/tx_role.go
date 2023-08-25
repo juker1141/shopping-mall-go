@@ -123,7 +123,7 @@ func (store *SQLStore) UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams)
 			}
 		}
 
-		result.PermissionList, err = q.ListPermissionForRole(ctx, result.Role.ID)
+		result.PermissionList, err = q.ListPermissionsForRole(ctx, result.Role.ID)
 		if err != nil {
 			return err
 		}

@@ -149,7 +149,7 @@ func (q *Queries) ListAdminUsers(ctx context.Context, arg ListAdminUsersParams) 
 	return items, nil
 }
 
-const listPermissionForAdminUser = `-- name: ListPermissionForAdminUser :many
+const listPermissionsForAdminUser = `-- name: ListPermissionsForAdminUser :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM admin_users AS au
 JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
@@ -159,8 +159,8 @@ JOIN permissions AS p ON rp.permission_id = p.id
 WHERE au.id = $1
 `
 
-func (q *Queries) ListPermissionForAdminUser(ctx context.Context, id int64) ([]Permission, error) {
-	rows, err := q.db.Query(ctx, listPermissionForAdminUser, id)
+func (q *Queries) ListPermissionsForAdminUser(ctx context.Context, id int64) ([]Permission, error) {
+	rows, err := q.db.Query(ctx, listPermissionsForAdminUser, id)
 	if err != nil {
 		return nil, err
 	}
@@ -179,7 +179,7 @@ func (q *Queries) ListPermissionForAdminUser(ctx context.Context, id int64) ([]P
 	return items, nil
 }
 
-const listRoleForAdminUser = `-- name: ListRoleForAdminUser :many
+const listRolesForAdminUser = `-- name: ListRolesForAdminUser :many
 SELECT DISTINCT r.id, r.name, r.created_at
 FROM admin_users AS au
 JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
@@ -187,8 +187,8 @@ JOIN roles AS r ON aur.role_id = r.id
 WHERE au.id = $1
 `
 
-func (q *Queries) ListRoleForAdminUser(ctx context.Context, id int64) ([]Role, error) {
-	rows, err := q.db.Query(ctx, listRoleForAdminUser, id)
+func (q *Queries) ListRolesForAdminUser(ctx context.Context, id int64) ([]Role, error) {
+	rows, err := q.db.Query(ctx, listRolesForAdminUser, id)
 	if err != nil {
 		return nil, err
 	}

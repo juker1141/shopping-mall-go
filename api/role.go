@@ -116,7 +116,7 @@ func (server *Server) listRole(ctx *gin.Context) {
 	var roleResponses []RoleResponse
 
 	for _, role := range roles {
-		permissions, err := server.store.ListPermissionForRole(ctx, role.ID)
+		permissions, err := server.store.ListPermissionsForRole(ctx, role.ID)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -154,7 +154,7 @@ func (server *Server) getRole(ctx *gin.Context) {
 		return
 	}
 
-	permissionList, err := server.store.ListPermissionForRole(ctx, req.ID)
+	permissionList, err := server.store.ListPermissionsForRole(ctx, req.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return

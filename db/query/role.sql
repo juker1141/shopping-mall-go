@@ -18,7 +18,7 @@ OFFSET $2;
 -- name: GetRolesCount :one
 SELECT COUNT(*) FROM roles;
 
--- name: ListPermissionForRole :many
+-- name: ListPermissionsForRole :many
 SELECT DISTINCT p.id, p.name, p.created_at
 FROM roles AS r
 JOIN role_permissions AS rp ON r.id = rp.role_id
