@@ -25,14 +25,14 @@ func TestGetPermissionAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		permissionID  int64
+		ID            int64
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name:         "OK",
-			permissionID: permission.ID,
+			name: "OK",
+			ID:   permission.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
@@ -48,8 +48,8 @@ func TestGetPermissionAPI(t *testing.T) {
 			},
 		},
 		{
-			name:         "NoAuthorization",
-			permissionID: permission.ID,
+			name: "NoAuthorization",
+			ID:   permission.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
@@ -62,8 +62,8 @@ func TestGetPermissionAPI(t *testing.T) {
 			},
 		},
 		{
-			name:         "NotFound",
-			permissionID: permission.ID,
+			name: "NotFound",
+			ID:   permission.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
@@ -78,8 +78,8 @@ func TestGetPermissionAPI(t *testing.T) {
 			},
 		},
 		{
-			name:         "InternalError",
-			permissionID: permission.ID,
+			name: "InternalError",
+			ID:   permission.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
@@ -94,8 +94,8 @@ func TestGetPermissionAPI(t *testing.T) {
 			},
 		},
 		{
-			name:         "InvalidID",
-			permissionID: 0,
+			name: "InvalidID",
+			ID:   0,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
@@ -124,7 +124,7 @@ func TestGetPermissionAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/permission/%d", tc.permissionID)
+			url := fmt.Sprintf("/admin/permission/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
