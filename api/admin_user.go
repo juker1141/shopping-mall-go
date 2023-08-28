@@ -2,10 +2,12 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
 )
@@ -93,9 +95,13 @@ type loginAdminUserRequest struct {
 }
 
 type loginAdminUserResponse struct {
-	AccessToken    string            `json:"access_token"`
-	AdminUser      adminUserResponse `json:"admin_user"`
-	PermissionList []db.Permission   `json:"permission_list"`
+	SessionID             uuid.UUID         `json:"session_id"`
+	AccessToken           string            `json:"access_token"`
+	AccessTokenExpiresAt  time.Time         `json:"access_token_expires_at"`
+	RefreshToken          string            `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time         `json:"refresh_token_expires_at"`
+	AdminUser             adminUserResponse `json:"admin_user"`
+	PermissionList        []db.Permission   `json:"permission_list"`
 }
 
 func (server *Server) loginAdminUser(ctx *gin.Context) {
@@ -115,6 +121,11 @@ func (server *Server) loginAdminUser(ctx *gin.Context) {
 		return
 	}
 
+	if adminUser.Status == 0 {
+		err := fmt.Errorf("user '%v' is in a disabled state", adminUser.Account)
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+	}
+
 	err = util.CheckPassword(req.Password, adminUser.HashedPassword)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
@@ -127,16 +138,40 @@ func (server *Server) loginAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, err := server.tokenMaker.CreateToken(adminUser.Account, server.config.AccessTokenDuration)
+	accessToken, accessPayload, err := server.tokenMaker.CreateToken(adminUser.Account, server.config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(adminUser.Account, server.config.RefreshTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	session, err := server.store.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Account:      adminUser.Account,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	rsp := loginAdminUserResponse{
-		AccessToken:    accessToken,
-		AdminUser:      newAdminUserResponse(adminUser),
-		PermissionList: permissionList,
+		SessionID:             session.ID,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshToken:          refreshToken,
+		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
+		AdminUser:             newAdminUserResponse(adminUser),
+		PermissionList:        permissionList,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)

@@ -7,6 +7,7 @@ package db
 import (
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -41,4 +42,15 @@ type Role struct {
 type RolePermission struct {
 	RoleID       pgtype.Int4 `json:"role_id"`
 	PermissionID pgtype.Int4 `json:"permission_id"`
+}
+
+type Session struct {
+	ID           uuid.UUID `json:"id"`
+	Account      string    `json:"account"`
+	RefreshToken string    `json:"refresh_token"`
+	UserAgent    string    `json:"user_agent"`
+	ClientIp     string    `json:"client_ip"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    time.Time `json:"expires_at"`
+	CreatedAt    time.Time `json:"created_at"`
 }

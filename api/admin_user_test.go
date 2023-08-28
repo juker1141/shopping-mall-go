@@ -295,6 +295,119 @@ func TestCreateAdminUser(t *testing.T) {
 	}
 }
 
+func TestLoginAdminUser(t *testing.T) {
+	adminUser, password := randomAdminUser(t)
+
+	n := 5
+	permissionList, _ := randomPermissionList(n)
+
+	testCases := []struct {
+		name          string
+		body          gin.H
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			body: gin.H{
+				"account":  adminUser.Account,
+				"password": password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAdminUserByAccount(gomock.Any(), gomock.Eq(adminUser.Account)).
+					Times(1).
+					Return(adminUser, nil)
+
+				store.EXPECT().
+					ListPermissionsForAdminUser(gomock.Any(), gomock.Eq(adminUser.ID)).
+					Times(1).
+					Return(permissionList, nil)
+
+				store.EXPECT().
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(1)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "AccountNotFound",
+			body: gin.H{
+				"account":  "NotFound",
+				"password": password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAdminUserByAccount(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.AdminUser{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "IncorrectPassword",
+			body: gin.H{
+				"account":  adminUser.Account,
+				"password": "incorrect",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAdminUserByAccount(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.AdminUser{}, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError",
+			body: gin.H{
+				"account":  adminUser.Account,
+				"password": password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetAdminUserByAccount(gomock.Any(), gomock.Eq(adminUser.Account)).
+					Times(1).
+					Return(db.AdminUser{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := newTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			jsonData, err := json.Marshal(tc.body)
+			require.NoError(t, err)
+
+			url := "/admin/login"
+			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
 func randomAdminUser(t *testing.T) (adminUser db.AdminUser, password string) {
 	password = util.RandomString(8)
 	hashedPassword, err := util.HashPassword(password)

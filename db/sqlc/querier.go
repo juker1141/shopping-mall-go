@@ -7,6 +7,7 @@ package db
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -16,6 +17,7 @@ type Querier interface {
 	CreatePermission(ctx context.Context, name string) (Permission, error)
 	CreateRole(ctx context.Context, name string) (Role, error)
 	CreateRolePermission(ctx context.Context, arg CreateRolePermissionParams) (RolePermission, error)
+	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	DeleteAdminUser(ctx context.Context, id int64) error
 	DeleteAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) error
 	DeleteAdminUserRoleByRoleId(ctx context.Context, roleID pgtype.Int4) error
@@ -31,6 +33,7 @@ type Querier interface {
 	GetRole(ctx context.Context, id int64) (Role, error)
 	GetRolePermission(ctx context.Context, arg GetRolePermissionParams) (RolePermission, error)
 	GetRolesCount(ctx context.Context) (int64, error)
+	GetSesstion(ctx context.Context, id uuid.UUID) (Session, error)
 	ListAdminUserRoleByAdminUserId(ctx context.Context, adminUserID pgtype.Int4) ([]AdminUserRole, error)
 	ListAdminUserRoleByRoleId(ctx context.Context, roleID pgtype.Int4) ([]AdminUserRole, error)
 	ListAdminUsers(ctx context.Context, arg ListAdminUsersParams) ([]AdminUser, error)
