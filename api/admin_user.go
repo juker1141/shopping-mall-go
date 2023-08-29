@@ -219,8 +219,14 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		arg.FullName = req.FullName
 	}
 
-	if req.Status != nil && val.IsValidStatus(int(*req.Status)) {
-		arg.Status = req.Status
+	if req.Status != nil {
+		if val.IsValidStatus(int(*req.Status)) {
+			arg.Status = req.Status
+		} else {
+			err := fmt.Errorf("invalid status input: %d", *req.Status)
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
 	}
 
 	if req.RolesID != nil {
