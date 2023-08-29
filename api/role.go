@@ -35,7 +35,7 @@ func (server *Server) createRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-type updateRoleRequestQuery struct {
+type updateRoleUri struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
@@ -45,8 +45,8 @@ type updateRoleRequest struct {
 }
 
 func (server *Server) updateRole(ctx *gin.Context) {
-	var query updateRoleRequestQuery
-	if err := ctx.ShouldBindUri(&query); err != nil {
+	var uri updateRoleUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -55,7 +55,7 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	ctx.BindJSON(&req)
 
 	arg := db.UpdateRoleTxParams{
-		ID: query.ID,
+		ID: uri.ID,
 	}
 
 	if req.Name != "" {
@@ -66,7 +66,7 @@ func (server *Server) updateRole(ctx *gin.Context) {
 		arg.PermissionsID = req.PermissionsID
 	}
 
-	result, err := server.store.UpdateRoleTx(context.Background(), arg)
+	result, err := server.store.UpdateRoleTx(ctx, arg)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -75,7 +75,7 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-type listRoleRequest struct {
+type listRoleQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
@@ -91,15 +91,15 @@ type listRoleResponse struct {
 }
 
 func (server *Server) listRole(ctx *gin.Context) {
-	var req listRoleRequest
-	if err := ctx.ShouldBindQuery(&req); err != nil {
+	var query listRoleQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := db.ListRolesParams{
-		Limit:  req.PageSize,
-		Offset: (req.Page - 1) * req.PageSize,
+		Limit:  query.PageSize,
+		Offset: (query.Page - 1) * query.PageSize,
 	}
 
 	roles, err := server.store.ListRoles(ctx, arg)

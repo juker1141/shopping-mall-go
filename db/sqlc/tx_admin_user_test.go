@@ -74,7 +74,7 @@ func TestUpdateAdminUserTx(t *testing.T) {
 		FullName:          newFullName,
 		HashedPassword:    newHashedPassword,
 		PasswordChangedAt: newPasswordChangeAt,
-		Status:            newStatus,
+		Status:            &newStatus,
 		RolesID:           rolesID,
 	})
 

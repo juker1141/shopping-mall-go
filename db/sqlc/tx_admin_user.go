@@ -77,7 +77,7 @@ type UpdateAdminUserTxParams struct {
 	FullName          string    `json:"full_name"`
 	HashedPassword    string    `json:"hashed_password"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
-	Status            int32     `json:"status"`
+	Status            *int32    `json:"status"`
 	RolesID           []int64   `json:"roles_id"`
 }
 
@@ -98,9 +98,9 @@ func (store *SQLStore) UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUse
 			}
 		}
 
-		if val.IsValidStatus(int(arg.Status)) {
+		if arg.Status != nil && val.IsValidStatus(int(*arg.Status)) {
 			updateAdminUserArg.Status = pgtype.Int4{
-				Int32: arg.Status,
+				Int32: *arg.Status,
 				Valid: true,
 			}
 		}

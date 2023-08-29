@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/juker1141/shopping-mall-go/val"
 )
 
 type createAdminUserRequest struct {
@@ -29,7 +31,7 @@ type adminUserResponse struct {
 	CreatedAt         time.Time `json:"created_at"`
 }
 
-type createAdminUserResponse struct {
+type adminUserAPIResponse struct {
 	AdminUser adminUserResponse `json:"admin_user"`
 	RoleList  []db.Role         `json:"role_list"`
 }
@@ -81,7 +83,185 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := createAdminUserResponse{
+	rsp := adminUserAPIResponse{
+		AdminUser: newAdminUserResponse(result.AdminUser),
+		RoleList:  result.RoleList,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type listAdminUserQuery struct {
+	Page     int32 `form:"page" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+type listAdminUserResponse struct {
+	Count int32                  `json:"count"`
+	Data  []adminUserAPIResponse `json:"data"`
+}
+
+func (server *Server) listAdminUser(ctx *gin.Context) {
+	var query listAdminUserQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListAdminUsersParams{
+		Limit:  query.PageSize,
+		Offset: (query.Page - 1) * query.PageSize,
+	}
+
+	adminUsers, err := server.store.ListAdminUsers(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	var data []adminUserAPIResponse
+	for _, adminUser := range adminUsers {
+		roles, err := server.store.ListRolesForAdminUser(ctx, adminUser.ID)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		data = append(data, adminUserAPIResponse{
+			AdminUser: newAdminUserResponse(adminUser),
+			RoleList:  roles,
+		})
+	}
+
+	counts, err := server.store.GetAdminUsersCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := listAdminUserResponse{
+		Count: int32(counts),
+		Data:  data,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type getAdminUserUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) getAdminUser(ctx *gin.Context) {
+	var uri getAdminUserUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	adminUser, err := server.store.GetAdminUser(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	roles, err := server.store.ListRolesForAdminUser(ctx, adminUser.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := adminUserAPIResponse{
+		AdminUser: newAdminUserResponse(adminUser),
+		RoleList:  roles,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type updateAdminUserUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+type updateAdminUserRequest struct {
+	FullName    string  `json:"full_name"`
+	OldPassword string  `json:"old_password"`
+	NewPassword string  `json:"new_password"`
+	Status      *int32  `json:"status"`
+	RolesID     []int64 `json:"roles_id"`
+}
+
+func (server *Server) updateAdminUser(ctx *gin.Context) {
+	var uri updateAdminUserUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var req updateAdminUserRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateAdminUserTxParams{
+		ID: uri.ID,
+	}
+
+	if req.FullName != "" {
+		if err := val.ValidateFullName(req.FullName); err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+		arg.FullName = req.FullName
+	}
+
+	if req.Status != nil && val.IsValidStatus(int(*req.Status)) {
+		arg.Status = req.Status
+	}
+
+	if req.RolesID != nil {
+		arg.RolesID = req.RolesID
+	}
+
+	// 如果使用者有想要更改密碼
+	if req.OldPassword != "" && req.NewPassword != "" {
+		adminUser, err := server.store.GetAdminUser(ctx, uri.ID)
+		if err != nil {
+			if err == db.ErrRecordNotFound {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = util.CheckPassword(req.OldPassword, adminUser.HashedPassword)
+		if err != nil {
+			ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+			return
+		}
+
+		hashedPassword, err := util.HashPassword(req.NewPassword)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		arg.HashedPassword = hashedPassword
+		arg.PasswordChangedAt = time.Now()
+	}
+
+	result, err := server.store.UpdateAdminUserTx(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := adminUserAPIResponse{
 		AdminUser: newAdminUserResponse(result.AdminUser),
 		RoleList:  result.RoleList,
 	}
@@ -124,6 +304,7 @@ func (server *Server) loginAdminUser(ctx *gin.Context) {
 	if adminUser.Status == 0 {
 		err := fmt.Errorf("user '%v' is in a disabled state", adminUser.Account)
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
 	}
 
 	err = util.CheckPassword(req.Password, adminUser.HashedPassword)

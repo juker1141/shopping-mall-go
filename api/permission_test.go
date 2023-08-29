@@ -255,7 +255,7 @@ func TestListPermissionsAPI(t *testing.T) {
 	}
 
 	type Query struct {
-		pageID   int
+		page     int
 		pageSize int
 	}
 
@@ -269,7 +269,7 @@ func TestListPermissionsAPI(t *testing.T) {
 		{
 			name: "OK",
 			query: Query{
-				pageID:   1,
+				page:     1,
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -294,7 +294,7 @@ func TestListPermissionsAPI(t *testing.T) {
 		{
 			name: "NoAuthorization",
 			query: Query{
-				pageID:   1,
+				page:     1,
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -311,7 +311,7 @@ func TestListPermissionsAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			query: Query{
-				pageID:   1,
+				page:     1,
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -328,9 +328,9 @@ func TestListPermissionsAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidPageID",
+			name: "InvalidPage",
 			query: Query{
-				pageID:   -1,
+				page:     -1,
 				pageSize: n,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -346,9 +346,9 @@ func TestListPermissionsAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidPageID",
+			name: "InvalidPage",
 			query: Query{
-				pageID:   1,
+				page:     1,
 				pageSize: 10000,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -383,7 +383,7 @@ func TestListPermissionsAPI(t *testing.T) {
 			require.NoError(t, err)
 
 			q := request.URL.Query()
-			q.Add("page_id", fmt.Sprintf("%d", tc.query.pageID))
+			q.Add("page", fmt.Sprintf("%d", tc.query.page))
 			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 

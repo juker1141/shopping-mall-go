@@ -65,7 +65,10 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/admin/role/:id", server.deleteRole)
 
 	// 使用者
-	authRoutes.POST("/admin/admin_user", server.createAdminUser)
+	authRoutes.POST("/admin/user", server.createAdminUser)
+	authRoutes.GET("/admin/users", server.listAdminUser)
+	authRoutes.GET("/admin/user/:id", server.getAdminUser)
+	authRoutes.PATCH("/admin/user/:id", server.updateAdminUser)
 
 	server.router = router
 }
