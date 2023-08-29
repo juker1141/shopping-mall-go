@@ -159,12 +159,6 @@ func TestUpdateRole(t *testing.T) {
 
 	updatePermissionList, updatedPermissionsID := randomPermissionList(n)
 
-	arg := db.UpdateRoleTxParams{
-		ID:            role.ID,
-		Name:          updateRoleName,
-		PermissionsID: updatedPermissionsID,
-	}
-
 	result := db.RoleTxResult{
 		Role:           role,
 		PermissionList: updatePermissionList,
@@ -188,6 +182,12 @@ func TestUpdateRole(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.UpdateRoleTxParams{
+					ID:            role.ID,
+					Name:          updateRoleName,
+					PermissionsID: updatedPermissionsID,
+				}
+
 				store.EXPECT().
 					UpdateRoleTx(gomock.Any(), gomock.Eq(arg)).
 					Times(1).

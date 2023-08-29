@@ -49,7 +49,7 @@ func EqCreateAdminUserParams(arg db.CreateAdminUserTxParams, password string) go
 }
 
 func TestCreateAdminUser(t *testing.T) {
-	adminUser, password := randomAdminUser(t)
+	adminUser, password := randomAdminUser(t, int32(1))
 
 	n := 5
 
@@ -539,6 +539,36 @@ func TestCreateAdminUser(t *testing.T) {
 func TestListAdminUser(t *testing.T) {
 }
 
+type eqUpdateAdminUserParamsMatcher struct {
+	arg      db.UpdateAdminUserTxParams
+	password string
+}
+
+func (e eqUpdateAdminUserParamsMatcher) Matches(x interface{}) bool {
+	arg, ok := x.(db.UpdateAdminUserTxParams)
+
+	if !ok {
+		return false
+	}
+	fmt.Println(e, x, arg, "arg")
+
+	err := util.CheckPassword(e.password, arg.HashedPassword)
+	if err != nil {
+		return false
+	}
+
+	e.arg.HashedPassword = arg.HashedPassword
+	return reflect.DeepEqual(e.arg, arg)
+}
+
+func (e eqUpdateAdminUserParamsMatcher) String() string {
+	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
+}
+
+func EqUpdateAdminUserParams(arg db.UpdateAdminUserTxParams, password string) gomock.Matcher {
+	return eqUpdateAdminUserParamsMatcher{arg, password}
+}
+
 func TestUpdateAdminUser(t *testing.T) {
 }
 
@@ -546,7 +576,7 @@ func TestDeleteAdminUser(t *testing.T) {
 }
 
 func TestLoginAdminUser(t *testing.T) {
-	adminUser, password := randomAdminUser(t)
+	adminUser, password := randomAdminUser(t, int32(1))
 
 	n := 5
 	permissionList, _ := randomPermissionList(n)
@@ -658,16 +688,17 @@ func TestLoginAdminUser(t *testing.T) {
 	}
 }
 
-func randomAdminUser(t *testing.T) (adminUser db.AdminUser, password string) {
+func randomAdminUser(t *testing.T, status int32) (adminUser db.AdminUser, password string) {
 	password = util.RandomString(8)
 	hashedPassword, err := util.HashPassword(password)
 	require.NoError(t, err)
 
 	adminUser = db.AdminUser{
+		ID:             util.RandomInt(1, 100),
 		Account:        util.RandomAccount(),
 		HashedPassword: hashedPassword,
 		FullName:       util.RandomName(),
-		Status:         1,
+		Status:         status,
 	}
 	return
 }

@@ -234,7 +234,7 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	}
 
 	// 如果使用者有想要更改密碼
-	if req.OldPassword != "" && req.NewPassword != "" {
+	if req.OldPassword != "" && req.NewPassword != "" && req.OldPassword != req.NewPassword {
 		adminUser, err := server.store.GetAdminUser(ctx, uri.ID)
 		if err != nil {
 			if err == db.ErrRecordNotFound {
@@ -258,7 +258,6 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		}
 
 		arg.HashedPassword = hashedPassword
-		arg.PasswordChangedAt = time.Now()
 	}
 
 	result, err := server.store.UpdateAdminUserTx(ctx, arg)
