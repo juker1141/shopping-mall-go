@@ -284,6 +284,34 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
+type deleteAdminUserUri struct {
+	ID int64 `uri:"id" binding:"required,min=0"`
+}
+
+func (server *Server) deleteAdminUser(ctx *gin.Context) {
+	var uri deleteAdminUserUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.DeleteAdminUserTxParams{
+		ID: uri.ID,
+	}
+
+	result, err := server.store.DeleteAdminUserTx(ctx, arg)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
+}
+
 type loginAdminUserRequest struct {
 	Account  string `json:"account" binding:"required,alphanum,min=8"`
 	Password string `json:"password" binding:"required,min=8"`

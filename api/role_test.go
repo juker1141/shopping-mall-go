@@ -635,7 +635,7 @@ func TestDeleteRole(t *testing.T) {
 					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
 					Return(db.DeleteRoleTxResult{
-						Message: "delete role success",
+						Message: "Delete role success",
 					}, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {

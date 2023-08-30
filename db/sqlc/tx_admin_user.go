@@ -171,8 +171,8 @@ type DeleteAdminUserTxResult struct {
 	Message string `json:"message"`
 }
 
-func (store *SQLStore) DeleteAdminUserTx(ctx context.Context, arg DeleteAdminUserTxParams) (DeleteRoleTxResult, error) {
-	var result DeleteRoleTxResult
+func (store *SQLStore) DeleteAdminUserTx(ctx context.Context, arg DeleteAdminUserTxParams) (DeleteAdminUserTxResult, error) {
+	var result DeleteAdminUserTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		// 在這裡執行刪除角色的操作

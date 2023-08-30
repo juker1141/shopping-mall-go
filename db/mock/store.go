@@ -200,10 +200,10 @@ func (mr *MockStoreMockRecorder) DeleteAdminUserRoleByRoleId(arg0, arg1 interfac
 }
 
 // DeleteAdminUserTx mocks base method.
-func (m *MockStore) DeleteAdminUserTx(arg0 context.Context, arg1 db.DeleteAdminUserTxParams) (db.DeleteRoleTxResult, error) {
+func (m *MockStore) DeleteAdminUserTx(arg0 context.Context, arg1 db.DeleteAdminUserTxParams) (db.DeleteAdminUserTxResult, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteAdminUserTx", arg0, arg1)
-	ret0, _ := ret[0].(db.DeleteRoleTxResult)
+	ret0, _ := ret[0].(db.DeleteAdminUserTxResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
