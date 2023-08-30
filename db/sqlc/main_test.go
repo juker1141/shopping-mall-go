@@ -8,7 +8,6 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/juker1141/shopping-mall-go/util"
-	_ "github.com/lib/pq"
 )
 
 var testStore Store

@@ -8,7 +8,6 @@ import (
 	"github.com/juker1141/shopping-mall-go/api"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
-	_ "github.com/lib/pq"
 )
 
 func main() {

@@ -24,6 +24,12 @@ migratedown1:
 new_migration:
 	migrate create -ext sql -dir db/migration -seq $(name)
 
+db_docs:
+	dbdocs build doc/db.dbml
+
+db_schema:
+	dbml2sql --postgres -o doc/schema.sql doc/db.dbml
+
 sqlc:
 	sqlc generate
 
@@ -36,4 +42,4 @@ server:
 mock:
 	mockgen -build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/juker1141/shopping-mall-go/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown new_migration sqlc test server mock
+.PHONY: postgres createdb dropdb migrateup migratedown new_migration db_docs db_schema sqlc test server mock

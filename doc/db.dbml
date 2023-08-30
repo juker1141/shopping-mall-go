@@ -1,0 +1,62 @@
+Project shopping_mall_go {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # Shopping Mall Database
+  '''
+}
+
+Table permissions as Permissions {
+  id bigserial [pk]
+  name varchar [not null, unique]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table roles as Roles {
+  id bigserial [pk]
+  name varchar [not null, unique]
+  status int [not null, default: 1, note: 'must be either 0 or 1']
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table admin_users as AdminUsers {
+  id bigserial [pk]
+  account varchar [not null, unique]
+  full_name varchar [not null]
+  hashed_password varchar [not null]
+  status int [not null, default: 1, note: 'must be either 0 or 1']
+  password_changed_at timestamptz [not null, default: '0001-01-01 00:00:00Z']
+  created_at timestamptz [not null, default: `now()`]
+
+  Indexes {
+    account
+  }
+}
+
+Table role_permissions {
+  role_id int [ref: > Roles.id]
+  permission_id int [ref: > Permissions.id]
+  
+  Indexes {
+    (role_id, permission_id) [unique]
+  }
+}
+
+Table admin_user_roles {
+  admin_user_id int [ref: > AdminUsers.id]
+  role_id int [ref: > Roles.id]
+
+  Indexes {
+    (admin_user_id, role_id) [unique]
+  }
+}
+
+Table sessions {
+  id uuid [pk]
+  account varchar [ref: > AdminUsers.account, not null]
+  refresh_token varchar [not null]
+  user_agent varchar [not null]
+  client_ip varchar [not null]
+  is_blocked boolean [not null, default: false]
+  expires_at timestamptz [not null]
+  created_at timestamptz [not null, default: `now()`]
+}
