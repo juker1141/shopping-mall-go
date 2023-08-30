@@ -139,7 +139,7 @@ func TestCreateAdminUser(t *testing.T) {
 			},
 		},
 		{
-			name: "DuplicateUsername",
+			name: "DuplicateAccount",
 			body: gin.H{
 				"account":   adminUser.Account,
 				"full_name": adminUser.FullName,
@@ -157,7 +157,7 @@ func TestCreateAdminUser(t *testing.T) {
 					Return(db.AdminUserTxResult{}, db.ErrUniqueViolation)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusForbidden, recorder.Code)
+				require.Equal(t, http.StatusConflict, recorder.Code)
 			},
 		},
 		{

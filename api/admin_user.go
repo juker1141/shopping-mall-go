@@ -75,8 +75,8 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 
 	result, err := server.store.CreateAdminUserTx(context.Background(), arg)
 	if err != nil {
-		if db.ErrorCode(err) == db.UniqueViolation {
-			err := fmt.Errorf("account already exists: %s", err)
+		errCode := db.ErrorCode(err)
+		if errCode == db.ForeignKeyViolation || errCode == db.UniqueViolation {
 			ctx.JSON(http.StatusConflict, errorResponse(err))
 			return
 		}
