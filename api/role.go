@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -40,8 +41,8 @@ type updateRoleUri struct {
 }
 
 type updateRoleRequest struct {
-	Name          string  `json:"name"`
-	PermissionsID []int64 `json:"permissions_id"`
+	Name          string   `json:"name"`
+	PermissionsID *[]int64 `json:"permissions_id"`
 }
 
 func (server *Server) updateRole(ctx *gin.Context) {
@@ -52,7 +53,10 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	}
 
 	var req updateRoleRequest
-	ctx.BindJSON(&req)
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
 	arg := db.UpdateRoleTxParams{
 		ID: uri.ID,
@@ -61,9 +65,16 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	if req.Name != "" {
 		arg.Name = req.Name
 	}
+	fmt.Print(req.PermissionsID)
 
 	if req.PermissionsID != nil {
-		arg.PermissionsID = req.PermissionsID
+		if len(*req.PermissionsID) > 0 {
+			arg.PermissionsID = *req.PermissionsID
+		} else {
+			err := fmt.Errorf("at least one permission is required")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
 	}
 
 	result, err := server.store.UpdateRoleTx(ctx, arg)

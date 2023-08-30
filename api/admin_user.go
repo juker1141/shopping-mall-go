@@ -187,11 +187,11 @@ type updateAdminUserUri struct {
 }
 
 type updateAdminUserRequest struct {
-	FullName    string  `json:"full_name"`
-	OldPassword string  `json:"old_password"`
-	NewPassword string  `json:"new_password"`
-	Status      *int32  `json:"status"`
-	RolesID     []int64 `json:"roles_id"`
+	FullName    string   `json:"full_name"`
+	OldPassword string   `json:"old_password"`
+	NewPassword string   `json:"new_password"`
+	Status      *int32   `json:"status"`
+	RolesID     *[]int64 `json:"roles_id"`
 }
 
 func (server *Server) updateAdminUser(ctx *gin.Context) {
@@ -202,7 +202,7 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	}
 
 	var req updateAdminUserRequest
-	if err := ctx.ShouldBind(&req); err != nil {
+	if err := ctx.BindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -230,7 +230,13 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	}
 
 	if req.RolesID != nil {
-		arg.RolesID = req.RolesID
+		if len(*req.RolesID) > 0 {
+			arg.RolesID = *req.RolesID
+		} else {
+			err := fmt.Errorf("at least one role is required")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
 	}
 
 	// 如果使用者有想要更改密碼
@@ -262,6 +268,10 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 
 	result, err := server.store.UpdateAdminUserTx(ctx, arg)
 	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
