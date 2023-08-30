@@ -46,7 +46,6 @@ func (server *Server) setupRouter() {
 
 	// 登入後台
 	router.POST("/admin/login", server.loginAdminUser)
-	router.POST("/admin/user", server.createAdminUser)
 	// renew token
 	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
 
@@ -66,6 +65,7 @@ func (server *Server) setupRouter() {
 	authRoutes.DELETE("/admin/role/:id", server.deleteRole)
 
 	// 使用者
+	authRoutes.POST("/admin/user", server.createAdminUser)
 	authRoutes.GET("/admin/users", server.listAdminUser)
 	authRoutes.GET("/admin/user/:id", server.getAdminUser)
 	authRoutes.PATCH("/admin/user/:id", server.updateAdminUser)
