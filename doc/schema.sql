@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-08-31T03:40:47.364Z
+-- Generated at: 2023-08-31T15:37:27.271Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -48,9 +48,10 @@ CREATE TABLE "sessions" (
 CREATE TABLE "users" (
   "id" bigserial PRIMARY KEY,
   "account" varchar UNIQUE NOT NULL,
+  "email" varchar UNIQUE NOT NULL,
   "full_name" varchar NOT NULL,
   "gender_id" int,
-  "phone" int NOT NULL,
+  "phone" varchar NOT NULL,
   "address" varchar NOT NULL,
   "shipping_address" varchar NOT NULL,
   "post_code" varchar NOT NULL,
@@ -70,7 +71,8 @@ CREATE TABLE "carts" (
   "id" bigserial PRIMARY KEY,
   "owner" varchar,
   "total_price" int NOT NULL,
-  "final_price" int NOT NULL
+  "final_price" int NOT NULL,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
 CREATE TABLE "coupons" (
@@ -99,7 +101,7 @@ CREATE TABLE "products" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "categorys" (
+CREATE TABLE "categories" (
   "id" bigserial PRIMARY KEY,
   "name" varchar NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
@@ -116,7 +118,7 @@ CREATE TABLE "cart_coupons" (
   "coupon_id" int
 );
 
-CREATE TABLE "product_categorys" (
+CREATE TABLE "product_categories" (
   "product_id" int,
   "category_id" int
 );
@@ -129,11 +131,21 @@ CREATE UNIQUE INDEX ON "admin_user_roles" ("admin_user_id", "role_id");
 
 CREATE INDEX ON "users" ("account");
 
+CREATE INDEX ON "carts" ("owner");
+
+CREATE INDEX ON "coupons" ("title");
+
+CREATE INDEX ON "coupons" ("code");
+
+CREATE INDEX ON "coupons" ("start_at");
+
+CREATE INDEX ON "coupons" ("expires_at");
+
 CREATE UNIQUE INDEX ON "cart_products" ("cart_id", "product_id");
 
 CREATE UNIQUE INDEX ON "cart_coupons" ("cart_id", "coupon_id");
 
-CREATE UNIQUE INDEX ON "product_categorys" ("product_id", "category_id");
+CREATE UNIQUE INDEX ON "product_categories" ("product_id", "category_id");
 
 COMMENT ON COLUMN "admin_users"."status" IS 'must be either 0 or 1';
 
@@ -167,6 +179,6 @@ ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id")
 
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
 
-ALTER TABLE "product_categorys" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "product_categories" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
-ALTER TABLE "product_categorys" ADD FOREIGN KEY ("category_id") REFERENCES "categorys" ("id");
+ALTER TABLE "product_categories" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");

@@ -1,7 +1,9 @@
 package util
 
 import (
+	"fmt"
 	"math/rand"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -53,4 +55,29 @@ func RandomPermission() string {
 // RandomRole generates a random role
 func RandomRole() string {
 	return RandomString(4)
+}
+
+// RandomEmail generates a random email
+func RandomEmail() string {
+	return fmt.Sprintf("%s@email.com", RandomString(8))
+}
+
+func RandomGender() int32 {
+	return int32(RandomInt(1, 3))
+}
+
+func RandomPhone() string {
+	return RandomString(10)
+}
+
+func RandomAddress() string {
+	return RandomString(20)
+}
+
+func RandomPostCode() string {
+	return strconv.Itoa(int(RandomInt(101, 999)))
+}
+
+func RandomPrice() int32 {
+	return int32(RandomInt(1, 1000))
 }

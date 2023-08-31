@@ -56,9 +56,10 @@ Table sessions {
 Table users as Users {
   id bigserial [pk]
   account varchar [not null, unique]
+  email varchar [not null, unique]
   full_name varchar [not null]
   gender_id int [ref: > Genders.id]
-  phone int [not null]
+  phone varchar [not null]
   address varchar [not null]
   shipping_address varchar [not null]
   post_code varchar [not null]
@@ -83,6 +84,11 @@ Table carts as Carts {
   owner varchar [ref: > Users.account]
   total_price int [not null, note: 'must be positive']
   final_price int [not null, note: 'must be positive']
+  created_at timestamptz [not null, default: `now()`]
+
+  Indexes {
+    owner
+  }
 }
 
 Table coupons as Coupons {
@@ -94,6 +100,13 @@ Table coupons as Coupons {
   start_at timestamptz [not null, default: `now()`]
   expires_at timestamptz [not null, default: '2100-01-01 00:00:00Z']
   created_at timestamptz [not null, default: `now()`]
+
+  Indexes {
+    title
+    code
+    start_at
+    expires_at  
+  }
 }
 
 Table products as Products {
@@ -111,7 +124,7 @@ Table products as Products {
   created_at timestamptz [not null, default: `now()`]
 }
 
-Table categorys as Categorys {
+Table categories as categories {
   id bigserial [pk]
   name varchar [not null]
   created_at timestamptz [not null, default: `now()`]
@@ -136,9 +149,9 @@ Table cart_coupons {
   }
 }
 
-Table product_categorys {
+Table product_categories {
   product_id int [ref: > Products.id]
-  category_id int [ref: > Categorys.id]
+  category_id int [ref: > categories.id]
   
   Indexes {
     (product_id, category_id) [unique]
