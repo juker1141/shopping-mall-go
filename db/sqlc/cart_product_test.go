@@ -142,6 +142,7 @@ func TestListCartProductByCartId(t *testing.T) {
 				Int32: int32(product.ID),
 				Valid: true,
 			},
+			Num: int32(util.RandomInt(1, 100)),
 		})
 	}
 
@@ -171,6 +172,7 @@ func TestListCartProductByProductId(t *testing.T) {
 				Int32: int32(product.ID),
 				Valid: true,
 			},
+			Num: int32(util.RandomInt(1, 100)),
 		})
 	}
 
