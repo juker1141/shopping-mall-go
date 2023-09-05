@@ -8,6 +8,8 @@ package db
 import (
 	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createCoupon = `-- name: CreateCoupon :one
@@ -91,28 +93,26 @@ WHERE
   CASE
     WHEN $1::varchar = 'title' THEN title ILIKE '%' || $2::varchar || '%'
     WHEN $1::varchar = 'code' THEN code ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'start_at' THEN start_at ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'expires_at' THEN expires_at ILIKE '%' || $2::varchar || '%'
     ELSE TRUE
   END
 ORDER BY id
-LIMIT $3
-OFFSET $4
+LIMIT $4
+OFFSET $3
 `
 
 type ListCouponsParams struct {
-	Column1 string `json:"column_1"`
-	Column2 string `json:"column_2"`
-	Limit   int32  `json:"limit"`
-	Offset  int32  `json:"offset"`
+	Key      string `json:"key"`
+	KeyValue string `json:"key_value"`
+	Offset   int32  `json:"Offset"`
+	Limit    int32  `json:"Limit"`
 }
 
 func (q *Queries) ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error) {
 	rows, err := q.db.Query(ctx, listCoupons,
-		arg.Column1,
-		arg.Column2,
-		arg.Limit,
+		arg.Key,
+		arg.KeyValue,
 		arg.Offset,
+		arg.Limit,
 	)
 	if err != nil {
 		return nil, err
@@ -144,32 +144,32 @@ func (q *Queries) ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Cou
 const updateCoupon = `-- name: UpdateCoupon :one
 UPDATE coupons
 SET 
-  title = $2,
-  code = $3,
-  percent = $4,
-  start_at = $5,
-  expires_at = $6
-WHERE id = $1
+  title = COALESCE($1, title),
+  code = COALESCE($2, code),
+  percent = COALESCE($3, percent),
+  start_at = COALESCE($4, start_at),
+  expires_at = COALESCE($5, expires_at)
+WHERE id = $6
 RETURNING id, title, code, percent, created_by, start_at, expires_at, created_at
 `
 
 type UpdateCouponParams struct {
-	ID        int64     `json:"id"`
-	Title     string    `json:"title"`
-	Code      string    `json:"code"`
-	Percent   int32     `json:"percent"`
-	StartAt   time.Time `json:"start_at"`
-	ExpiresAt time.Time `json:"expires_at"`
+	Title     pgtype.Text        `json:"title"`
+	Code      pgtype.Text        `json:"code"`
+	Percent   pgtype.Int4        `json:"percent"`
+	StartAt   pgtype.Timestamptz `json:"start_at"`
+	ExpiresAt pgtype.Timestamptz `json:"expires_at"`
+	ID        int64              `json:"id"`
 }
 
 func (q *Queries) UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error) {
 	row := q.db.QueryRow(ctx, updateCoupon,
-		arg.ID,
 		arg.Title,
 		arg.Code,
 		arg.Percent,
 		arg.StartAt,
 		arg.ExpiresAt,
+		arg.ID,
 	)
 	var i Coupon
 	err := row.Scan(

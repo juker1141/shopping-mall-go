@@ -18,25 +18,23 @@ WHERE id = $1 LIMIT 1;
 SELECT * FROM coupons
 WHERE
   CASE
-    WHEN $1::varchar = 'title' THEN title ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'code' THEN code ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'start_at' THEN start_at ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'expires_at' THEN expires_at ILIKE '%' || $2::varchar || '%'
+    WHEN sqlc.arg(key)::varchar = 'title' THEN title ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
+    WHEN sqlc.arg(key)::varchar = 'code' THEN code ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
     ELSE TRUE
   END
 ORDER BY id
-LIMIT $3
-OFFSET $4;
+LIMIT sqlc.arg('Limit')
+OFFSET sqlc.arg('Offset');
 
 -- name: UpdateCoupon :one
 UPDATE coupons
 SET 
-  title = $2,
-  code = $3,
-  percent = $4,
-  start_at = $5,
-  expires_at = $6
-WHERE id = $1
+  title = COALESCE(sqlc.narg(title), title),
+  code = COALESCE(sqlc.narg(code), code),
+  percent = COALESCE(sqlc.narg(percent), percent),
+  start_at = COALESCE(sqlc.narg(start_at), start_at),
+  expires_at = COALESCE(sqlc.narg(expires_at), expires_at)
+WHERE id = sqlc.arg(id)
 RETURNING *;
 
 -- name: DeleteCoupon :exec

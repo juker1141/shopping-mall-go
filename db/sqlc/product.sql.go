@@ -109,32 +109,32 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (Product, error) {
 const listProducts = `-- name: ListProducts :many
 SELECT p.id, p.title, p.origin_price, p.price, p.unit, p.description, p.content, p.status, p.image_url, p.images_url, p.created_by, p.created_at
 FROM products AS p
-JOIN product_categories AS pc ON p.id = pc.product_id
-JOIN categories AS c ON pc.category_id = c.id
 WHERE
   CASE
     WHEN $1::varchar = 'title' THEN p.title ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
+    -- WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
     ELSE TRUE
   END
 ORDER BY p.id
-LIMIT $3
-OFFSET $4
+LIMIT $4
+OFFSET $3
 `
 
 type ListProductsParams struct {
-	Column1 string `json:"column_1"`
-	Column2 string `json:"column_2"`
-	Limit   int32  `json:"limit"`
-	Offset  int32  `json:"offset"`
+	Key      string `json:"key"`
+	KeyValue string `json:"key_value"`
+	Offset   int32  `json:"Offset"`
+	Limit    int32  `json:"Limit"`
 }
 
+// JOIN product_categories AS pc ON p.id = pc.product_id
+// JOIN categories AS c ON pc.category_id = c.id
 func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error) {
 	rows, err := q.db.Query(ctx, listProducts,
-		arg.Column1,
-		arg.Column2,
-		arg.Limit,
+		arg.Key,
+		arg.KeyValue,
 		arg.Offset,
+		arg.Limit,
 	)
 	if err != nil {
 		return nil, err

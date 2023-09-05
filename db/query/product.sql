@@ -21,17 +21,17 @@ WHERE id = $1 LIMIT 1;
 -- name: ListProducts :many
 SELECT p.*
 FROM products AS p
-JOIN product_categories AS pc ON p.id = pc.product_id
-JOIN categories AS c ON pc.category_id = c.id
+-- JOIN product_categories AS pc ON p.id = pc.product_id
+-- JOIN categories AS c ON pc.category_id = c.id
 WHERE
   CASE
-    WHEN $1::varchar = 'title' THEN p.title ILIKE '%' || $2::varchar || '%'
-    WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
+    WHEN sqlc.arg(key)::varchar = 'title' THEN p.title ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
+    -- WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
     ELSE TRUE
   END
 ORDER BY p.id
-LIMIT $3
-OFFSET $4;
+LIMIT sqlc.arg('Limit')
+OFFSET sqlc.arg('Offset');
 
 -- name: UpdateProduct :one
 UPDATE products

@@ -61,6 +61,8 @@ type Querier interface {
 	ListPermissions(ctx context.Context, arg ListPermissionsParams) ([]Permission, error)
 	ListPermissionsForAdminUser(ctx context.Context, id int64) ([]Permission, error)
 	ListPermissionsForRole(ctx context.Context, id int64) ([]Permission, error)
+	// JOIN product_categories AS pc ON p.id = pc.product_id
+	// JOIN categories AS c ON pc.category_id = c.id
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListRolePermissionByPermissionId(ctx context.Context, permissionID pgtype.Int4) ([]RolePermission, error)
 	ListRolePermissionByRoleId(ctx context.Context, roleID pgtype.Int4) ([]RolePermission, error)
