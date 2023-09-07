@@ -2,7 +2,9 @@ package api
 
 import (
 	"fmt"
+	"mime/multipart"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,17 +14,17 @@ import (
 )
 
 type createUserRequest struct {
-	Account         string `json:"account" binding:"required,alphanum,min=8"`
-	Email           string `json:"email" binding:"required,email"`
-	FullName        string `json:"full_name" binding:"required,min=2,fullName"`
-	Password        string `json:"password" binding:"required,min=8"`
-	GenderId        int32  `json:"gender_id" binding:"required,number"`
-	Phone           string `json:"phone" binding:"required,e164"`
-	Address         string `json:"address" binding:"required"`
-	ShippingAddress string `json:"shipping_address" binding:"required"`
-	PostCode        string `json:"post_code" binding:"required"`
-	AvatarUrl       string `json:"avatar_url"`
-	Status          int32  `json:"status" binding:"required,number"`
+	Account         string                `form:"account" binding:"required,alphanum,min=8"`
+	Email           string                `form:"email" binding:"required,email"`
+	FullName        string                `form:"full_name" binding:"required,min=2,fullName"`
+	Password        string                `form:"password" binding:"required,min=8"`
+	GenderId        int32                 `form:"gender_id" binding:"required,number"`
+	Phone           string                `form:"phone" binding:"required,twPhone"`
+	Address         string                `form:"address" binding:"required"`
+	ShippingAddress string                `form:"shipping_address" binding:"required"`
+	PostCode        string                `form:"post_code" binding:"required"`
+	Status          int32                 `form:"status" binding:"required,number"`
+	AvatarFile      *multipart.FileHeader `form:"avatar_file"`
 }
 
 type userResponse struct {
@@ -40,14 +42,13 @@ func newUserResponse(user db.User) userResponse {
 		Account:   user.Account,
 		Email:     user.Email,
 		FullName:  user.FullName,
-		Phone:     user.Phone,
 		AvatarUrl: user.AvatarUrl,
 	}
 }
 
 func (server *Server) createUser(ctx *gin.Context) {
 	var req createUserRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
@@ -71,12 +72,29 @@ func (server *Server) createUser(ctx *gin.Context) {
 		Address:         req.Address,
 		ShippingAddress: req.ShippingAddress,
 		PostCode:        req.PostCode,
-		AvatarUrl:       "",
 		Status:          req.Status,
 	}
 
-	if req.AvatarUrl != "" {
-		arg.AvatarUrl = req.AvatarUrl
+	if req.AvatarFile != nil {
+		file, err := ctx.FormFile("avatar_file")
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		timestamp := time.Now().UnixNano()
+		filename := fmt.Sprintf("%d_%s", timestamp, file.Filename)
+		targetPath := filepath.Join("static", "avatar_images", filename)
+
+		err = ctx.SaveUploadedFile(req.AvatarFile, targetPath)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		arg.AvatarUrl = targetPath
+	} else {
+		arg.AvatarUrl = filepath.Join("static", "avatar_images", "default_avatar.png")
 	}
 
 	user, err := server.store.CreateUser(ctx, arg)

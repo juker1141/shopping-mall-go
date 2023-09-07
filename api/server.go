@@ -34,6 +34,7 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("fullName", validFullName)
+		v.RegisterValidation("twPhone", validTaiwanPhone)
 	}
 
 	server.setupRouter()
@@ -54,6 +55,9 @@ func (server *Server) setupRouter() {
 	router.POST("/user", server.createUser)
 
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+
+	// 獲取圖片
+	router.Static("/static", "./static")
 
 	// 權限
 	authRoutes.POST("/admin/permission", server.createPermission)

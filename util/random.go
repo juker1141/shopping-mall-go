@@ -8,7 +8,10 @@ import (
 	"time"
 )
 
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
+const (
+	alphabet = "abcdefghijklmnopqrstuvwxyz"
+	numbers  = "0123456789"
+)
 
 func init() {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -17,6 +20,18 @@ func init() {
 // RandomInt generates a random integer between min and max
 func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
+}
+
+func RandomNumber(n int) string {
+	var sb strings.Builder
+	k := len(numbers)
+
+	for i := 0; i < n; i++ {
+		c := numbers[rand.Intn(k)]
+		sb.WriteByte(c)
+	}
+
+	return sb.String()
 }
 
 // RandomString generates a random string of length n
@@ -67,7 +82,11 @@ func RandomGender() int32 {
 }
 
 func RandomPhone() string {
-	return RandomString(10)
+	return fmt.Sprintf("%v%v", "0", RandomNumber(8))
+}
+
+func RandomCellPhone() string {
+	return fmt.Sprintf("%v%v", "09", RandomNumber(8))
 }
 
 func RandomAddress() string {

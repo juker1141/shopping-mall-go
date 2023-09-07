@@ -35,8 +35,10 @@ sqlc:
 
 test:
 	go test -v -cover ./...
+	rm -rf api/static
 
 server:
+	rm -rf api/static
 	go run main.go
 
 mock:
