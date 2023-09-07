@@ -14,6 +14,7 @@ import (
 const createProduct = `-- name: CreateProduct :one
 INSERT INTO products (
   title,
+  category,
   description,
   content,
   origin_price,
@@ -24,12 +25,13 @@ INSERT INTO products (
   images_url,
   created_by
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
-) RETURNING id, title, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
+) RETURNING id, title, category, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at
 `
 
 type CreateProductParams struct {
 	Title       string   `json:"title"`
+	Category    string   `json:"category"`
 	Description string   `json:"description"`
 	Content     string   `json:"content"`
 	OriginPrice int32    `json:"origin_price"`
@@ -44,6 +46,7 @@ type CreateProductParams struct {
 func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error) {
 	row := q.db.QueryRow(ctx, createProduct,
 		arg.Title,
+		arg.Category,
 		arg.Description,
 		arg.Content,
 		arg.OriginPrice,
@@ -58,6 +61,7 @@ func (q *Queries) CreateProduct(ctx context.Context, arg CreateProductParams) (P
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Category,
 		&i.OriginPrice,
 		&i.Price,
 		&i.Unit,
@@ -82,7 +86,7 @@ func (q *Queries) DeleteProduct(ctx context.Context, id int64) error {
 }
 
 const getProduct = `-- name: GetProduct :one
-SELECT id, title, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at FROM products
+SELECT id, title, category, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at FROM products
 WHERE id = $1 LIMIT 1
 `
 
@@ -92,6 +96,7 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (Product, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Category,
 		&i.OriginPrice,
 		&i.Price,
 		&i.Unit,
@@ -107,12 +112,11 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (Product, error) {
 }
 
 const listProducts = `-- name: ListProducts :many
-SELECT p.id, p.title, p.origin_price, p.price, p.unit, p.description, p.content, p.status, p.image_url, p.images_url, p.created_by, p.created_at
+SELECT p.id, p.title, p.category, p.origin_price, p.price, p.unit, p.description, p.content, p.status, p.image_url, p.images_url, p.created_by, p.created_at
 FROM products AS p
 WHERE
   CASE
     WHEN $1::varchar = 'title' THEN p.title ILIKE '%' || $2::varchar || '%'
-    -- WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
     ELSE TRUE
   END
 ORDER BY p.id
@@ -127,8 +131,6 @@ type ListProductsParams struct {
 	Limit    int32  `json:"Limit"`
 }
 
-// JOIN product_categories AS pc ON p.id = pc.product_id
-// JOIN categories AS c ON pc.category_id = c.id
 func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error) {
 	rows, err := q.db.Query(ctx, listProducts,
 		arg.Key,
@@ -146,6 +148,7 @@ func (q *Queries) ListProducts(ctx context.Context, arg ListProductsParams) ([]P
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
+			&i.Category,
 			&i.OriginPrice,
 			&i.Price,
 			&i.Unit,
@@ -171,21 +174,23 @@ const updateProduct = `-- name: UpdateProduct :one
 UPDATE products
 SET
   title = COALESCE($1, title),
-  description = COALESCE($2, description),
-  content = COALESCE($3, content),
-  origin_price = COALESCE($4, origin_price),
-  price = COALESCE($5, price),
-  unit = COALESCE($6, unit),
-  status = COALESCE($7, status),
-  image_url = COALESCE($8, image_url),
-  images_url = COALESCE($9, images_url)
+  category = COALESCE($2, category),
+  description = COALESCE($3, description),
+  content = COALESCE($4, content),
+  origin_price = COALESCE($5, origin_price),
+  price = COALESCE($6, price),
+  unit = COALESCE($7, unit),
+  status = COALESCE($8, status),
+  image_url = COALESCE($9, image_url),
+  images_url = COALESCE($10, images_url)
 WHERE
-  id = $10
-RETURNING id, title, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at
+  id = $11
+RETURNING id, title, category, origin_price, price, unit, description, content, status, image_url, images_url, created_by, created_at
 `
 
 type UpdateProductParams struct {
 	Title       pgtype.Text `json:"title"`
+	Category    pgtype.Text `json:"category"`
 	Description pgtype.Text `json:"description"`
 	Content     pgtype.Text `json:"content"`
 	OriginPrice pgtype.Int4 `json:"origin_price"`
@@ -200,6 +205,7 @@ type UpdateProductParams struct {
 func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error) {
 	row := q.db.QueryRow(ctx, updateProduct,
 		arg.Title,
+		arg.Category,
 		arg.Description,
 		arg.Content,
 		arg.OriginPrice,
@@ -214,6 +220,7 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
+		&i.Category,
 		&i.OriginPrice,
 		&i.Price,
 		&i.Unit,

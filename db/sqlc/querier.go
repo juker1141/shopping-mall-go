@@ -17,11 +17,9 @@ type Querier interface {
 	CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error)
 	CreateCartCoupon(ctx context.Context, arg CreateCartCouponParams) (CartCoupon, error)
 	CreateCartProduct(ctx context.Context, arg CreateCartProductParams) (CartProduct, error)
-	CreateCategory(ctx context.Context, name string) (Category, error)
 	CreateCoupon(ctx context.Context, arg CreateCouponParams) (Coupon, error)
 	CreatePermission(ctx context.Context, name string) (Permission, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
-	CreateProductCategory(ctx context.Context, arg CreateProductCategoryParams) (ProductCategory, error)
 	CreateRole(ctx context.Context, name string) (Role, error)
 	CreateRolePermission(ctx context.Context, arg CreateRolePermissionParams) (RolePermission, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
@@ -34,12 +32,9 @@ type Querier interface {
 	DeleteCartCouponByCouponId(ctx context.Context, couponID pgtype.Int4) error
 	DeleteCartProductByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartProductByProductId(ctx context.Context, productID pgtype.Int4) error
-	DeleteCategory(ctx context.Context, id int64) error
 	DeleteCoupon(ctx context.Context, id int64) error
 	DeletePermission(ctx context.Context, id int64) error
 	DeleteProduct(ctx context.Context, id int64) error
-	DeleteProductCategoryByCategoryId(ctx context.Context, categoryID pgtype.Int4) error
-	DeleteProductCategoryByProductId(ctx context.Context, productID pgtype.Int4) error
 	DeleteRole(ctx context.Context, id int64) error
 	DeleteRolePermissionByPermissionId(ctx context.Context, permissionID pgtype.Int4) error
 	DeleteRolePermissionByRoleId(ctx context.Context, roleID pgtype.Int4) error
@@ -52,12 +47,9 @@ type Querier interface {
 	GetCartByOwner(ctx context.Context, owner pgtype.Text) (Cart, error)
 	GetCartCoupon(ctx context.Context, arg GetCartCouponParams) (CartCoupon, error)
 	GetCartProduct(ctx context.Context, arg GetCartProductParams) (CartProduct, error)
-	GetCategoriesCount(ctx context.Context) (int64, error)
-	GetCategory(ctx context.Context, id int64) (Category, error)
 	GetCoupon(ctx context.Context, id int64) (Coupon, error)
 	GetPermission(ctx context.Context, id int64) (Permission, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)
-	GetProductCategory(ctx context.Context, arg GetProductCategoryParams) (ProductCategory, error)
 	GetRole(ctx context.Context, id int64) (Role, error)
 	GetRolePermission(ctx context.Context, arg GetRolePermissionParams) (RolePermission, error)
 	GetRolesCount(ctx context.Context) (int64, error)
@@ -72,15 +64,10 @@ type Querier interface {
 	ListCartCouponByCouponId(ctx context.Context, couponID pgtype.Int4) ([]CartCoupon, error)
 	ListCartProductByCartId(ctx context.Context, cartID pgtype.Int4) ([]CartProduct, error)
 	ListCartProductByProductId(ctx context.Context, productID pgtype.Int4) ([]CartProduct, error)
-	ListCategories(ctx context.Context) ([]Category, error)
 	ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error)
 	ListPermissions(ctx context.Context, arg ListPermissionsParams) ([]Permission, error)
 	ListPermissionsForAdminUser(ctx context.Context, id int64) ([]Permission, error)
 	ListPermissionsForRole(ctx context.Context, id int64) ([]Permission, error)
-	ListProductCategoryByCategoryId(ctx context.Context, categoryID pgtype.Int4) ([]ProductCategory, error)
-	ListProductCategoryByProductId(ctx context.Context, productID pgtype.Int4) ([]ProductCategory, error)
-	// JOIN product_categories AS pc ON p.id = pc.product_id
-	// JOIN categories AS c ON pc.category_id = c.id
 	ListProducts(ctx context.Context, arg ListProductsParams) ([]Product, error)
 	ListRolePermissionByPermissionId(ctx context.Context, permissionID pgtype.Int4) ([]RolePermission, error)
 	ListRolePermissionByRoleId(ctx context.Context, roleID pgtype.Int4) ([]RolePermission, error)
@@ -96,7 +83,6 @@ type Querier interface {
 	// WHERE c.id = $1;
 	UpdateCart(ctx context.Context, arg UpdateCartParams) (Cart, error)
 	UpdateCartProduct(ctx context.Context, arg UpdateCartProductParams) (CartProduct, error)
-	UpdateCategory(ctx context.Context, arg UpdateCategoryParams) (Category, error)
 	UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)

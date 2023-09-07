@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-08-31T15:37:27.271Z
+-- Generated at: 2023-09-06T02:01:31.727Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -89,6 +89,7 @@ CREATE TABLE "coupons" (
 CREATE TABLE "products" (
   "id" bigserial PRIMARY KEY,
   "title" varchar NOT NULL,
+  "category" varchar NOT NULL,
   "origin_price" int NOT NULL,
   "price" int NOT NULL,
   "unit" varchar NOT NULL,
@@ -101,12 +102,6 @@ CREATE TABLE "products" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "categories" (
-  "id" bigserial PRIMARY KEY,
-  "name" varchar NOT NULL,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
-);
-
 CREATE TABLE "cart_products" (
   "cart_id" int,
   "product_id" int,
@@ -116,11 +111,6 @@ CREATE TABLE "cart_products" (
 CREATE TABLE "cart_coupons" (
   "cart_id" int,
   "coupon_id" int
-);
-
-CREATE TABLE "product_categories" (
-  "product_id" int,
-  "category_id" int
 );
 
 CREATE INDEX ON "admin_users" ("account");
@@ -144,8 +134,6 @@ CREATE INDEX ON "coupons" ("expires_at");
 CREATE UNIQUE INDEX ON "cart_products" ("cart_id", "product_id");
 
 CREATE UNIQUE INDEX ON "cart_coupons" ("cart_id", "coupon_id");
-
-CREATE UNIQUE INDEX ON "product_categories" ("product_id", "category_id");
 
 COMMENT ON COLUMN "admin_users"."status" IS 'must be either 0 or 1';
 
@@ -178,7 +166,3 @@ ALTER TABLE "cart_products" ADD FOREIGN KEY ("product_id") REFERENCES "products"
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id");
 
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
-
-ALTER TABLE "product_categories" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
-
-ALTER TABLE "product_categories" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");

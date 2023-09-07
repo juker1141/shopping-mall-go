@@ -15,6 +15,7 @@ func createRandomProduct(t *testing.T, name string) Product {
 
 	arg := CreateProductParams{
 		Title:       name,
+		Category:    util.RandomName(),
 		Description: util.RandomString(20),
 		Content:     util.RandomString(30),
 		OriginPrice: util.RandomPrice(),
@@ -36,6 +37,7 @@ func createRandomProduct(t *testing.T, name string) Product {
 
 	require.NotZero(t, product.ID)
 	require.Equal(t, arg.Title, product.Title)
+	require.Equal(t, arg.Category, product.Category)
 	require.Equal(t, arg.Description, product.Description)
 	require.Equal(t, arg.Content, product.Content)
 	require.Equal(t, arg.OriginPrice, product.OriginPrice)
@@ -59,6 +61,7 @@ func TestCreateProductButImagesEmpty(t *testing.T) {
 
 	arg := CreateProductParams{
 		Title:       util.RandomName(),
+		Category:    util.RandomName(),
 		Description: util.RandomString(20),
 		Content:     util.RandomString(30),
 		OriginPrice: util.RandomPrice(),
@@ -75,6 +78,7 @@ func TestCreateProductButImagesEmpty(t *testing.T) {
 
 	require.NotZero(t, product.ID)
 	require.Equal(t, arg.Title, product.Title)
+	require.Equal(t, arg.Category, product.Category)
 	require.Equal(t, arg.Description, product.Description)
 	require.Equal(t, arg.Content, product.Content)
 	require.Equal(t, arg.OriginPrice, product.OriginPrice)
@@ -98,6 +102,7 @@ func TestGetProduct(t *testing.T) {
 
 	require.Equal(t, product1.ID, product2.ID)
 	require.Equal(t, product1.Title, product2.Title)
+	require.Equal(t, product1.Category, product2.Category)
 	require.Equal(t, product1.Description, product2.Description)
 	require.Equal(t, product1.Content, product2.Content)
 	require.Equal(t, product1.OriginPrice, product2.OriginPrice)
@@ -119,6 +124,10 @@ func TestUpdateProductAllField(t *testing.T) {
 	arg := UpdateProductParams{
 		ID: oldProduct.ID,
 		Title: pgtype.Text{
+			String: util.RandomName(),
+			Valid:  true,
+		},
+		Category: pgtype.Text{
 			String: util.RandomName(),
 			Valid:  true,
 		},
@@ -166,6 +175,7 @@ func TestUpdateProductAllField(t *testing.T) {
 	require.WithinDuration(t, oldProduct.CreatedAt, newProduct.CreatedAt, time.Second)
 
 	require.NotEqual(t, oldProduct.Title, newProduct.Title)
+	require.NotEqual(t, oldProduct.Category, newProduct.Category)
 	require.NotEqual(t, oldProduct.Description, newProduct.Description)
 	require.NotEqual(t, oldProduct.Content, newProduct.Content)
 	require.NotEqual(t, oldProduct.OriginPrice, newProduct.OriginPrice)
@@ -196,6 +206,7 @@ func TestUpdateProductOnlyStatus(t *testing.T) {
 	require.WithinDuration(t, oldProduct.CreatedAt, newProduct.CreatedAt, time.Second)
 
 	require.Equal(t, oldProduct.Title, newProduct.Title)
+	require.Equal(t, oldProduct.Category, newProduct.Category)
 	require.Equal(t, oldProduct.Description, newProduct.Description)
 	require.Equal(t, oldProduct.Content, newProduct.Content)
 	require.Equal(t, oldProduct.OriginPrice, newProduct.OriginPrice)
@@ -227,10 +238,12 @@ func TestUpdateProductOnlyPrice(t *testing.T) {
 	require.NotEmpty(t, newProduct)
 
 	require.Equal(t, oldProduct.ID, newProduct.ID)
+	require.Equal(t, oldProduct.ID, newProduct.ID)
 	require.Equal(t, oldProduct.CreatedBy, newProduct.CreatedBy)
 	require.WithinDuration(t, oldProduct.CreatedAt, newProduct.CreatedAt, time.Second)
 
 	require.Equal(t, oldProduct.Title, newProduct.Title)
+	require.Equal(t, oldProduct.Category, newProduct.Category)
 	require.Equal(t, oldProduct.Description, newProduct.Description)
 	require.Equal(t, oldProduct.Content, newProduct.Content)
 	require.Equal(t, oldProduct.Unit, newProduct.Unit)

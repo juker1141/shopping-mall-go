@@ -112,6 +112,7 @@ Table coupons as Coupons {
 Table products as Products {
   id bigserial [pk]
   title varchar [not null]
+  category varchar [not null]
   origin_price int [not null]
   price int [not null]
   unit varchar [not null]
@@ -121,12 +122,6 @@ Table products as Products {
   image_url varchar [not null]
   images_url varchar[]
   created_by varchar [not null]
-  created_at timestamptz [not null, default: `now()`]
-}
-
-Table categories as categories {
-  id bigserial [pk]
-  name varchar [not null]
   created_at timestamptz [not null, default: `now()`]
 }
 
@@ -146,15 +141,6 @@ Table cart_coupons {
   
   Indexes {
     (cart_id, coupon_id) [unique]
-  }
-}
-
-Table product_categories {
-  product_id int [ref: > Products.id]
-  category_id int [ref: > categories.id]
-  
-  Indexes {
-    (product_id, category_id) [unique]
   }
 }
 

@@ -1,6 +1,7 @@
 -- name: CreateProduct :one
 INSERT INTO products (
   title,
+  category,
   description,
   content,
   origin_price,
@@ -11,7 +12,7 @@ INSERT INTO products (
   images_url,
   created_by
 ) VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
 ) RETURNING *;
 
 -- name: GetProduct :one
@@ -21,12 +22,9 @@ WHERE id = $1 LIMIT 1;
 -- name: ListProducts :many
 SELECT p.*
 FROM products AS p
--- JOIN product_categories AS pc ON p.id = pc.product_id
--- JOIN categories AS c ON pc.category_id = c.id
 WHERE
   CASE
     WHEN sqlc.arg(key)::varchar = 'title' THEN p.title ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
-    -- WHEN $1::varchar = 'category' THEN c.name ILIKE '%' || $2::varchar || '%'
     ELSE TRUE
   END
 ORDER BY p.id
@@ -37,6 +35,7 @@ OFFSET sqlc.arg('Offset');
 UPDATE products
 SET
   title = COALESCE(sqlc.narg(title), title),
+  category = COALESCE(sqlc.narg(category), category),
   description = COALESCE(sqlc.narg(description), description),
   content = COALESCE(sqlc.narg(content), content),
   origin_price = COALESCE(sqlc.narg(origin_price), origin_price),

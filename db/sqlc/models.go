@@ -48,12 +48,6 @@ type CartProduct struct {
 	Num       int32       `json:"num"`
 }
 
-type Category struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
 type Coupon struct {
 	ID        int64     `json:"id"`
 	Title     string    `json:"title"`
@@ -79,6 +73,7 @@ type Permission struct {
 type Product struct {
 	ID          int64  `json:"id"`
 	Title       string `json:"title"`
+	Category    string `json:"category"`
 	OriginPrice int32  `json:"origin_price"`
 	Price       int32  `json:"price"`
 	Unit        string `json:"unit"`
@@ -90,11 +85,6 @@ type Product struct {
 	ImagesUrl []string  `json:"images_url"`
 	CreatedBy string    `json:"created_by"`
 	CreatedAt time.Time `json:"created_at"`
-}
-
-type ProductCategory struct {
-	ProductID  pgtype.Int4 `json:"product_id"`
-	CategoryID pgtype.Int4 `json:"category_id"`
 }
 
 type Role struct {
