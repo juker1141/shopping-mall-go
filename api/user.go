@@ -5,6 +5,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -80,6 +81,19 @@ func (server *Server) createUser(ctx *gin.Context) {
 	if req.AvatarFile != nil {
 		file, err := ctx.FormFile("avatar_file")
 		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if !strings.HasPrefix(file.Header.Get("Content-Type"), "image/") || strings.HasSuffix(file.Filename, ".gif") {
+			err := fmt.Errorf("only non-GIF image files are allowed for upload")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		const maxSize = 5 << 20 // 5MB
+		if file.Size > maxSize {
+			err := fmt.Errorf("file size exceeds 5 MB")
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
@@ -254,6 +268,19 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	if req.AvatarFile != nil {
 		file, err := ctx.FormFile("avatar_file")
 		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if !strings.HasPrefix(file.Header.Get("Content-Type"), "image/") || strings.HasSuffix(file.Filename, ".gif") {
+			err := fmt.Errorf("only non-GIF image files are allowed for upload")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		const maxSize = 5 << 20 // 5MB
+		if file.Size > maxSize {
+			err := fmt.Errorf("file size exceeds 5 MB")
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
