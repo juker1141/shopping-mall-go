@@ -4,6 +4,13 @@ CREATE TABLE "permissions" (
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
+INSERT INTO "permissions" ("name") VALUES
+  ('帳號管理'),
+  ('商品管理'),
+  ('訂單管理'),
+  ('優惠卷管理'),
+  ('最新消息管理');
+
 CREATE TABLE "roles" (
   "id" bigserial PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL,
