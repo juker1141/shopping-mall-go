@@ -54,30 +54,31 @@ func (server *Server) setupRouter() {
 	// user 註冊
 	router.POST("/user", server.createUser)
 
-	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes := router.Group("/auth").Use(authMiddleware(server.tokenMaker))
 
+	adminRoutes := router.Group("/admin").Use(authMiddleware(server.tokenMaker)).Use(permissionMiddleware(server.store))
 	// 獲取圖片
 	router.Static("/static", "./static")
 
 	// 權限
-	authRoutes.POST("/admin/permission", server.createPermission)
-	authRoutes.GET("/admin/permissions", server.listPermission)
-	authRoutes.GET("/admin/permission/:id", server.getPermission)
-	authRoutes.PATCH("/admin/permission/:id", server.updatePermission)
+	adminRoutes.POST("/permission", server.createPermission)
+	adminRoutes.GET("/permissions", server.listPermission)
+	adminRoutes.GET("/permission/:id", server.getPermission)
+	adminRoutes.PATCH("/permission/:id", server.updatePermission)
 
 	// 角色
-	authRoutes.POST("/admin/role", server.createRole)
-	authRoutes.GET("/admin/roles", server.listRole)
-	authRoutes.GET("/admin/role/:id", server.getRole)
-	authRoutes.PATCH("/admin/role/:id", server.updateRole)
-	authRoutes.DELETE("/admin/role/:id", server.deleteRole)
+	adminRoutes.POST("/role", server.createRole)
+	adminRoutes.GET("/roles", server.listRole)
+	adminRoutes.GET("/role/:id", server.getRole)
+	adminRoutes.PATCH("/role/:id", server.updateRole)
+	adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 使用者
-	authRoutes.POST("/admin/user", server.createAdminUser)
-	authRoutes.GET("/admin/users", server.listAdminUser)
-	authRoutes.GET("/admin/user/:id", server.getAdminUser)
-	authRoutes.PATCH("/admin/user/:id", server.updateAdminUser)
-	authRoutes.DELETE("/admin/user/:id", server.deleteAdminUser)
+	router.POST("/admin/user", server.createAdminUser)
+	adminRoutes.GET("/users", server.listAdminUser)
+	adminRoutes.GET("/user/:id", server.getAdminUser)
+	adminRoutes.PATCH("/user/:id", server.updateAdminUser)
+	adminRoutes.DELETE("/user/:id", server.deleteAdminUser)
 
 	// 前台使用者
 	authRoutes.PATCH("/user/:id", server.updateUser)
@@ -87,6 +88,7 @@ func (server *Server) setupRouter() {
 
 // Start runs the HTTP server on a specific address
 func (server *Server) Start(address string) error {
+	server.InitProject()
 	return server.router.Run(address)
 }
 

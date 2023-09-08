@@ -80,3 +80,12 @@ func ValidateStatus(status int) error {
 func ValidatePassword(value string) error {
 	return ValidateString(value, 6, 100)
 }
+
+func ContainsNumber(slice []int64, number int64) bool {
+	for _, n := range slice {
+		if n == number {
+			return true
+		}
+	}
+	return false
+}

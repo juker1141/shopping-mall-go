@@ -65,7 +65,6 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	if req.Name != "" {
 		arg.Name = req.Name
 	}
-	fmt.Print(req.PermissionsID)
 
 	if req.PermissionsID != nil {
 		if len(*req.PermissionsID) > 0 {

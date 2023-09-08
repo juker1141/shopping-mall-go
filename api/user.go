@@ -187,7 +187,6 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	if req.Phone != "" {
-		fmt.Println(req.Phone)
 		if err := val.ValidateTaiwanPhone(req.Phone); err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
@@ -309,7 +308,6 @@ func (server *Server) updateUser(ctx *gin.Context) {
 
 	rsp := newUserResponse(user)
 
-	fmt.Println(rsp)
 	ctx.JSON(http.StatusOK, rsp)
 }
 
