@@ -140,9 +140,8 @@ func TestUpdateUserAllField(t *testing.T) {
 			Valid:  true,
 		},
 		PasswordChangedAt: pgtype.Timestamptz{
-			Time:             time.Now(),
-			InfinityModifier: 0,
-			Valid:            true,
+			Time:  time.Now(),
+			Valid: true,
 		},
 		Status: pgtype.Int4{
 			Int32: 0,
@@ -246,9 +245,8 @@ func TestUpdateUserOnlyPassword(t *testing.T) {
 			Valid:  true,
 		},
 		PasswordChangedAt: pgtype.Timestamptz{
-			Time:             time.Now(),
-			InfinityModifier: 0,
-			Valid:            true,
+			Time:  time.Now(),
+			Valid: true,
 		},
 	}
 

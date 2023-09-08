@@ -11,7 +11,10 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/juker1141/shopping-mall-go/val"
 )
+
+var defaultAvaterPath = filepath.Join("static", "avatar_images", "default_avatar.png")
 
 type createUserRequest struct {
 	Account         string                `form:"account" binding:"required,alphanum,min=8"`
@@ -32,7 +35,6 @@ type userResponse struct {
 	Account   string `json:"account"`
 	Email     string `json:"email"`
 	FullName  string `json:"full_name"`
-	Phone     string `json:"phone"`
 	AvatarUrl string `json:"avatar_url"`
 }
 
@@ -94,7 +96,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 
 		arg.AvatarUrl = targetPath
 	} else {
-		arg.AvatarUrl = filepath.Join("static", "avatar_images", "default_avatar.png")
+		arg.AvatarUrl = defaultAvaterPath
 	}
 
 	user, err := server.store.CreateUser(ctx, arg)
@@ -123,6 +125,164 @@ func (server *Server) createUser(ctx *gin.Context) {
 
 	rsp := newUserResponse(user)
 
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type updateUserUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+type updateUserRequest struct {
+	FullName        string                `form:"full_name"`
+	OldPassword     string                `form:"old_password"`
+	NewPassword     string                `form:"new_password"`
+	Phone           string                `form:"phone"`
+	Address         string                `form:"address"`
+	ShippingAddress string                `form:"shipping_address"`
+	PostCode        string                `form:"post_code"`
+	Status          *int32                `form:"status"`
+	AvatarFile      *multipart.FileHeader `form:"avatar_file"`
+}
+
+func (server *Server) updateUser(ctx *gin.Context) {
+	var uri updateUserUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var req updateUserRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateUserParams{
+		ID: uri.ID,
+	}
+
+	if req.FullName != "" {
+		if err := val.ValidateFullName(req.FullName); err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+		arg.FullName = pgtype.Text{
+			String: req.FullName,
+			Valid:  true,
+		}
+	}
+
+	if req.Phone != "" {
+		fmt.Println(req.Phone)
+		if err := val.ValidateTaiwanPhone(req.Phone); err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+		arg.Phone = pgtype.Text{
+			String: req.Phone,
+			Valid:  true,
+		}
+	}
+
+	if req.Address != "" {
+		arg.Address = pgtype.Text{
+			String: req.Address,
+			Valid:  true,
+		}
+	}
+
+	if req.ShippingAddress != "" {
+		arg.ShippingAddress = pgtype.Text{
+			String: req.ShippingAddress,
+			Valid:  true,
+		}
+	}
+
+	if req.PostCode != "" {
+		arg.PostCode = pgtype.Text{
+			String: req.PostCode,
+			Valid:  true,
+		}
+	}
+
+	if req.Status != nil {
+		if val.IsValidStatus(int(*req.Status)) {
+			arg.Status = pgtype.Int4{
+				Int32: *req.Status,
+				Valid: true,
+			}
+		} else {
+			err := fmt.Errorf("invalid status input: %d", *req.Status)
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+	}
+
+	if req.OldPassword != "" && req.NewPassword != "" && req.OldPassword != req.NewPassword {
+		user, err := server.store.GetUser(ctx, uri.ID)
+		if err != nil {
+			if err == db.ErrRecordNotFound {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = util.CheckPassword(req.OldPassword, user.HashedPassword)
+		if err != nil {
+			ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+			return
+		}
+
+		hashedPassword, err := util.HashPassword(req.NewPassword)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		arg.HashedPassword = pgtype.Text{
+			String: hashedPassword,
+			Valid:  true,
+		}
+		arg.PasswordChangedAt = pgtype.Timestamptz{
+			Time:  time.Now(),
+			Valid: true,
+		}
+	}
+
+	if req.AvatarFile != nil {
+		file, err := ctx.FormFile("avatar_file")
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		timestamp := time.Now().UnixNano()
+		filename := fmt.Sprintf("%d_%s", timestamp, file.Filename)
+		targetPath := filepath.Join("static", "avatar_images", filename)
+
+		err = ctx.SaveUploadedFile(req.AvatarFile, targetPath)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		arg.AvatarUrl = pgtype.Text{
+			String: targetPath,
+			Valid:  true,
+		}
+	}
+
+	user, err := server.store.UpdateUser(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := newUserResponse(user)
+
+	fmt.Println(rsp)
 	ctx.JSON(http.StatusOK, rsp)
 }
 

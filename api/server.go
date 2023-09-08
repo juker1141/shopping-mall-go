@@ -79,6 +79,9 @@ func (server *Server) setupRouter() {
 	authRoutes.PATCH("/admin/user/:id", server.updateAdminUser)
 	authRoutes.DELETE("/admin/user/:id", server.deleteAdminUser)
 
+	// 前台使用者
+	authRoutes.PATCH("/user/:id", server.updateUser)
+
 	server.router = router
 }
 

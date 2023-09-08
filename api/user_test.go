@@ -38,9 +38,8 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	}
 
 	e.arg.HashedPassword = arg.HashedPassword
+	e.arg.AvatarUrl = arg.AvatarUrl
 
-	arg.AvatarUrl = ""
-	e.arg.AvatarUrl = ""
 	return reflect.DeepEqual(e.arg, arg)
 }
 

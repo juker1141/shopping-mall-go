@@ -8,6 +8,7 @@ import (
 var (
 	isValidAccount = regexp.MustCompile(`^[a-z0-9]+$`).MatchString
 	isValidName    = regexp.MustCompile(`^[a-zA-Z\s\p{Han}]+$`).MatchString
+	isValidPhone   = regexp.MustCompile(`^(09\d{2}-?\d{6}|(\+8869\d{2}-?)?\d{6}|0[1-9]\d{7})$`).MatchString
 )
 
 func ValidateString(value string, minLength, maxLength int) error {
@@ -44,6 +45,16 @@ func ValidateFullName(value string) error {
 	}
 	if !isValidName(value) {
 		return fmt.Errorf("must only contain Chinese characters, English letters, or spaces")
+	}
+	return nil
+}
+
+func ValidateTaiwanPhone(value string) error {
+	if err := ValidateString(value, 9, 10); err != nil {
+		return err
+	}
+	if !isValidPhone(value) {
+		return fmt.Errorf("must input taiwan phone number")
 	}
 	return nil
 }
