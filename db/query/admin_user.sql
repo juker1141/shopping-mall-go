@@ -49,6 +49,15 @@ JOIN role_permissions AS rp ON r.id = rp.role_id
 JOIN permissions AS p ON rp.permission_id = p.id
 WHERE au.id = $1;
 
+-- name: ListPermissionsIDByAccount :many
+SELECT p.id
+FROM admin_users AS au
+JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
+JOIN roles AS r ON aur.role_id = r.id
+JOIN role_permissions AS rp ON r.id = rp.role_id
+JOIN permissions AS p ON rp.permission_id = p.id
+WHERE au.account = $1;
+
 -- name: GetAdminUsersCount :one
 SELECT COUNT(*) FROM admin_users;
 

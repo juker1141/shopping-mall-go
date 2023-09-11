@@ -356,3 +356,11 @@ func TestListProductsSearchButNoKey(t *testing.T) {
 		require.NotEmpty(t, product)
 	}
 }
+
+func TestGetProductsCount(t *testing.T) {
+	createRandomProduct(t, util.RandomName())
+
+	count, err := testStore.GetProductsCount(context.Background())
+	require.NoError(t, err)
+	require.NotZero(t, count)
+}

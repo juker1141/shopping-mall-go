@@ -179,6 +179,36 @@ func (q *Queries) ListPermissionsForAdminUser(ctx context.Context, id int64) ([]
 	return items, nil
 }
 
+const listPermissionsIDByAccount = `-- name: ListPermissionsIDByAccount :many
+SELECT p.id
+FROM admin_users AS au
+JOIN admin_user_roles AS aur ON au.id = aur.admin_user_id
+JOIN roles AS r ON aur.role_id = r.id
+JOIN role_permissions AS rp ON r.id = rp.role_id
+JOIN permissions AS p ON rp.permission_id = p.id
+WHERE au.account = $1
+`
+
+func (q *Queries) ListPermissionsIDByAccount(ctx context.Context, account string) ([]int64, error) {
+	rows, err := q.db.Query(ctx, listPermissionsIDByAccount, account)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []int64{}
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		items = append(items, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listRolesForAdminUser = `-- name: ListRolesForAdminUser :many
 SELECT DISTINCT r.id, r.name, r.created_at
 FROM admin_users AS au

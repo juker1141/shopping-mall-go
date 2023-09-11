@@ -50,3 +50,6 @@ RETURNING *;
 
 -- name: DeleteProduct :exec
 DELETE FROM products WHERE id = $1;
+
+-- name: GetProductsCount :one
+SELECT COUNT(*) FROM products;

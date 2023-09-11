@@ -11,6 +11,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	emptyPermission    = []int64{}
+	accountPermissions = []int64{accountPermissionCode}
+	// productPermissions = []int64{productPermissionCode}
+	// orderPermissions   = []int64{orderPermissionCode}
+	// couponPermissions  = []int64{couponPermissionCode}
+	// newsPermissions    = []int64{newsPermissionCode}
+)
+
 func newTestServer(t *testing.T, store db.Store) *Server {
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
+	"github.com/juker1141/shopping-mall-go/val"
 )
 
 const (
@@ -68,7 +69,7 @@ func permissionMiddleware(store db.Store) gin.HandlerFunc {
 			return
 		}
 
-		adminUser, err := store.GetAdminUserByAccount(ctx, typePayload.Account)
+		permissions_id, err := store.ListPermissionsIDByAccount(ctx, typePayload.Account)
 		if err != nil {
 			if err == db.ErrRecordNotFound {
 				ctx.AbortWithStatusJSON(http.StatusNotFound, errorResponse(err))
@@ -77,20 +78,54 @@ func permissionMiddleware(store db.Store) gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
-
-		permissionList, err := store.ListPermissionsForAdminUser(ctx, adminUser.ID)
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		var permissions_id []int64
-		for _, permission := range permissionList {
-			permissions_id = append(permissions_id, permission.ID)
-		}
-
 		requestedPath := ctx.FullPath()
 
-		checkPermission(ctx, requestedPath, permissions_id)
+		if userHasPermission(requestedPath, permissions_id) {
+			ctx.Next()
+		} else {
+			err := errors.New("account does not have the relevant permissions")
+			ctx.AbortWithStatusJSON(http.StatusForbidden, errorResponse(err))
+			return
+		}
+	}
+}
+
+func userHasPermission(requestedPath string, permissions_id []int64) bool {
+	switch {
+	case strings.Contains(requestedPath, "permission") ||
+		strings.Contains(requestedPath, "role") ||
+		strings.Contains(requestedPath, "/admin/user") ||
+		strings.Contains(requestedPath, "user"):
+		if val.ContainsNumber(permissions_id, accountPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	case strings.Contains(requestedPath, "product"):
+		if val.ContainsNumber(permissions_id, productPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	case strings.Contains(requestedPath, "order"):
+		if val.ContainsNumber(permissions_id, orderPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	case strings.Contains(requestedPath, "coupon"):
+		if val.ContainsNumber(permissions_id, couponPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	case strings.Contains(requestedPath, "news"):
+		if val.ContainsNumber(permissions_id, newsPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	default:
+		return false
 	}
 }

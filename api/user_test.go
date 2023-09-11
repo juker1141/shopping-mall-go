@@ -5,11 +5,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/textproto"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -38,7 +41,8 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	}
 
 	e.arg.HashedPassword = arg.HashedPassword
-	e.arg.AvatarUrl = arg.AvatarUrl
+	e.arg.AvatarUrl = ""
+	arg.AvatarUrl = ""
 
 	return reflect.DeepEqual(e.arg, arg)
 }
@@ -49,6 +53,21 @@ func (e eqCreateUserParamsMatcher) String() string {
 
 func EqCreateUserParams(arg db.CreateUserParams, password string) gomock.Matcher {
 	return eqCreateUserParamsMatcher{arg, password}
+}
+
+var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
+
+func escapeQuotes(s string) string {
+	return quoteEscaper.Replace(s)
+}
+
+func CreateImageFormFile(w *multipart.Writer, fieldname string, filename string) (io.Writer, error) {
+	h := make(textproto.MIMEHeader)
+
+	h.Set("Content-Disposition", fmt.Sprintf(`form-data; name="%s"; filename="%s"`, escapeQuotes(fieldname), escapeQuotes(filename)))
+	h.Set("Content-Type", "image/*")
+
+	return w.CreatePart(h)
 }
 
 func TestCreateUser(t *testing.T) {
@@ -312,7 +331,7 @@ func TestCreateUser(t *testing.T) {
 			if tc.isUploadAvatar {
 				var fakeFileContent []byte
 
-				fileWriter, err := writer.CreateFormFile("avatar_file", "default_avatar.png")
+				fileWriter, err := CreateImageFormFile(writer, "avatar_file", "fake_avatar.png")
 				require.NoError(t, err)
 
 				fakeFileContent = append(fakeFileContent, []byte("Fake image data...")...)
@@ -323,8 +342,8 @@ func TestCreateUser(t *testing.T) {
 			// 結束FormData
 			writer.Close()
 
-			url := "/user"
-			request, err := http.NewRequest(http.MethodPost, url, body)
+			// url := "/user"
+			request, err := http.NewRequest(http.MethodPost, "/user", body)
 			require.NoError(t, err)
 			request.Header.Set("Content-Type", writer.FormDataContentType())
 
@@ -440,7 +459,7 @@ func randomUser(t *testing.T, status int32) (user db.User, password string) {
 	hashedPassword, err := util.HashPassword(password)
 	require.NoError(t, err)
 
-	targetPath := filepath.Join("static", "avatar_images", "default_avatar.png")
+	targetPath := filepath.Join("static", "avatar_images", "fake_avatar.png")
 
 	user = db.User{
 		ID:             util.RandomInt(1, 100),

@@ -19,6 +19,14 @@ type Server struct {
 	router     *gin.Engine
 }
 
+const (
+	accountPermissionCode = int64(1)
+	productPermissionCode = int64(2)
+	orderPermissionCode   = int64(3)
+	couponPermissionCode  = int64(4)
+	newsPermissionCode    = int64(5)
+)
+
 // NewServer creates a new HTTP server and setup routing.
 func NewServer(config util.Config, store db.Store) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
@@ -45,20 +53,31 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 func (server *Server) setupRouter() {
 	router := gin.Default()
 
-	// 登入後台
-	router.POST("/login", server.loginUser)
-	router.POST("/admin/login", server.loginAdminUser)
-	// renew token
-	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
+	server.setupNoAuthRoutes(router)
 
+	server.setupAuthRoutes(router)
+
+	server.setupAdminRoutes(router)
+
+	// 獲取靜態資源
+	router.Static("/static", "./static")
+
+	server.router = router
+}
+
+func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
+	// 使用者登入網頁
+	router.POST("/login", server.loginUser)
+	// 登入後台
+	router.POST("/admin/login", server.loginAdminUser)
+	// Renew Token
+	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
 	// user 註冊
 	router.POST("/user", server.createUser)
+}
 
-	authRoutes := router.Group("/auth").Use(authMiddleware(server.tokenMaker))
-
+func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes := router.Group("/admin").Use(authMiddleware(server.tokenMaker)).Use(permissionMiddleware(server.store))
-	// 獲取圖片
-	router.Static("/static", "./static")
 
 	// 權限
 	adminRoutes.POST("/permission", server.createPermission)
@@ -74,16 +93,21 @@ func (server *Server) setupRouter() {
 	adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 使用者
-	router.POST("/admin/user", server.createAdminUser)
+	adminRoutes.POST("/user", server.createAdminUser)
 	adminRoutes.GET("/users", server.listAdminUser)
 	adminRoutes.GET("/user/:id", server.getAdminUser)
 	adminRoutes.PATCH("/user/:id", server.updateAdminUser)
 	adminRoutes.DELETE("/user/:id", server.deleteAdminUser)
 
+	// 商品
+	adminRoutes.POST("/product", server.createProduct)
+	adminRoutes.GET("/products", server.listProduct)
+}
+
+func (server *Server) setupAuthRoutes(router *gin.Engine) {
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	// 前台使用者
 	authRoutes.PATCH("/user/:id", server.updateUser)
-
-	server.router = router
 }
 
 // Start runs the HTTP server on a specific address

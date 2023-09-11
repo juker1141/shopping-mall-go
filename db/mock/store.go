@@ -652,6 +652,21 @@ func (mr *MockStoreMockRecorder) GetProduct(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProduct", reflect.TypeOf((*MockStore)(nil).GetProduct), arg0, arg1)
 }
 
+// GetProductsCount mocks base method.
+func (m *MockStore) GetProductsCount(arg0 context.Context) (int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProductsCount", arg0)
+	ret0, _ := ret[0].(int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProductsCount indicates an expected call of GetProductsCount.
+func (mr *MockStoreMockRecorder) GetProductsCount(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProductsCount", reflect.TypeOf((*MockStore)(nil).GetProductsCount), arg0)
+}
+
 // GetRole mocks base method.
 func (m *MockStore) GetRole(arg0 context.Context, arg1 int64) (db.Role, error) {
 	m.ctrl.T.Helper()
@@ -920,6 +935,21 @@ func (m *MockStore) ListPermissionsForRole(arg0 context.Context, arg1 int64) ([]
 func (mr *MockStoreMockRecorder) ListPermissionsForRole(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPermissionsForRole", reflect.TypeOf((*MockStore)(nil).ListPermissionsForRole), arg0, arg1)
+}
+
+// ListPermissionsIDByAccount mocks base method.
+func (m *MockStore) ListPermissionsIDByAccount(arg0 context.Context, arg1 string) ([]int64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListPermissionsIDByAccount", arg0, arg1)
+	ret0, _ := ret[0].([]int64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListPermissionsIDByAccount indicates an expected call of ListPermissionsIDByAccount.
+func (mr *MockStoreMockRecorder) ListPermissionsIDByAccount(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListPermissionsIDByAccount", reflect.TypeOf((*MockStore)(nil).ListPermissionsIDByAccount), arg0, arg1)
 }
 
 // ListProducts mocks base method.

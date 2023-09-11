@@ -111,6 +111,17 @@ func (q *Queries) GetProduct(ctx context.Context, id int64) (Product, error) {
 	return i, err
 }
 
+const getProductsCount = `-- name: GetProductsCount :one
+SELECT COUNT(*) FROM products
+`
+
+func (q *Queries) GetProductsCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, getProductsCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const listProducts = `-- name: ListProducts :many
 SELECT p.id, p.title, p.category, p.origin_price, p.price, p.unit, p.description, p.content, p.status, p.image_url, p.images_url, p.created_by, p.created_at
 FROM products AS p

@@ -37,6 +37,8 @@ func TestGetPermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					GetPermission(gomock.Any(), gomock.Eq(permission.ID)).
 					Times(1).
@@ -62,12 +64,31 @@ func TestGetPermissionAPI(t *testing.T) {
 			},
 		},
 		{
+			name: "NoRequiredPermission",
+			ID:   permission.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					GetPermission(gomock.Any(), gomock.Eq(permission.ID)).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
 			name: "NotFound",
 			ID:   permission.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					GetPermission(gomock.Any(), gomock.Eq(permission.ID)).
 					Times(1).
@@ -84,6 +105,8 @@ func TestGetPermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					GetPermission(gomock.Any(), gomock.Eq(permission.ID)).
 					Times(1).
@@ -100,6 +123,8 @@ func TestGetPermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					GetPermission(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -155,6 +180,8 @@ func TestCreatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					CreatePermission(gomock.Any(), gomock.Eq(permission.Name)).
 					Times(1).
@@ -182,6 +209,25 @@ func TestCreatePermissionAPI(t *testing.T) {
 			},
 		},
 		{
+			name: "NoRequiredPermission",
+			body: gin.H{
+				"name": permission.Name,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					CreatePermission(gomock.Any(), gomock.Eq(permission.Name)).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
 			name: "InternalError",
 			body: gin.H{
 				"name": permission.Name,
@@ -190,6 +236,8 @@ func TestCreatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					CreatePermission(gomock.Any(), gomock.Eq(permission.Name)).
 					Times(1).
@@ -208,6 +256,8 @@ func TestCreatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					CreatePermission(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -276,6 +326,8 @@ func TestListPermissionsAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				arg := db.ListPermissionsParams{
 					Limit:  int32(n),
 					Offset: 0,
@@ -309,6 +361,26 @@ func TestListPermissionsAPI(t *testing.T) {
 			},
 		},
 		{
+			name: "NoRequiredPermission",
+			query: Query{
+				page:     1,
+				pageSize: n,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					ListPermissions(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
 			name: "InternalError",
 			query: Query{
 				page:     1,
@@ -318,6 +390,8 @@ func TestListPermissionsAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					ListPermissions(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -337,6 +411,8 @@ func TestListPermissionsAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					ListPermissions(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -355,6 +431,8 @@ func TestListPermissionsAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					ListPermissions(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -421,6 +499,8 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				arg := db.UpdatePermissionParams{
 					ID:   permission.ID,
 					Name: updatedName,
@@ -446,6 +526,8 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				arg := db.UpdatePermissionParams{
 					ID:   permission.ID,
 					Name: updatedName,
@@ -478,6 +560,26 @@ func TestUpdatePermissionAPI(t *testing.T) {
 			},
 		},
 		{
+			name: "NoAuthorization",
+			arg: db.UpdatePermissionParams{
+				ID:   permission.ID,
+				Name: updatedName,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					UpdatePermission(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
 			name: "InternalError",
 			arg: db.UpdatePermissionParams{
 				ID:   permission.ID,
@@ -487,6 +589,8 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				arg := db.UpdatePermissionParams{
 					ID:   permission.ID,
 					Name: updatedName,
@@ -511,6 +615,8 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					UpdatePermission(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -529,6 +635,8 @@ func TestUpdatePermissionAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", accountPermissions)
+
 				store.EXPECT().
 					UpdatePermission(gomock.Any(), gomock.Any()).
 					Times(0)
