@@ -19,7 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateRole(t *testing.T) {
+func TestCreateRoleAPI(t *testing.T) {
 	role := randomRole()
 
 	n := 5
@@ -197,7 +197,7 @@ func TestCreateRole(t *testing.T) {
 	}
 }
 
-func TestUpdateRole(t *testing.T) {
+func TestUpdateRoleAPI(t *testing.T) {
 	role := randomRole()
 	updateRoleName := util.RandomRole()
 	n := 5
@@ -431,7 +431,7 @@ func TestUpdateRole(t *testing.T) {
 	}
 }
 
-func TestListRole(t *testing.T) {
+func TestListRoleAPI(t *testing.T) {
 	n := 5
 
 	permissionList, _ := randomPermissionList(n)
@@ -620,7 +620,7 @@ func TestListRole(t *testing.T) {
 	}
 }
 
-func TestGetRole(t *testing.T) {
+func TestGetRoleAPI(t *testing.T) {
 	role := randomRole()
 
 	n := 5
@@ -757,7 +757,7 @@ func TestGetRole(t *testing.T) {
 	}
 }
 
-func TestDeleteRole(t *testing.T) {
+func TestDeleteRoleAPI(t *testing.T) {
 	role := randomRole()
 
 	testCases := []struct {

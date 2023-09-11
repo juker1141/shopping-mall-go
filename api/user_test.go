@@ -70,7 +70,7 @@ func CreateImageFormFile(w *multipart.Writer, fieldname string, filename string)
 	return w.CreatePart(h)
 }
 
-func TestCreateUser(t *testing.T) {
+func TestCreateUserAPI(t *testing.T) {
 	user, password := randomUser(t, int32(1))
 	cart := randomCart(user.Account)
 	genderId := util.RandomGender()
@@ -353,7 +353,7 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-func TestLoginUser(t *testing.T) {
+func TestLoginUserAPI(t *testing.T) {
 	user, password := randomUser(t, int32(1))
 
 	testCases := []struct {

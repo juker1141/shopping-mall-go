@@ -48,7 +48,7 @@ func EqCreateAdminUserParams(arg db.CreateAdminUserTxParams, password string) go
 	return eqCreateAdminUserParamsMatcher{arg, password}
 }
 
-func TestCreateAdminUser(t *testing.T) {
+func TestCreateAdminUserAPI(t *testing.T) {
 	adminUser, password := randomAdminUser(t, int32(1))
 
 	n := 5
@@ -334,7 +334,7 @@ func TestCreateAdminUser(t *testing.T) {
 	}
 }
 
-func TestGetAdminUser(t *testing.T) {
+func TestGetAdminUserAPI(t *testing.T) {
 	adminUser, _ := randomAdminUser(t, int32(1))
 
 	n := 5
@@ -482,7 +482,7 @@ func TestGetAdminUser(t *testing.T) {
 	}
 }
 
-func TestListAdminUser(t *testing.T) {
+func TestListAdminUserAPI(t *testing.T) {
 	n := 5
 
 	adminUserList := make([]db.AdminUser, n)
@@ -698,7 +698,7 @@ func EqUpdateAdminUserParams(arg db.UpdateAdminUserTxParams, password string) go
 	return eqUpdateAdminUserParamsMatcher{arg, password}
 }
 
-func TestUpdateAdminUser(t *testing.T) {
+func TestUpdateAdminUserAPI(t *testing.T) {
 	adminUser, password := randomAdminUser(t, int32(1))
 	newPassword := util.RandomString(8)
 	newName := util.RandomString(8)
@@ -1158,7 +1158,7 @@ func TestUpdateAdminUser(t *testing.T) {
 	}
 }
 
-func TestDeleteAdminUser(t *testing.T) {
+func TestDeleteAdminUserAPI(t *testing.T) {
 	adminUser, _ := randomAdminUser(t, int32(0))
 
 	testCases := []struct {
@@ -1307,7 +1307,7 @@ func TestDeleteAdminUser(t *testing.T) {
 	}
 }
 
-func TestLoginAdminUser(t *testing.T) {
+func TestLoginAdminUserAPI(t *testing.T) {
 	adminUser, password := randomAdminUser(t, int32(1))
 
 	n := 5
