@@ -211,7 +211,7 @@ func (server *Server) updateProduct(ctx *gin.Context) {
 	}
 
 	if req.Title != "" {
-		if err := val.ValidateFullName(req.Title); err != nil {
+		if err := val.ValidateTitle(req.Title); err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
@@ -239,6 +239,27 @@ func (server *Server) updateProduct(ctx *gin.Context) {
 		arg.Description = pgtype.Text{
 			String: req.Description,
 			Valid:  true,
+		}
+	}
+
+	if req.Unit != "" {
+		arg.Unit = pgtype.Text{
+			String: req.Unit,
+			Valid:  true,
+		}
+	}
+
+	if req.Price >= 0 {
+		arg.Price = pgtype.Int4{
+			Int32: req.Price,
+			Valid: true,
+		}
+	}
+
+	if req.OriginPrice >= 0 {
+		arg.OriginPrice = pgtype.Int4{
+			Int32: req.OriginPrice,
+			Valid: true,
 		}
 	}
 
