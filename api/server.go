@@ -102,6 +102,9 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
 	adminRoutes.GET("/products", server.listProduct)
+	adminRoutes.GET("/product/:id", server.getProduct)
+	adminRoutes.PATCH("/product/:id", server.updateProduct)
+	adminRoutes.DELETE("/product/:id", server.deleteProduct)
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {

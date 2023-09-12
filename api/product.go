@@ -10,8 +10,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
+	"github.com/juker1141/shopping-mall-go/val"
 )
 
 type createProductRequest struct {
@@ -171,4 +173,186 @@ func (server *Server) listProduct(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
+}
+
+type productRoutesUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+type updateProductRequest struct {
+	Title       string                `form:"title"`
+	Category    string                `form:"category"`
+	Description string                `form:"description"`
+	Content     string                `form:"content"`
+	OriginPrice int32                 `form:"origin_price"`
+	Price       int32                 `form:"price"`
+	Unit        string                `form:"unit"`
+	Status      *int32                `form:"status"`
+	ImageFile   *multipart.FileHeader `form:"image_file"`
+	ImageUrl    string                `form:"image_url"`
+	ImagesUrl   *[]string             `form:"images_url"`
+}
+
+func (server *Server) updateProduct(ctx *gin.Context) {
+	var uri productRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var req updateProductRequest
+	if err := ctx.ShouldBind(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateProductParams{
+		ID: uri.ID,
+	}
+
+	if req.Title != "" {
+		if err := val.ValidateFullName(req.Title); err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+		arg.Title = pgtype.Text{
+			String: req.Title,
+			Valid:  true,
+		}
+	}
+
+	if req.Category != "" {
+		arg.Category = pgtype.Text{
+			String: req.Category,
+			Valid:  true,
+		}
+	}
+
+	if req.Content != "" {
+		arg.Content = pgtype.Text{
+			String: req.Content,
+			Valid:  true,
+		}
+	}
+
+	if req.Description != "" {
+		arg.Description = pgtype.Text{
+			String: req.Description,
+			Valid:  true,
+		}
+	}
+
+	if req.Status != nil {
+		if val.IsValidStatus(int(*req.Status)) {
+			arg.Status = pgtype.Int4{
+				Int32: *req.Status,
+				Valid: true,
+			}
+		} else {
+			err := fmt.Errorf("invalid status input: %d", *req.Status)
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+	}
+
+	if req.ImageFile != nil {
+		file, err := ctx.FormFile("image_file")
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if !strings.HasPrefix(file.Header.Get("Content-Type"), "image/") || strings.HasSuffix(file.Filename, ".gif") {
+			err := fmt.Errorf("only non-GIF image files are allowed for upload")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		const maxSize = 5 << 20 // 5MB
+		if file.Size > maxSize {
+			err := fmt.Errorf("file size exceeds 5 MB")
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		timestamp := time.Now().UnixNano()
+		filename := fmt.Sprintf("%d_%s", timestamp, file.Filename)
+		targetPath := filepath.Join("static", "products", filename)
+
+		err = ctx.SaveUploadedFile(req.ImageFile, targetPath)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		arg.ImageUrl = pgtype.Text{
+			String: targetPath,
+			Valid:  true,
+		}
+	} else if req.ImageUrl != "" {
+		arg.ImageUrl = pgtype.Text{
+			String: req.ImageUrl,
+			Valid:  true,
+		}
+	}
+
+	if req.ImagesUrl != nil && len(*req.ImagesUrl) > 0 {
+		arg.ImagesUrl = *req.ImagesUrl
+	}
+
+	product, err := server.store.UpdateProduct(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
+}
+
+func (server *Server) getProduct(ctx *gin.Context) {
+	var uri productRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	product, err := server.store.GetProduct(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, product)
+}
+
+type deleteProductResult struct {
+	Message string `json:"message"`
+}
+
+func (server *Server) deleteProduct(ctx *gin.Context) {
+	var uri productRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	err := server.store.DeleteProduct(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	result := deleteProductResult{
+		Message: "delete product success",
+	}
+
+	ctx.JSON(http.StatusOK, result)
 }
