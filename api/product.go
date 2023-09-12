@@ -372,7 +372,7 @@ func (server *Server) deleteProduct(ctx *gin.Context) {
 	}
 
 	result := deleteProductResult{
-		Message: "delete product success",
+		Message: "Delete product success.",
 	}
 
 	ctx.JSON(http.StatusOK, result)

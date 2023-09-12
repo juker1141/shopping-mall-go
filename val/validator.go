@@ -91,7 +91,7 @@ func ContainsNumber(slice []int64, number int64) bool {
 }
 
 func ValidateTitle(value string) error {
-	if err := ValidateString(value, 2, 100); err != nil {
+	if err := ValidateString(value, 3, 100); err != nil {
 		return err
 	}
 	return nil
