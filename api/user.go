@@ -142,7 +142,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-type updateUserUri struct {
+type userRoutesUri struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
@@ -159,7 +159,7 @@ type updateUserRequest struct {
 }
 
 func (server *Server) updateUser(ctx *gin.Context) {
-	var uri updateUserUri
+	var uri userRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return

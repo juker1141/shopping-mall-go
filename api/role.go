@@ -36,7 +36,7 @@ func (server *Server) createRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-type updateRoleUri struct {
+type roleRoutesUri struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
@@ -46,7 +46,7 @@ type updateRoleRequest struct {
 }
 
 func (server *Server) updateRole(ctx *gin.Context) {
-	var uri updateRoleUri
+	var uri roleRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -148,18 +148,14 @@ func (server *Server) listRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, listResponse)
 }
 
-type getRoleRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-}
-
 func (server *Server) getRole(ctx *gin.Context) {
-	var req getRoleRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	var uri roleRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	role, err := server.store.GetRole(ctx, req.ID)
+	role, err := server.store.GetRole(ctx, uri.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -169,7 +165,7 @@ func (server *Server) getRole(ctx *gin.Context) {
 		return
 	}
 
-	permissionList, err := server.store.ListPermissionsForRole(ctx, req.ID)
+	permissionList, err := server.store.ListPermissionsForRole(ctx, uri.ID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
@@ -183,19 +179,15 @@ func (server *Server) getRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-type deleteRoleRequest struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-}
-
 func (server *Server) deleteRole(ctx *gin.Context) {
-	var req deleteRoleRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	var uri roleRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
 	arg := db.DeleteRoleTxParams{
-		ID: req.ID,
+		ID: uri.ID,
 	}
 
 	result, err := server.store.DeleteRoleTx(ctx, arg)

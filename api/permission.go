@@ -54,18 +54,18 @@ func (server *Server) listPermission(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, permission)
 }
 
-type getPermissionRequest struct {
+type permissionRoutesUri struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
 
 func (server *Server) getPermission(ctx *gin.Context) {
-	var req getPermissionRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
+	var uri permissionRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	permission, err := server.store.GetPermission(ctx, req.ID)
+	permission, err := server.store.GetPermission(ctx, uri.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -78,23 +78,18 @@ func (server *Server) getPermission(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, permission)
 }
 
-type updatePermissionUri struct {
-	ID int64 `uri:"id" binding:"required,min=1"`
-}
-
 type updatePermissionRequest struct {
 	Name string `json:"name" binding:"required"`
 }
 
 func (server *Server) updatePermission(ctx *gin.Context) {
-	var req updatePermissionRequest
-	var uri updatePermissionUri
-
+	var uri permissionRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
+	var req updatePermissionRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
