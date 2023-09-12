@@ -25,7 +25,7 @@ type createProductRequest struct {
 	Status      int32                 `form:"status" binding:"required"`
 	ImageFile   *multipart.FileHeader `form:"image_file"`
 	ImageUrl    string                `form:"image_url"`
-	ImagesUrl   []string              `form:"images_url"`
+	ImagesUrl   *[]string             `form:"images_url"`
 }
 
 // type productResponse struct {
@@ -116,8 +116,8 @@ func (server *Server) createProduct(ctx *gin.Context) {
 		arg.ImageUrl = req.ImageUrl
 	}
 
-	if req.ImagesUrl != nil && len(req.ImagesUrl) > 0 {
-		arg.ImagesUrl = req.ImagesUrl
+	if req.ImagesUrl != nil && len(*req.ImagesUrl) > 0 {
+		arg.ImagesUrl = *req.ImagesUrl
 	} else {
 		arg.ImagesUrl = []string{}
 	}

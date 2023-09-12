@@ -1426,7 +1426,7 @@ func randomAdminUser(t *testing.T, status int32) (adminUser db.AdminUser, passwo
 	require.NoError(t, err)
 
 	adminUser = db.AdminUser{
-		ID:             util.RandomInt(1, 100),
+		ID:             util.RandomID(),
 		Account:        util.RandomAccount(),
 		HashedPassword: hashedPassword,
 		FullName:       util.RandomName(),

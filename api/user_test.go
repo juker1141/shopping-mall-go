@@ -91,6 +91,8 @@ func TestCreateUserAPI(t *testing.T) {
 	testCases := []struct {
 		name           string
 		isUploadAvatar bool
+		fileType       string
+		fileName       string
 		body           gin.H
 		buildStubs     func(store *mockdb.MockStore)
 		checkResponse  func(t *testing.T, recorder *httptest.ResponseRecorder)
@@ -98,6 +100,8 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name:           "OK",
 			isUploadAvatar: true,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.CreateUserParams{
@@ -138,8 +142,10 @@ func TestCreateUserAPI(t *testing.T) {
 		},
 		{
 			name:           "InternalError",
-			body:           templateBody,
 			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
+			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
@@ -152,8 +158,10 @@ func TestCreateUserAPI(t *testing.T) {
 		},
 		{
 			name:           "DuplicateAccount",
-			body:           templateBody,
 			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
+			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
@@ -165,7 +173,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidUsername",
+			name:           "InvalidUsername",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          "invalid-user#1",
 				"email":            user.Email,
@@ -188,7 +199,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidFullName",
+			name:           "InvalidFullName",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          user.Account,
 				"email":            user.Email,
@@ -211,7 +225,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "TooShortPassword",
+			name:           "TooShortPassword",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          user.Account,
 				"email":            user.Email,
@@ -234,7 +251,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidEmailAddress",
+			name:           "InvalidEmailAddress",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          user.Account,
 				"email":            "invalidEmail",
@@ -257,7 +277,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidEmailPhoneNumber",
+			name:           "InvalidEmailPhoneNumber",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          user.Account,
 				"email":            user.Email,
@@ -280,7 +303,10 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidStatusInput",
+			name:           "InvalidStatusInput",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"account":          user.Account,
 				"email":            user.Email,
@@ -292,6 +318,58 @@ func TestCreateUserAPI(t *testing.T) {
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
 				"status":           "0",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:           "InvalidImageType",
+			isUploadAvatar: true,
+			fileType:       "image",
+			fileName:       "fake_avatar.gif",
+			body: gin.H{
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        genderId,
+				"phone":            user.Phone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           1,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:           "InvalidImageContentType",
+			isUploadAvatar: true,
+			fileType:       "other",
+			fileName:       "fake_avatar.pdf",
+			body: gin.H{
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        genderId,
+				"phone":            user.Phone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           1,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -330,8 +408,15 @@ func TestCreateUserAPI(t *testing.T) {
 
 			if tc.isUploadAvatar {
 				var fakeFileContent []byte
+				var fileWriter io.Writer
+				var err error
 
-				fileWriter, err := CreateImageFormFile(writer, "avatar_file", "fake_avatar.png")
+				if tc.fileType == "image" {
+					fileWriter, err = CreateImageFormFile(writer, "avatar_file", tc.fileName)
+				} else {
+					fileWriter, err = writer.CreateFormFile("avatar_file", tc.fileName)
+				}
+
 				require.NoError(t, err)
 
 				fakeFileContent = append(fakeFileContent, []byte("Fake image data...")...)
@@ -342,8 +427,8 @@ func TestCreateUserAPI(t *testing.T) {
 			// 結束FormData
 			writer.Close()
 
-			// url := "/user"
-			request, err := http.NewRequest(http.MethodPost, "/user", body)
+			url := "/user"
+			request, err := http.NewRequest(http.MethodPost, url, body)
 			require.NoError(t, err)
 			request.Header.Set("Content-Type", writer.FormDataContentType())
 
@@ -462,7 +547,7 @@ func randomUser(t *testing.T, status int32) (user db.User, password string) {
 	targetPath := filepath.Join("static", "avatar_images", "fake_avatar.png")
 
 	user = db.User{
-		ID:             util.RandomInt(1, 100),
+		ID:             util.RandomID(),
 		Account:        util.RandomAccount(),
 		Email:          util.RandomEmail(),
 		HashedPassword: hashedPassword,

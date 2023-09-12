@@ -48,8 +48,8 @@ func RandomString(n int) string {
 }
 
 // RandomID generates a random ID
-func RandomID() int32 {
-	return int32(RandomInt(1, 100))
+func RandomID() int64 {
+	return int64(RandomInt(1, 100))
 }
 
 // RandomAccount generates a random account
