@@ -187,7 +187,7 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	}
 
 	if req.Phone != "" {
-		if err := val.ValidateTaiwanPhone(req.Phone); err != nil {
+		if err := val.ValidateCellPhone(req.Phone); err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}

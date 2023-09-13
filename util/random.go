@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	alphabet = "abcdefghijklmnopqrstuvwxyz"
-	numbers  = "0123456789"
+	alphabet    = "abcdefghijklmnopqrstuvwxyz"
+	numbers     = "0123456789"
+	positiveNum = "123456789"
 )
 
 func init() {
@@ -79,10 +80,6 @@ func RandomEmail() string {
 
 func RandomGender() int32 {
 	return int32(RandomInt(1, 3))
-}
-
-func RandomPhone() string {
-	return fmt.Sprintf("%v%v", "0", RandomNumber(8))
 }
 
 func RandomCellPhone() string {

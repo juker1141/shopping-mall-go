@@ -22,7 +22,7 @@ func createRandomUser(t *testing.T) User {
 			Int32: util.RandomGender(),
 			Valid: true,
 		},
-		Phone:           util.RandomPhone(),
+		Phone:           util.RandomCellPhone(),
 		Address:         util.RandomAddress(),
 		ShippingAddress: util.RandomAddress(),
 		PostCode:        util.RandomPostCode(),
@@ -116,7 +116,7 @@ func TestUpdateUserAllField(t *testing.T) {
 			Valid:  true,
 		},
 		Phone: pgtype.Text{
-			String: util.RandomPhone(),
+			String: util.RandomCellPhone(),
 			Valid:  true,
 		},
 		Address: pgtype.Text{
