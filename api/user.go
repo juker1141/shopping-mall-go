@@ -23,7 +23,7 @@ type createUserRequest struct {
 	FullName        string                `form:"full_name" binding:"required,min=2,fullName"`
 	Password        string                `form:"password" binding:"required,min=8"`
 	GenderId        int32                 `form:"gender_id" binding:"required,number"`
-	Phone           string                `form:"phone" binding:"required,twPhone"`
+	Cellphone       string                `form:"cellphone" binding:"required,cellPhone"`
 	Address         string                `form:"address" binding:"required"`
 	ShippingAddress string                `form:"shipping_address" binding:"required"`
 	PostCode        string                `form:"post_code" binding:"required"`
@@ -71,7 +71,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 			Valid: true,
 		},
 		HashedPassword:  hashedPassword,
-		Phone:           req.Phone,
+		Cellphone:       req.Cellphone,
 		Address:         req.Address,
 		ShippingAddress: req.ShippingAddress,
 		PostCode:        req.PostCode,
@@ -150,7 +150,7 @@ type updateUserRequest struct {
 	FullName        string                `form:"full_name"`
 	OldPassword     string                `form:"old_password"`
 	NewPassword     string                `form:"new_password"`
-	Phone           string                `form:"phone"`
+	Cellphone       string                `form:"cellphone"`
 	Address         string                `form:"address"`
 	ShippingAddress string                `form:"shipping_address"`
 	PostCode        string                `form:"post_code"`
@@ -186,13 +186,13 @@ func (server *Server) updateUser(ctx *gin.Context) {
 		}
 	}
 
-	if req.Phone != "" {
-		if err := val.ValidateCellPhone(req.Phone); err != nil {
+	if req.Cellphone != "" {
+		if err := val.ValidateCellPhone(req.Cellphone); err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
-		arg.Phone = pgtype.Text{
-			String: req.Phone,
+		arg.Cellphone = pgtype.Text{
+			String: req.Cellphone,
 			Valid:  true,
 		}
 	}

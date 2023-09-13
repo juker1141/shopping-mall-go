@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-06T02:01:31.727Z
+-- Generated at: 2023-09-13T07:10:05.533Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -51,7 +51,7 @@ CREATE TABLE "users" (
   "email" varchar UNIQUE NOT NULL,
   "full_name" varchar NOT NULL,
   "gender_id" int,
-  "phone" varchar NOT NULL,
+  "cellphone" varchar NOT NULL,
   "address" varchar NOT NULL,
   "shipping_address" varchar NOT NULL,
   "post_code" varchar NOT NULL,

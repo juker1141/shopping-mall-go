@@ -22,7 +22,7 @@ func createRandomUser(t *testing.T) User {
 			Int32: util.RandomGender(),
 			Valid: true,
 		},
-		Phone:           util.RandomCellPhone(),
+		Cellphone:       util.RandomCellPhone(),
 		Address:         util.RandomAddress(),
 		ShippingAddress: util.RandomAddress(),
 		PostCode:        util.RandomPostCode(),
@@ -38,7 +38,7 @@ func createRandomUser(t *testing.T) User {
 	require.Equal(t, arg.Account, user.Account)
 	require.Equal(t, arg.FullName, user.FullName)
 	require.Equal(t, arg.GenderID, user.GenderID)
-	require.Equal(t, arg.Phone, user.Phone)
+	require.Equal(t, arg.Cellphone, user.Cellphone)
 	require.Equal(t, arg.Address, user.Address)
 	require.Equal(t, arg.ShippingAddress, user.ShippingAddress)
 	require.Equal(t, arg.PostCode, user.PostCode)
@@ -67,7 +67,7 @@ func TestGetUser(t *testing.T) {
 	require.Equal(t, user1.Account, user2.Account)
 	require.Equal(t, user1.FullName, user2.FullName)
 	require.Equal(t, user1.GenderID, user2.GenderID)
-	require.Equal(t, user1.Phone, user2.Phone)
+	require.Equal(t, user1.Cellphone, user2.Cellphone)
 	require.Equal(t, user1.Address, user2.Address)
 	require.Equal(t, user1.ShippingAddress, user2.ShippingAddress)
 	require.Equal(t, user1.PostCode, user2.PostCode)
@@ -90,7 +90,7 @@ func TestGetUserByAccount(t *testing.T) {
 	require.Equal(t, user1.Account, user2.Account)
 	require.Equal(t, user1.FullName, user2.FullName)
 	require.Equal(t, user1.GenderID, user2.GenderID)
-	require.Equal(t, user1.Phone, user2.Phone)
+	require.Equal(t, user1.Cellphone, user2.Cellphone)
 	require.Equal(t, user1.Address, user2.Address)
 	require.Equal(t, user1.ShippingAddress, user2.ShippingAddress)
 	require.Equal(t, user1.PostCode, user2.PostCode)
@@ -115,7 +115,7 @@ func TestUpdateUserAllField(t *testing.T) {
 			String: util.RandomName(),
 			Valid:  true,
 		},
-		Phone: pgtype.Text{
+		Cellphone: pgtype.Text{
 			String: util.RandomCellPhone(),
 			Valid:  true,
 		},
@@ -158,7 +158,7 @@ func TestUpdateUserAllField(t *testing.T) {
 	require.Equal(t, oldUser.GenderID, newUser.GenderID)
 
 	require.NotEqual(t, oldUser.FullName, newUser.FullName)
-	require.NotEqual(t, oldUser.Phone, newUser.Phone)
+	require.NotEqual(t, oldUser.Cellphone, newUser.Cellphone)
 	require.NotEqual(t, oldUser.Address, newUser.Address)
 	require.NotEqual(t, oldUser.ShippingAddress, newUser.ShippingAddress)
 	require.NotEqual(t, oldUser.PostCode, newUser.PostCode)
@@ -187,7 +187,7 @@ func TestUpdateUserOnlyFullName(t *testing.T) {
 	require.Equal(t, oldUser.ID, newUser.ID)
 	require.Equal(t, oldUser.Account, newUser.Account)
 	require.Equal(t, oldUser.GenderID, newUser.GenderID)
-	require.Equal(t, oldUser.Phone, newUser.Phone)
+	require.Equal(t, oldUser.Cellphone, newUser.Cellphone)
 	require.Equal(t, oldUser.Address, newUser.Address)
 	require.Equal(t, oldUser.ShippingAddress, newUser.ShippingAddress)
 	require.Equal(t, oldUser.PostCode, newUser.PostCode)
@@ -219,7 +219,7 @@ func TestUpdateUserOnlyStatus(t *testing.T) {
 	require.Equal(t, oldUser.Account, newUser.Account)
 	require.Equal(t, oldUser.FullName, newUser.FullName)
 	require.Equal(t, oldUser.GenderID, newUser.GenderID)
-	require.Equal(t, oldUser.Phone, newUser.Phone)
+	require.Equal(t, oldUser.Cellphone, newUser.Cellphone)
 	require.Equal(t, oldUser.Address, newUser.Address)
 	require.Equal(t, oldUser.ShippingAddress, newUser.ShippingAddress)
 	require.Equal(t, oldUser.PostCode, newUser.PostCode)
@@ -258,7 +258,7 @@ func TestUpdateUserOnlyPassword(t *testing.T) {
 	require.Equal(t, oldUser.Account, newUser.Account)
 	require.Equal(t, oldUser.GenderID, newUser.GenderID)
 	require.Equal(t, oldUser.FullName, newUser.FullName)
-	require.Equal(t, oldUser.Phone, newUser.Phone)
+	require.Equal(t, oldUser.Cellphone, newUser.Cellphone)
 	require.Equal(t, oldUser.Address, newUser.Address)
 	require.Equal(t, oldUser.ShippingAddress, newUser.ShippingAddress)
 	require.Equal(t, oldUser.PostCode, newUser.PostCode)

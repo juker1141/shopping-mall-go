@@ -115,7 +115,7 @@ type User struct {
 	Email           string      `json:"email"`
 	FullName        string      `json:"full_name"`
 	GenderID        pgtype.Int4 `json:"gender_id"`
-	Phone           string      `json:"phone"`
+	Cellphone       string      `json:"cellphone"`
 	Address         string      `json:"address"`
 	ShippingAddress string      `json:"shipping_address"`
 	PostCode        string      `json:"post_code"`

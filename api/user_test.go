@@ -83,7 +83,7 @@ func TestCreateUserAPI(t *testing.T) {
 		"full_name":        user.FullName,
 		"password":         password,
 		"gender_id":        genderId,
-		"phone":            user.Phone,
+		"cellphone":        user.Cellphone,
 		"address":          user.Address,
 		"shipping_address": user.ShippingAddress,
 		"post_code":        user.PostCode,
@@ -114,7 +114,7 @@ func TestCreateUserAPI(t *testing.T) {
 						Int32: genderId,
 						Valid: true,
 					},
-					Phone:           user.Phone,
+					Cellphone:       user.Cellphone,
 					Address:         user.Address,
 					ShippingAddress: user.ShippingAddress,
 					PostCode:        user.PostCode,
@@ -185,7 +185,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -211,7 +211,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        "invalid_FullName#@",
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -237,7 +237,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         "psw",
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -263,7 +263,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -289,7 +289,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            "123456789",
+				"cellphone":        "123456789",
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -315,7 +315,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -341,7 +341,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -367,7 +367,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"full_name":        user.FullName,
 				"password":         password,
 				"gender_id":        genderId,
-				"phone":            user.Phone,
+				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
 				"post_code":        user.PostCode,
@@ -497,7 +497,7 @@ func TestUpdateUserAPI(t *testing.T) {
 
 	templateBody := gin.H{
 		"full_name":        newName,
-		"phone":            newPhone,
+		"cellphone":        newPhone,
 		"address":          newAddress,
 		"shipping_address": newAddress,
 		"post_code":        newPostCode,
@@ -539,7 +539,7 @@ func TestUpdateUserAPI(t *testing.T) {
 						String: newName,
 						Valid:  true,
 					},
-					Phone: pgtype.Text{
+					Cellphone: pgtype.Text{
 						String: newPhone,
 						Valid:  true,
 					},
@@ -578,7 +578,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"full_name":        newName,
-				"phone":            newPhone,
+				"cellphone":        newPhone,
 				"address":          newAddress,
 				"shipping_address": newAddress,
 				"post_code":        newPostCode,
@@ -594,7 +594,7 @@ func TestUpdateUserAPI(t *testing.T) {
 						String: newName,
 						Valid:  true,
 					},
-					Phone: pgtype.Text{
+					Cellphone: pgtype.Text{
 						String: newPhone,
 						Valid:  true,
 					},
@@ -689,7 +689,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			fileName:       "fake_avatar.png",
 			body: gin.H{
 				"full_name":        newName,
-				"phone":            newPhone,
+				"cellphone":        newPhone,
 				"address":          newAddress,
 				"shipping_address": newAddress,
 				"post_code":        newPostCode,
@@ -776,7 +776,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"phone": "1234567890",
+				"cellphone": "1234567890",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -797,7 +797,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.gif",
 			body: gin.H{
-				"phone": "1234567890",
+				"cellphone": "1234567890",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -818,7 +818,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			fileType:       "other",
 			fileName:       "fake_avatar.pdf",
 			body: gin.H{
-				"phone": "1234567890",
+				"cellphone": "1234567890",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1056,7 +1056,7 @@ func randomUser(t *testing.T, status int32) (user db.User, password string) {
 			Int32: util.RandomGender(),
 			Valid: true,
 		},
-		Phone:           util.RandomCellPhone(),
+		Cellphone:       util.RandomCellPhone(),
 		Address:         util.RandomString(20),
 		ShippingAddress: util.RandomString(20),
 		PostCode:        util.RandomPostCode(),

@@ -17,7 +17,7 @@ INSERT INTO users (
   email,
   full_name,
   gender_id,
-  phone,
+  cellphone,
   address,
   shipping_address,
   post_code,
@@ -26,7 +26,7 @@ INSERT INTO users (
   avatar_url
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11
-) RETURNING id, account, email, full_name, gender_id, phone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at
+) RETURNING id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at
 `
 
 type CreateUserParams struct {
@@ -34,7 +34,7 @@ type CreateUserParams struct {
 	Email           string      `json:"email"`
 	FullName        string      `json:"full_name"`
 	GenderID        pgtype.Int4 `json:"gender_id"`
-	Phone           string      `json:"phone"`
+	Cellphone       string      `json:"cellphone"`
 	Address         string      `json:"address"`
 	ShippingAddress string      `json:"shipping_address"`
 	PostCode        string      `json:"post_code"`
@@ -49,7 +49,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.Email,
 		arg.FullName,
 		arg.GenderID,
-		arg.Phone,
+		arg.Cellphone,
 		arg.Address,
 		arg.ShippingAddress,
 		arg.PostCode,
@@ -64,7 +64,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Email,
 		&i.FullName,
 		&i.GenderID,
-		&i.Phone,
+		&i.Cellphone,
 		&i.Address,
 		&i.ShippingAddress,
 		&i.PostCode,
@@ -87,7 +87,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, account, email, full_name, gender_id, phone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
+SELECT id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -100,7 +100,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Email,
 		&i.FullName,
 		&i.GenderID,
-		&i.Phone,
+		&i.Cellphone,
 		&i.Address,
 		&i.ShippingAddress,
 		&i.PostCode,
@@ -114,7 +114,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const getUserByAccount = `-- name: GetUserByAccount :one
-SELECT id, account, email, full_name, gender_id, phone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
+SELECT id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
 WHERE account = $1 LIMIT 1
 `
 
@@ -127,7 +127,7 @@ func (q *Queries) GetUserByAccount(ctx context.Context, account string) (User, e
 		&i.Email,
 		&i.FullName,
 		&i.GenderID,
-		&i.Phone,
+		&i.Cellphone,
 		&i.Address,
 		&i.ShippingAddress,
 		&i.PostCode,
@@ -152,7 +152,7 @@ func (q *Queries) GetUsersCount(ctx context.Context) (int64, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, account, email, full_name, gender_id, phone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
+SELECT id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at FROM users
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -178,7 +178,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.Email,
 			&i.FullName,
 			&i.GenderID,
-			&i.Phone,
+			&i.Cellphone,
 			&i.Address,
 			&i.ShippingAddress,
 			&i.PostCode,
@@ -204,7 +204,7 @@ SET
   hashed_password = COALESCE($1, hashed_password),
   password_changed_at = COALESCE($2, password_changed_at),
   full_name = COALESCE($3, full_name),
-  phone = COALESCE($4, phone),
+  cellphone = COALESCE($4, cellphone),
   address = COALESCE($5, address),
   shipping_address = COALESCE($6, shipping_address),
   post_code = COALESCE($7, post_code),
@@ -212,14 +212,14 @@ SET
   status = COALESCE($9, status)
 WHERE
   id = $10
-RETURNING id, account, email, full_name, gender_id, phone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at
+RETURNING id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at
 `
 
 type UpdateUserParams struct {
 	HashedPassword    pgtype.Text        `json:"hashed_password"`
 	PasswordChangedAt pgtype.Timestamptz `json:"password_changed_at"`
 	FullName          pgtype.Text        `json:"full_name"`
-	Phone             pgtype.Text        `json:"phone"`
+	Cellphone         pgtype.Text        `json:"cellphone"`
 	Address           pgtype.Text        `json:"address"`
 	ShippingAddress   pgtype.Text        `json:"shipping_address"`
 	PostCode          pgtype.Text        `json:"post_code"`
@@ -233,7 +233,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.HashedPassword,
 		arg.PasswordChangedAt,
 		arg.FullName,
-		arg.Phone,
+		arg.Cellphone,
 		arg.Address,
 		arg.ShippingAddress,
 		arg.PostCode,
@@ -248,7 +248,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Email,
 		&i.FullName,
 		&i.GenderID,
-		&i.Phone,
+		&i.Cellphone,
 		&i.Address,
 		&i.ShippingAddress,
 		&i.PostCode,

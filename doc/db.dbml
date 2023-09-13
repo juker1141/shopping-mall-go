@@ -59,7 +59,7 @@ Table users as Users {
   email varchar [not null, unique]
   full_name varchar [not null]
   gender_id int [ref: > Genders.id]
-  phone varchar [not null]
+  cellphone varchar [not null]
   address varchar [not null]
   shipping_address varchar [not null]
   post_code varchar [not null]

@@ -5,7 +5,7 @@ CREATE TABLE "users" (
   "email" varchar UNIQUE NOT NULL,
   "full_name" varchar NOT NULL,
   "gender_id" int,
-  "phone" varchar NOT NULL,
+  "cellphone" varchar NOT NULL,
   "address" varchar NOT NULL,
   "shipping_address" varchar NOT NULL,
   "post_code" varchar NOT NULL,
