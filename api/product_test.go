@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"mime/multipart"
@@ -104,6 +105,7 @@ func TestCreateProductAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchProduct(t, recorder.Body, product)
 			},
 		},
 		{
@@ -139,6 +141,7 @@ func TestCreateProductAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchProduct(t, recorder.Body, product)
 			},
 		},
 		{
@@ -1332,4 +1335,27 @@ func randomProduct() db.Product {
 		ImageUrl:    targetPath,
 		CreatedBy:   "user",
 	}
+}
+
+func requireBodyMatchProduct(t *testing.T, body *bytes.Buffer, product db.Product) {
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
+
+	var gotProduct db.Product
+	err = json.Unmarshal(data, &gotProduct)
+
+	fmt.Printf("%+v", gotProduct)
+	require.NoError(t, err)
+	require.Equal(t, product.ID, gotProduct.ID)
+	require.Equal(t, product.Title, gotProduct.Title)
+	require.Equal(t, product.Category, gotProduct.Category)
+	require.Equal(t, product.OriginPrice, gotProduct.OriginPrice)
+	require.Equal(t, product.Price, gotProduct.Price)
+	require.Equal(t, product.Unit, gotProduct.Unit)
+	require.Equal(t, product.Description, gotProduct.Description)
+	require.Equal(t, product.Content, gotProduct.Content)
+	require.Equal(t, product.Status, gotProduct.Status)
+	require.Equal(t, product.ImageUrl, gotProduct.ImageUrl)
+	require.Equal(t, product.ImagesUrl, gotProduct.ImagesUrl)
+	require.Equal(t, product.CreatedBy, gotProduct.CreatedBy)
 }

@@ -43,8 +43,7 @@ func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
 	}
 
 	e.arg.HashedPassword = arg.HashedPassword
-	e.arg.AvatarUrl = ""
-	arg.AvatarUrl = ""
+	e.arg.AvatarUrl = arg.AvatarUrl
 
 	return reflect.DeepEqual(e.arg, arg)
 }
@@ -75,14 +74,13 @@ func CreateImageFormFile(w *multipart.Writer, fieldname string, filename string)
 func TestCreateUserAPI(t *testing.T) {
 	user, password := randomUser(t, int32(1))
 	cart := randomCart(user.Account)
-	genderId := util.RandomGender()
 
 	templateBody := gin.H{
 		"account":          user.Account,
 		"email":            user.Email,
 		"full_name":        user.FullName,
 		"password":         password,
-		"gender_id":        genderId,
+		"gender_id":        user.GenderID.Int32,
 		"cellphone":        user.Cellphone,
 		"address":          user.Address,
 		"shipping_address": user.ShippingAddress,
@@ -111,7 +109,7 @@ func TestCreateUserAPI(t *testing.T) {
 					Email:    user.Email,
 					FullName: user.FullName,
 					GenderID: pgtype.Int4{
-						Int32: genderId,
+						Int32: user.GenderID.Int32,
 						Valid: true,
 					},
 					Cellphone:       user.Cellphone,
@@ -140,6 +138,51 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchUser(t, recorder.Body, user)
+			},
+		},
+		{
+			name:           "OK_NoImage",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
+			body:           templateBody,
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateUserParams{
+					Account:  user.Account,
+					Email:    user.Email,
+					FullName: user.FullName,
+					GenderID: pgtype.Int4{
+						Int32: user.GenderID.Int32,
+						Valid: true,
+					},
+					Cellphone:       user.Cellphone,
+					Address:         user.Address,
+					ShippingAddress: user.ShippingAddress,
+					PostCode:        user.PostCode,
+					Status:          user.Status,
+					AvatarUrl:       user.AvatarUrl,
+				}
+
+				store.EXPECT().
+					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
+					Times(1).
+					Return(user, nil)
+
+				cartArg := db.CreateCartParams{
+					Owner: pgtype.Text{
+						String: user.Account,
+						Valid:  true,
+					},
+					TotalPrice: 0,
+					FinalPrice: 0,
+				}
+
+				store.EXPECT().CreateCart(gomock.Any(), gomock.Eq(cartArg)).Times(1).Return(cart, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchUser(t, recorder.Body, user)
 			},
 		},
 		{
@@ -184,7 +227,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -210,7 +253,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        "invalid_FullName#@",
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -236,7 +279,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         "psw",
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -262,7 +305,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            "invalidEmail",
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -279,6 +322,49 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 		},
 		{
+			name:           "InvalidGenderID",
+			isUploadAvatar: false,
+			fileType:       "image",
+			fileName:       "fake_avatar.png",
+			body: gin.H{
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        4,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateUserParams{
+					Account:  user.Account,
+					Email:    user.Email,
+					FullName: user.FullName,
+					GenderID: pgtype.Int4{
+						Int32: 4,
+						Valid: true,
+					},
+					Cellphone:       user.Cellphone,
+					Address:         user.Address,
+					ShippingAddress: user.ShippingAddress,
+					PostCode:        user.PostCode,
+					Status:          user.Status,
+					AvatarUrl:       user.AvatarUrl,
+				}
+
+				store.EXPECT().
+					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
+					Times(1).
+					Return(db.User{}, db.ErrUniqueViolation)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusConflict, recorder.Code)
+			},
+		},
+		{
 			name:           "InvalidEmailPhoneNumber",
 			isUploadAvatar: false,
 			fileType:       "image",
@@ -288,7 +374,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        "123456789",
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -314,7 +400,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -340,7 +426,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -366,7 +452,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"email":            user.Email,
 				"full_name":        user.FullName,
 				"password":         password,
-				"gender_id":        genderId,
+				"gender_id":        user.GenderID.Int32,
 				"cellphone":        user.Cellphone,
 				"address":          user.Address,
 				"shipping_address": user.ShippingAddress,
@@ -484,7 +570,7 @@ func EqUpdateUserParams(arg db.UpdateUserParams, password string) gomock.Matcher
 	return eqUpdateUserParamsMatcher{arg, password}
 }
 
-func TestUpdateUserAPI(t *testing.T) {
+func TestUpdateUserByAdminAPI(t *testing.T) {
 	user, password := randomUser(t, 1)
 	newPassword := util.RandomString(8)
 	newName := util.RandomName()
@@ -1612,4 +1698,19 @@ func randomCart(account string) db.Cart {
 		TotalPrice: 0,
 		FinalPrice: 0,
 	}
+}
+
+func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
+
+	var gotUser db.User
+	err = json.Unmarshal(data, &gotUser)
+
+	require.NoError(t, err)
+	require.Equal(t, user.ID, gotUser.ID)
+	require.Equal(t, user.Account, gotUser.Account)
+	require.Equal(t, user.Email, gotUser.Email)
+	require.Equal(t, user.FullName, gotUser.FullName)
+	require.Equal(t, user.AvatarUrl, gotUser.AvatarUrl)
 }

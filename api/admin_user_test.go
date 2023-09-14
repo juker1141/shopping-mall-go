@@ -1447,3 +1447,18 @@ func randomRoleList(size int) ([]db.Role, []int64) {
 
 	return roleList, rolesID
 }
+
+// func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
+// 	data, err := io.ReadAll(body)
+// 	require.NoError(t, err)
+
+// 	var gotUser db.User
+// 	err = json.Unmarshal(data, &gotUser)
+
+// 	require.NoError(t, err)
+// 	require.Equal(t, user.ID, gotUser.ID)
+// 	require.Equal(t, user.Account, gotUser.Account)
+// 	require.Equal(t, user.Email, gotUser.Email)
+// 	require.Equal(t, user.FullName, gotUser.FullName)
+// 	require.Equal(t, user.AvatarUrl, gotUser.AvatarUrl)
+// }

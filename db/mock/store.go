@@ -142,6 +142,21 @@ func (mr *MockStoreMockRecorder) CreateCoupon(arg0, arg1 interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCoupon", reflect.TypeOf((*MockStore)(nil).CreateCoupon), arg0, arg1)
 }
 
+// CreateGender mocks base method.
+func (m *MockStore) CreateGender(arg0 context.Context, arg1 string) (db.Gender, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGender", arg0, arg1)
+	ret0, _ := ret[0].(db.Gender)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateGender indicates an expected call of CreateGender.
+func (mr *MockStoreMockRecorder) CreateGender(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGender", reflect.TypeOf((*MockStore)(nil).CreateGender), arg0, arg1)
+}
+
 // CreatePermission mocks base method.
 func (m *MockStore) CreatePermission(arg0 context.Context, arg1 string) (db.Permission, error) {
 	m.ctrl.T.Helper()
@@ -622,6 +637,21 @@ func (mr *MockStoreMockRecorder) GetCoupon(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCoupon", reflect.TypeOf((*MockStore)(nil).GetCoupon), arg0, arg1)
 }
 
+// GetGender mocks base method.
+func (m *MockStore) GetGender(arg0 context.Context, arg1 int64) (db.Gender, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGender", arg0, arg1)
+	ret0, _ := ret[0].(db.Gender)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGender indicates an expected call of GetGender.
+func (mr *MockStoreMockRecorder) GetGender(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGender", reflect.TypeOf((*MockStore)(nil).GetGender), arg0, arg1)
+}
+
 // GetPermission mocks base method.
 func (m *MockStore) GetPermission(arg0 context.Context, arg1 int64) (db.Permission, error) {
 	m.ctrl.T.Helper()
@@ -890,6 +920,21 @@ func (m *MockStore) ListCoupons(arg0 context.Context, arg1 db.ListCouponsParams)
 func (mr *MockStoreMockRecorder) ListCoupons(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCoupons", reflect.TypeOf((*MockStore)(nil).ListCoupons), arg0, arg1)
+}
+
+// ListGenders mocks base method.
+func (m *MockStore) ListGenders(arg0 context.Context) ([]db.Gender, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListGenders", arg0)
+	ret0, _ := ret[0].([]db.Gender)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListGenders indicates an expected call of ListGenders.
+func (mr *MockStoreMockRecorder) ListGenders(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListGenders", reflect.TypeOf((*MockStore)(nil).ListGenders), arg0)
 }
 
 // ListPermissions mocks base method.
