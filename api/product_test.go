@@ -1246,7 +1246,7 @@ func TestDeleteProductAPI(t *testing.T) {
 				addPermissionMiddleware(store, "user", productPermissions)
 
 				store.EXPECT().
-					DeleteProduct(gomock.Any(), gomock.Any()).
+					DeleteProduct(gomock.Any(), gomock.Eq(product.ID)).
 					Times(1).
 					Return(sql.ErrConnDone)
 			},

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"mime/multipart"
 	"net/http"
@@ -142,6 +143,41 @@ func (server *Server) createUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
+type userResponseForAdmin struct {
+	ID                int64       `json:"id"`
+	Account           string      `json:"account"`
+	Email             string      `json:"email"`
+	FullName          string      `json:"full_name"`
+	GenderID          pgtype.Int4 `json:"gender_id"`
+	Cellphone         string      `json:"cellphone"`
+	Address           string      `json:"address"`
+	ShippingAddress   string      `json:"shipping_address"`
+	PostCode          string      `json:"post_code"`
+	HashedPassword    string      `json:"hashed_password"`
+	Status            int32       `json:"status"`
+	AvatarUrl         string      `json:"avatar_url"`
+	PasswordChangedAt time.Time   `json:"password_changed_at"`
+	CreatedAt         time.Time   `json:"created_at"`
+}
+
+func newUserResponseForAdmin(user db.User) userResponseForAdmin {
+	return userResponseForAdmin{
+		ID:                user.ID,
+		Account:           user.Account,
+		Email:             user.Email,
+		FullName:          user.FullName,
+		GenderID:          user.GenderID,
+		Cellphone:         user.Cellphone,
+		Address:           user.Address,
+		ShippingAddress:   user.ShippingAddress,
+		PostCode:          user.PostCode,
+		Status:            user.Status,
+		AvatarUrl:         user.AvatarUrl,
+		PasswordChangedAt: user.PasswordChangedAt,
+		CreatedAt:         user.CreatedAt,
+	}
+}
+
 type userRoutesUri struct {
 	ID int64 `uri:"id" binding:"required,min=1"`
 }
@@ -158,7 +194,7 @@ type updateUserRequest struct {
 	AvatarFile      *multipart.FileHeader `form:"avatar_file"`
 }
 
-func (server *Server) updateUser(ctx *gin.Context) {
+func (server *Server) updateUserByAdmin(ctx *gin.Context) {
 	var uri userRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -311,7 +347,7 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-func (server *Server) getUser(ctx *gin.Context) {
+func (server *Server) getUserByAdmin(ctx *gin.Context) {
 	var uri userRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -328,10 +364,84 @@ func (server *Server) getUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, user)
+	rsp := newUserResponseForAdmin(user)
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
-func (server *Server) listUsers(ctx *gin.Context) {
+type listUsersQuery struct {
+	Page     int32 `form:"page" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+type listUsersResponse struct {
+	Count int32                  `json:"count"`
+	Data  []userResponseForAdmin `json:"data"`
+}
+
+func (server *Server) listUsersByAdmin(ctx *gin.Context) {
+	var query listUsersQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListUsersParams{
+		Limit:  query.PageSize,
+		Offset: (query.Page - 1) * query.PageSize,
+	}
+
+	users, err := server.store.ListUsers(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	var data []userResponseForAdmin
+	for _, user := range users {
+		data = append(data, newUserResponseForAdmin(user))
+	}
+
+	counts, err := server.store.GetUsersCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := listUsersResponse{
+		Count: int32(counts),
+		Data:  data,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type deleteUserResult struct {
+	Message string `json:"message"`
+}
+
+func (server *Server) deleteUserByAdmin(ctx *gin.Context) {
+	var uri userRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	err := server.store.DeleteUser(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	result := deleteUserResult{
+		Message: "Delete member user success.",
+	}
+
+	ctx.JSON(http.StatusOK, result)
 }
 
 type loginUserRequest struct {

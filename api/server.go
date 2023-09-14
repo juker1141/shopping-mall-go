@@ -100,8 +100,10 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.DELETE("/manager-user/:id", server.deleteAdminUser)
 
 	// 顧客資料
-	adminRoutes.GET("/member-user/:id", server.getUser)
-	adminRoutes.PATCH("/member-user/:id", server.updateUser)
+	adminRoutes.GET("/member-users", server.listUsersByAdmin)
+	adminRoutes.GET("/member-user/:id", server.getUserByAdmin)
+	adminRoutes.PATCH("/member-user/:id", server.updateUserByAdmin)
+	adminRoutes.DELETE("/member-user/:id", server.deleteUserByAdmin)
 
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
