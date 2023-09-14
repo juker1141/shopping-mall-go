@@ -311,6 +311,26 @@ func (server *Server) updateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
+func (server *Server) getUser(ctx *gin.Context) {
+	var uri userRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	user, err := server.store.GetUser(ctx, uri.ID)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user)
+}
+
 type loginUserRequest struct {
 	Account  string `json:"account" binding:"required,alphanum,min=8"`
 	Password string `json:"password" binding:"required,min=8"`

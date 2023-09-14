@@ -93,11 +93,15 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 使用者
-	adminRoutes.POST("/user", server.createAdminUser)
-	adminRoutes.GET("/users", server.listAdminUser)
-	adminRoutes.GET("/user/:id", server.getAdminUser)
-	adminRoutes.PATCH("/user/:id", server.updateAdminUser)
-	adminRoutes.DELETE("/user/:id", server.deleteAdminUser)
+	adminRoutes.POST("/manager-user", server.createAdminUser)
+	adminRoutes.GET("/manager-users", server.listAdminUser)
+	adminRoutes.GET("/manager-user/:id", server.getAdminUser)
+	adminRoutes.PATCH("/manager-user/:id", server.updateAdminUser)
+	adminRoutes.DELETE("/manager-user/:id", server.deleteAdminUser)
+
+	// 顧客資料
+	adminRoutes.GET("/member-user/:id", server.getUser)
+	adminRoutes.PATCH("/member-user/:id", server.updateUser)
 
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
@@ -108,9 +112,9 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {
-	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	// authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	// 前台使用者
-	authRoutes.PATCH("/user/:id", server.updateUser)
+	// authRoutes.PATCH("/user/:id", server.updateUser)
 }
 
 // Start runs the HTTP server on a specific address
