@@ -322,7 +322,7 @@ func TestCreateAdminUserAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/admin/user"
+			url := "/admin/manager-user"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -470,7 +470,7 @@ func TestGetAdminUserAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager-user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -653,7 +653,7 @@ func TestListAdminUsersAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/users"
+			url := "/admin/manager-users"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -1146,7 +1146,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := fmt.Sprintf("/admin/user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager-user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -1295,7 +1295,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager-user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 
