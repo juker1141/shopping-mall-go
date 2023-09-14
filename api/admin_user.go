@@ -92,18 +92,18 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-type listAdminUserQuery struct {
+type listAdminUsersQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
-type listAdminUserResponse struct {
+type listAdminUsersResponse struct {
 	Count int32                  `json:"count"`
 	Data  []adminUserAPIResponse `json:"data"`
 }
 
 func (server *Server) listAdminUsers(ctx *gin.Context) {
-	var query listAdminUserQuery
+	var query listAdminUsersQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -140,7 +140,7 @@ func (server *Server) listAdminUsers(ctx *gin.Context) {
 		return
 	}
 
-	rsp := listAdminUserResponse{
+	rsp := listAdminUsersResponse{
 		Count: int32(counts),
 		Data:  data,
 	}

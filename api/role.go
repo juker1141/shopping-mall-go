@@ -85,7 +85,7 @@ func (server *Server) updateRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
-type listRoleQuery struct {
+type listRolesQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
@@ -95,13 +95,13 @@ type RoleResponse struct {
 	PermissionList []db.Permission `json:"permission_list"`
 }
 
-type listRoleResponse struct {
+type listRolesResponse struct {
 	Count int32          `json:"count"`
 	Data  []RoleResponse `json:"data"`
 }
 
 func (server *Server) listRoles(ctx *gin.Context) {
-	var query listRoleQuery
+	var query listRolesQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -140,7 +140,7 @@ func (server *Server) listRoles(ctx *gin.Context) {
 		roleResponses = append(roleResponses, roleRsp)
 	}
 
-	listResponse := listRoleResponse{
+	listResponse := listRolesResponse{
 		Count: int32(counts),
 		Data:  roleResponses,
 	}
