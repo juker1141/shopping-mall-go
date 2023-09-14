@@ -111,6 +111,9 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.GET("/product/:id", server.getProduct)
 	adminRoutes.PATCH("/product/:id", server.updateProduct)
 	adminRoutes.DELETE("/product/:id", server.deleteProduct)
+
+	// 優惠卷
+	adminRoutes.POST("/coupon", server.createCoupon)
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {

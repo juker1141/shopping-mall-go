@@ -53,15 +53,15 @@ func (server *Server) createProduct(ctx *gin.Context) {
 
 	payload, exists := ctx.Get(authorizationPayloadKey)
 	if !exists {
-		err := errors.New("can not get permission")
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
+		err := errors.New("can not get token payload")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
 	typePayload, ok := payload.(*token.Payload)
 	if !ok {
-		err := errors.New("payload is not of type Payload")
-		ctx.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse(err))
+		err := errors.New("payload is not of type payload")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
 
