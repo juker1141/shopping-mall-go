@@ -191,7 +191,7 @@ func TestDeleteCoupon(t *testing.T) {
 	require.Empty(t, coupon2)
 }
 
-func TestListCoupon(t *testing.T) {
+func TestListCoupons(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 	}
@@ -209,7 +209,7 @@ func TestListCoupon(t *testing.T) {
 	}
 }
 
-func TestListCouponSearchTitle(t *testing.T) {
+func TestListCouponsSearchTitle(t *testing.T) {
 	n := 3
 	name := util.RandomName()
 	for i := 0; i < n; i++ {
@@ -234,7 +234,7 @@ func TestListCouponSearchTitle(t *testing.T) {
 	}
 }
 
-func TestListCouponSearchTitleButNoKeyValue(t *testing.T) {
+func TestListCouponsSearchTitleButNoKeyValue(t *testing.T) {
 	n := 3
 	name := util.RandomName()
 	for i := 0; i < n; i++ {
@@ -258,7 +258,7 @@ func TestListCouponSearchTitleButNoKeyValue(t *testing.T) {
 	}
 }
 
-func TestListCouponSearchTitleButNoKey(t *testing.T) {
+func TestListCouponsSearchTitleButNoKey(t *testing.T) {
 	n := 3
 	name := util.RandomName()
 	for i := 0; i < n; i++ {
@@ -282,7 +282,7 @@ func TestListCouponSearchTitleButNoKey(t *testing.T) {
 	}
 }
 
-func TestListCouponSearchCode(t *testing.T) {
+func TestListCouponsSearchCode(t *testing.T) {
 	n := 3
 	code := util.RandomString(10)
 	for i := 0; i < n; i++ {

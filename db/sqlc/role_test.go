@@ -71,7 +71,7 @@ func TestDeleteRole(t *testing.T) {
 	require.Empty(t, role2)
 }
 
-func TestListRole(t *testing.T) {
+func TestListRoles(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomRole(t)
 	}

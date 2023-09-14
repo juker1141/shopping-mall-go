@@ -174,7 +174,7 @@ func TestDeleteAdminUser(t *testing.T) {
 	require.Empty(t, adminUser2)
 }
 
-func TestListAdminUser(t *testing.T) {
+func TestListAdminUsers(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomAdminUser(t)
 	}

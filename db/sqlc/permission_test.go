@@ -69,7 +69,7 @@ func TestDeletePermission(t *testing.T) {
 	require.Empty(t, permission2)
 }
 
-func TestListPermission(t *testing.T) {
+func TestListPermissions(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		createRandomPermission(t)
 	}
