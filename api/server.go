@@ -81,20 +81,20 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 
 	// 權限
 	adminRoutes.POST("/permission", server.createPermission)
-	adminRoutes.GET("/permissions", server.listPermission)
+	adminRoutes.GET("/permissions", server.listPermissions)
 	adminRoutes.GET("/permission/:id", server.getPermission)
 	adminRoutes.PATCH("/permission/:id", server.updatePermission)
 
 	// 角色
 	adminRoutes.POST("/role", server.createRole)
-	adminRoutes.GET("/roles", server.listRole)
+	adminRoutes.GET("/roles", server.listRoles)
 	adminRoutes.GET("/role/:id", server.getRole)
 	adminRoutes.PATCH("/role/:id", server.updateRole)
 	adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 使用者
 	adminRoutes.POST("/manager-user", server.createAdminUser)
-	adminRoutes.GET("/manager-users", server.listAdminUser)
+	adminRoutes.GET("/manager-users", server.listAdminUsers)
 	adminRoutes.GET("/manager-user/:id", server.getAdminUser)
 	adminRoutes.PATCH("/manager-user/:id", server.updateAdminUser)
 	adminRoutes.DELETE("/manager-user/:id", server.deleteAdminUser)
@@ -105,7 +105,7 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
-	adminRoutes.GET("/products", server.listProduct)
+	adminRoutes.GET("/products", server.listProducts)
 	adminRoutes.GET("/product/:id", server.getProduct)
 	adminRoutes.PATCH("/product/:id", server.updateProduct)
 	adminRoutes.DELETE("/product/:id", server.deleteProduct)

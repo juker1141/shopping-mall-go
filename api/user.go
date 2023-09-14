@@ -331,6 +331,9 @@ func (server *Server) getUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+func (server *Server) listUsers(ctx *gin.Context) {
+}
+
 type loginUserRequest struct {
 	Account  string `json:"account" binding:"required,alphanum,min=8"`
 	Password string `json:"password" binding:"required,min=8"`

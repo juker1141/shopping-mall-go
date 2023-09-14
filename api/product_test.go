@@ -833,7 +833,7 @@ func TestUpdateProductAPI(t *testing.T) {
 	}
 }
 
-func TestListProductAPI(t *testing.T) {
+func TestListProductsAPI(t *testing.T) {
 	n := 5
 
 	productList := make([]db.Product, n)

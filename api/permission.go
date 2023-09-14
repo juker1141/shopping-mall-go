@@ -33,7 +33,7 @@ type listPermissionQuery struct {
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
-func (server *Server) listPermission(ctx *gin.Context) {
+func (server *Server) listPermissions(ctx *gin.Context) {
 	var query listPermissionQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

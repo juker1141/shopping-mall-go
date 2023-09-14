@@ -143,7 +143,7 @@ type listProductResponse struct {
 	Data  []db.Product `json:"data"`
 }
 
-func (server *Server) listProduct(ctx *gin.Context) {
+func (server *Server) listProducts(ctx *gin.Context) {
 	var query listProductQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

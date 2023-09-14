@@ -102,7 +102,7 @@ type listAdminUserResponse struct {
 	Data  []adminUserAPIResponse `json:"data"`
 }
 
-func (server *Server) listAdminUser(ctx *gin.Context) {
+func (server *Server) listAdminUsers(ctx *gin.Context) {
 	var query listAdminUserQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

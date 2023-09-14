@@ -100,7 +100,7 @@ type listRoleResponse struct {
 	Data  []RoleResponse `json:"data"`
 }
 
-func (server *Server) listRole(ctx *gin.Context) {
+func (server *Server) listRoles(ctx *gin.Context) {
 	var query listRoleQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

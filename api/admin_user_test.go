@@ -482,7 +482,7 @@ func TestGetAdminUserAPI(t *testing.T) {
 	}
 }
 
-func TestListAdminUserAPI(t *testing.T) {
+func TestListAdminUsersAPI(t *testing.T) {
 	n := 5
 
 	adminUserList := make([]db.AdminUser, n)

@@ -297,7 +297,7 @@ func TestCreatePermissionAPI(t *testing.T) {
 	}
 }
 
-func TestListPermissionAPI(t *testing.T) {
+func TestListPermissionsAPI(t *testing.T) {
 	n := 5
 	permissions := make([]db.Permission, n)
 	for i := 0; i < n; i++ {

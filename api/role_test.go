@@ -431,7 +431,7 @@ func TestUpdateRoleAPI(t *testing.T) {
 	}
 }
 
-func TestListRoleAPI(t *testing.T) {
+func TestListRolesAPI(t *testing.T) {
 	n := 5
 
 	permissionList, _ := randomPermissionList(n)
