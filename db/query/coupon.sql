@@ -39,3 +39,6 @@ RETURNING *;
 
 -- name: DeleteCoupon :exec
 DELETE FROM coupons WHERE id = $1;
+
+-- name: GetCouponsCount :one
+SELECT COUNT(*) FROM coupons;

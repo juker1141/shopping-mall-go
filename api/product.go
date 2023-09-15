@@ -354,10 +354,6 @@ func (server *Server) getProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, product)
 }
 
-type deleteProductResult struct {
-	Message string `json:"message"`
-}
-
 func (server *Server) deleteProduct(ctx *gin.Context) {
 	var uri productRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -375,7 +371,7 @@ func (server *Server) deleteProduct(ctx *gin.Context) {
 		return
 	}
 
-	result := deleteProductResult{
+	result := deleteResult{
 		Message: "Delete product success.",
 	}
 

@@ -144,3 +144,88 @@ func (server *Server) updateCoupon(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, coupon)
 }
+
+type listCouponsQuery struct {
+	Page     int32 `form:"page" binding:"required,min=1"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+}
+
+type listCouponsResponse struct {
+	Count int32       `json:"count"`
+	Data  []db.Coupon `json:"data"`
+}
+
+func (server *Server) listCoupons(ctx *gin.Context) {
+	var query listCouponsQuery
+	if err := ctx.ShouldBindQuery(&query); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.ListCouponsParams{
+		Limit:  query.PageSize,
+		Offset: (query.Page - 1) * query.PageSize,
+	}
+
+	coupons, err := server.store.ListCoupons(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	counts, err := server.store.GetCouponsCount(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := listCouponsResponse{
+		Count: int32(counts),
+		Data:  coupons,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+func (server *Server) getCoupon(ctx *gin.Context) {
+	var uri couponRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	coupon, err := server.store.GetCoupon(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, coupon)
+}
+
+func (server *Server) deleteCoupon(ctx *gin.Context) {
+	var uri couponRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	err := server.store.DeleteCoupon(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := deleteResult{
+		Message: "Delete coupon success.",
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}

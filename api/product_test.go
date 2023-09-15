@@ -988,7 +988,7 @@ func TestListProductsAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidPage",
+			name: "InvalidPageSize",
 			query: Query{
 				page:     1,
 				pageSize: 10000,

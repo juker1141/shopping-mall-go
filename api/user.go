@@ -420,10 +420,6 @@ func (server *Server) listUsersByAdmin(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-type deleteUserResult struct {
-	Message string `json:"message"`
-}
-
 func (server *Server) deleteUserByAdmin(ctx *gin.Context) {
 	var uri userRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -441,7 +437,7 @@ func (server *Server) deleteUserByAdmin(ctx *gin.Context) {
 		return
 	}
 
-	result := deleteUserResult{
+	result := deleteResult{
 		Message: "Delete member user success.",
 	}
 

@@ -49,6 +49,7 @@ type Querier interface {
 	GetCartCoupon(ctx context.Context, arg GetCartCouponParams) (CartCoupon, error)
 	GetCartProduct(ctx context.Context, arg GetCartProductParams) (CartProduct, error)
 	GetCoupon(ctx context.Context, id int64) (Coupon, error)
+	GetCouponsCount(ctx context.Context) (int64, error)
 	GetGender(ctx context.Context, id int64) (Gender, error)
 	GetPermission(ctx context.Context, id int64) (Permission, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)

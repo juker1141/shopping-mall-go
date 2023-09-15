@@ -306,3 +306,11 @@ func TestListCouponsSearchCode(t *testing.T) {
 		require.NotEmpty(t, coupon)
 	}
 }
+
+func TestGetCouponsCount(t *testing.T) {
+	createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
+
+	count, err := testStore.GetCouponsCount(context.Background())
+	require.NoError(t, err)
+	require.NotZero(t, count)
+}

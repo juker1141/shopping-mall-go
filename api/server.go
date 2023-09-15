@@ -114,7 +114,10 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
+	adminRoutes.GET("/coupons", server.listCoupons)
+	adminRoutes.GET("/coupon/:id", server.getCoupon)
 	adminRoutes.PATCH("/coupon/:id", server.updateCoupon)
+	adminRoutes.DELETE("/coupon/:id", server.deleteCoupon)
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {
@@ -127,6 +130,10 @@ func (server *Server) setupAuthRoutes(router *gin.Engine) {
 func (server *Server) Start(address string) error {
 	server.InitProject()
 	return server.router.Run(address)
+}
+
+type deleteResult struct {
+	Message string `json:"message"`
 }
 
 func errorResponse(err error) gin.H {
