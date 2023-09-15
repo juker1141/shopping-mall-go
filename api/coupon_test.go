@@ -14,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/jackc/pgx/v5/pgtype"
 	mockdb "github.com/juker1141/shopping-mall-go/db/mock"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
@@ -288,6 +289,397 @@ func TestCreateCoupon(t *testing.T) {
 
 			url := "/admin/coupon"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
+type eqUpdateCouponParamsMatcher struct {
+	arg db.UpdateCouponParams
+}
+
+func (e eqUpdateCouponParamsMatcher) Matches(x interface{}) bool {
+	arg, ok := x.(db.UpdateCouponParams)
+	if !ok {
+		return false
+	}
+
+	if !e.arg.StartAt.Time.IsZero() && !e.arg.StartAt.Time.Equal(arg.StartAt.Time) {
+		return false
+	}
+
+	if !e.arg.ExpiresAt.Time.IsZero() && !e.arg.ExpiresAt.Time.Equal(arg.ExpiresAt.Time) {
+		return false
+	}
+
+	e.arg.StartAt = arg.StartAt
+	e.arg.ExpiresAt = arg.ExpiresAt
+
+	return reflect.DeepEqual(e.arg, arg)
+}
+
+func (e eqUpdateCouponParamsMatcher) String() string {
+	return fmt.Sprintf("matches arg %v", e.arg)
+}
+
+func EqUpdateCouponParams(arg db.UpdateCouponParams) gomock.Matcher {
+	return eqUpdateCouponParamsMatcher{arg}
+}
+
+func TestUpdateCoupon(t *testing.T) {
+	coupon := randomCoupon()
+
+	templateBody := gin.H{
+		"title":      coupon.Title,
+		"code":       coupon.Code,
+		"percent":    coupon.Percent,
+		"start_at":   coupon.StartAt,
+		"expires_at": coupon.ExpiresAt,
+	}
+
+	testCases := []struct {
+		name          string
+		ID            int64
+		body          gin.H
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			ID:   coupon.ID,
+			body: templateBody,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+					Title: pgtype.Text{
+						String: coupon.Title,
+						Valid:  true,
+					},
+					Code: pgtype.Text{
+						String: coupon.Code,
+						Valid:  true,
+					},
+					Percent: pgtype.Int4{
+						Int32: coupon.Percent,
+						Valid: true,
+					},
+					StartAt: pgtype.Timestamptz{
+						Time:  coupon.StartAt,
+						Valid: true,
+					},
+					ExpiresAt: pgtype.Timestamptz{
+						Time:  coupon.ExpiresAt,
+						Valid: true,
+					},
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), EqUpdateCouponParams(arg)).
+					Times(1).
+					Return(coupon, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "OK_NoInputTime",
+			ID:   coupon.ID,
+			body: gin.H{
+				"title":   coupon.Title,
+				"code":    coupon.Code,
+				"percent": coupon.Percent,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+					Title: pgtype.Text{
+						String: coupon.Title,
+						Valid:  true,
+					},
+					Code: pgtype.Text{
+						String: coupon.Code,
+						Valid:  true,
+					},
+					Percent: pgtype.Int4{
+						Int32: coupon.Percent,
+						Valid: true,
+					},
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), EqUpdateCouponParams(arg)).
+					Times(1).
+					Return(coupon, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "OK_OnlyInputStartTime",
+			ID:   coupon.ID,
+			body: gin.H{
+				"title":    coupon.Title,
+				"code":     coupon.Code,
+				"percent":  coupon.Percent,
+				"start_at": coupon.StartAt,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+					Title: pgtype.Text{
+						String: coupon.Title,
+						Valid:  true,
+					},
+					Code: pgtype.Text{
+						String: coupon.Code,
+						Valid:  true,
+					},
+					Percent: pgtype.Int4{
+						Int32: coupon.Percent,
+						Valid: true,
+					},
+					StartAt: pgtype.Timestamptz{
+						Time:  coupon.StartAt,
+						Valid: true,
+					},
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), EqUpdateCouponParams(arg)).
+					Times(1).
+					Return(coupon, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "OK_OnlyInputExpiresTime",
+			ID:   coupon.ID,
+			body: gin.H{
+				"title":      coupon.Title,
+				"code":       coupon.Code,
+				"percent":    coupon.Percent,
+				"expires_at": coupon.ExpiresAt,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+					Title: pgtype.Text{
+						String: coupon.Title,
+						Valid:  true,
+					},
+					Code: pgtype.Text{
+						String: coupon.Code,
+						Valid:  true,
+					},
+					Percent: pgtype.Int4{
+						Int32: coupon.Percent,
+						Valid: true,
+					},
+					ExpiresAt: pgtype.Timestamptz{
+						Time:  coupon.ExpiresAt,
+						Valid: true,
+					},
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), EqUpdateCouponParams(arg)).
+					Times(1).
+					Return(coupon, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "NoAuthorization",
+			ID:   coupon.ID,
+			body: templateBody,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name: "NoRequiredPermission",
+			ID:   coupon.ID,
+			body: templateBody,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError",
+			ID:   coupon.ID,
+			body: templateBody,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+					Title: pgtype.Text{
+						String: coupon.Title,
+						Valid:  true,
+					},
+					Code: pgtype.Text{
+						String: coupon.Code,
+						Valid:  true,
+					},
+					Percent: pgtype.Int4{
+						Int32: coupon.Percent,
+						Valid: true,
+					},
+					StartAt: pgtype.Timestamptz{
+						Time:  coupon.StartAt,
+						Valid: true,
+					},
+					ExpiresAt: pgtype.Timestamptz{
+						Time:  coupon.ExpiresAt,
+						Valid: true,
+					},
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), EqUpdateCouponParams(arg)).
+					Times(1).
+					Return(db.Coupon{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "FieldEmpty",
+			ID:   coupon.ID,
+			body: gin.H{},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(coupon, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "NotFound",
+			ID:   coupon.ID,
+			body: gin.H{},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				arg := db.UpdateCouponParams{
+					ID: coupon.ID,
+				}
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(db.Coupon{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidID",
+			ID:   -1,
+			body: gin.H{},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", couponPermissions)
+
+				store.EXPECT().
+					UpdateCoupon(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := newTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			jsonData, err := json.Marshal(tc.body)
+			require.NoError(t, err)
+
+			url := fmt.Sprintf("/admin/coupon/%d", tc.ID)
+			request, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
 			tc.setupAuth(t, request, server.tokenMaker)

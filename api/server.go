@@ -114,6 +114,7 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
+	adminRoutes.PATCH("/coupon/:id", server.updateCoupon)
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {

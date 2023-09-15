@@ -78,6 +78,10 @@ func (server *Server) updateRole(ctx *gin.Context) {
 
 	result, err := server.store.UpdateRoleTx(ctx, arg)
 	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

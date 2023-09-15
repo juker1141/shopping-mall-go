@@ -323,6 +323,10 @@ func (server *Server) updateProduct(ctx *gin.Context) {
 
 	product, err := server.store.UpdateProduct(ctx, arg)
 	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}

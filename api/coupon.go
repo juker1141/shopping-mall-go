@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
 )
@@ -60,6 +61,83 @@ func (server *Server) createCoupon(ctx *gin.Context) {
 
 	coupon, err := server.store.CreateCoupon(ctx, arg)
 	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, coupon)
+}
+
+type couponRoutesUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+type updateCouponRequest struct {
+	Title     string    `json:"title"`
+	Code      string    `json:"code"`
+	Percent   int32     `json:"percent"`
+	StartAt   time.Time `json:"start_at"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
+func (server *Server) updateCoupon(ctx *gin.Context) {
+	var uri couponRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var req updateCouponRequest
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateCouponParams{
+		ID: uri.ID,
+	}
+
+	if req.Title != "" {
+		arg.Title = pgtype.Text{
+			String: req.Title,
+			Valid:  true,
+		}
+	}
+
+	if req.Code != "" {
+		arg.Code = pgtype.Text{
+			String: req.Code,
+			Valid:  true,
+		}
+	}
+
+	if req.Percent > 0 {
+		arg.Percent = pgtype.Int4{
+			Int32: req.Percent,
+			Valid: true,
+		}
+	}
+
+	if !req.StartAt.IsZero() {
+		arg.StartAt = pgtype.Timestamptz{
+			Time:  req.StartAt,
+			Valid: true,
+		}
+	}
+
+	if !req.ExpiresAt.IsZero() {
+		arg.ExpiresAt = pgtype.Timestamptz{
+			Time:  req.ExpiresAt,
+			Valid: true,
+		}
+	}
+
+	coupon, err := server.store.UpdateCoupon(ctx, arg)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
