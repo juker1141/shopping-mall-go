@@ -24,7 +24,8 @@ WHERE
   CASE
     WHEN sqlc.arg(key)::varchar = 'title' THEN title ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
     WHEN sqlc.arg(key)::varchar = 'code' THEN code ILIKE '%' || sqlc.arg(key_value)::varchar || '%'
-    ELSE TRUE
+    WHEN sqlc.arg(key)::varchar = 'start_time' THEN start_at >= sqlc.arg(key_time_value)::timestamptz
+    WHEN sqlc.arg(key)::varchar = 'expires_time' THEN expires_at <= sqlc.arg(key_time_value)::timestamptz
   END
 ORDER BY id
 LIMIT sqlc.arg('Limit')

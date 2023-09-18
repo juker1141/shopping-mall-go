@@ -312,6 +312,61 @@ func TestListCouponsSearchCode(t *testing.T) {
 	}
 }
 
+func TestListCouponsSearchStartTime(t *testing.T) {
+	n := 3
+
+	centerTime := time.Now()
+	startTime := centerTime.Add(30 * time.Second)
+
+	for i := 0; i < 10-n; i++ {
+		createRandomCoupon(t, util.RandomName(), util.RandomString(10), centerTime)
+	}
+	for i := 0; i < n; i++ {
+		createRandomCoupon(t, util.RandomName(), util.RandomString(10), startTime)
+	}
+
+	arg := ListCouponsParams{
+		Key:          KeyStartTime,
+		KeyTimeValue: startTime,
+		Limit:        10,
+		Offset:       0,
+	}
+	coupons, err := testStore.ListCoupons(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, coupons, n)
+
+	for _, coupon := range coupons {
+		require.NotEmpty(t, coupon)
+	}
+}
+
+func TestListCouponsSearchExpiresTime(t *testing.T) {
+	n := 3
+
+	centerTime := time.Now()
+	expiresTime := time.Date(1997, 9, 13, 12, 0, 0, 0, time.UTC)
+	for i := 0; i < 10-n; i++ {
+		createRandomCoupon(t, util.RandomName(), util.RandomString(10), centerTime)
+	}
+	for i := 0; i < n; i++ {
+		createRandomCoupon(t, util.RandomName(), util.RandomString(10), expiresTime)
+	}
+
+	arg := ListCouponsParams{
+		Key:          KeyExpiresTime,
+		KeyTimeValue: expiresTime.Add(time.Minute),
+		Limit:        10,
+		Offset:       0,
+	}
+	coupons, err := testStore.ListCoupons(context.Background(), arg)
+	require.NoError(t, err)
+	require.Len(t, coupons, n)
+
+	for _, coupon := range coupons {
+		require.NotEmpty(t, coupon)
+	}
+}
+
 func TestGetCouponsCount(t *testing.T) {
 	createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 

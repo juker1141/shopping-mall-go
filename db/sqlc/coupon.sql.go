@@ -125,24 +125,27 @@ WHERE
   CASE
     WHEN $1::varchar = 'title' THEN title ILIKE '%' || $2::varchar || '%'
     WHEN $1::varchar = 'code' THEN code ILIKE '%' || $2::varchar || '%'
-    ELSE TRUE
+    WHEN $1::varchar = 'start_time' THEN start_at >= $3::timestamptz
+    WHEN $1::varchar = 'expires_time' THEN expires_at <= $3::timestamptz
   END
 ORDER BY id
-LIMIT $4
-OFFSET $3
+LIMIT $5
+OFFSET $4
 `
 
 type ListCouponsParams struct {
-	Key      string `json:"key"`
-	KeyValue string `json:"key_value"`
-	Offset   int32  `json:"Offset"`
-	Limit    int32  `json:"Limit"`
+	Key          string    `json:"key"`
+	KeyValue     string    `json:"key_value"`
+	KeyTimeValue time.Time `json:"key_time_value"`
+	Offset       int32     `json:"Offset"`
+	Limit        int32     `json:"Limit"`
 }
 
 func (q *Queries) ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error) {
 	rows, err := q.db.Query(ctx, listCoupons,
 		arg.Key,
 		arg.KeyValue,
+		arg.KeyTimeValue,
 		arg.Offset,
 		arg.Limit,
 	)
