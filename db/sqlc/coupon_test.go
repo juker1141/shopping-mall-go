@@ -314,3 +314,20 @@ func TestGetCouponsCount(t *testing.T) {
 	require.NoError(t, err)
 	require.NotZero(t, count)
 }
+
+func TestGetCouponByCode(t *testing.T) {
+	code := util.RandomString(10)
+	coupon1 := createRandomCoupon(t, util.RandomName(), code, time.Now())
+
+	coupon2, err := testStore.GetCouponByCode(context.Background(), code)
+	require.NoError(t, err)
+	require.NotEmpty(t, coupon2)
+
+	require.Equal(t, coupon1.ID, coupon2.ID)
+	require.Equal(t, coupon1.Title, coupon2.Title)
+	require.Equal(t, coupon1.Code, coupon2.Code)
+	require.Equal(t, coupon1.CreatedBy, coupon2.CreatedBy)
+	require.WithinDuration(t, coupon1.StartAt, coupon2.StartAt, time.Second)
+	require.WithinDuration(t, coupon1.ExpiresAt, coupon2.ExpiresAt, time.Second)
+	require.WithinDuration(t, coupon1.CreatedAt, coupon2.CreatedAt, time.Second)
+}

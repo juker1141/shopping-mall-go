@@ -94,7 +94,7 @@ Table carts as Carts {
 Table coupons as Coupons {
   id bigserial [pk]
   title varchar [not null]
-  code varchar [not null]
+  code varchar [not null, unique]
   percent int [not null]
   created_by varchar [not null]
   start_at timestamptz [not null, default: `now()`]

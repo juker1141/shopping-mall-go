@@ -637,6 +637,21 @@ func (mr *MockStoreMockRecorder) GetCoupon(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCoupon", reflect.TypeOf((*MockStore)(nil).GetCoupon), arg0, arg1)
 }
 
+// GetCouponByCode mocks base method.
+func (m *MockStore) GetCouponByCode(arg0 context.Context, arg1 string) (db.Coupon, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCouponByCode", arg0, arg1)
+	ret0, _ := ret[0].(db.Coupon)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCouponByCode indicates an expected call of GetCouponByCode.
+func (mr *MockStoreMockRecorder) GetCouponByCode(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCouponByCode", reflect.TypeOf((*MockStore)(nil).GetCouponByCode), arg0, arg1)
+}
+
 // GetCouponsCount mocks base method.
 func (m *MockStore) GetCouponsCount(arg0 context.Context) (int64, error) {
 	m.ctrl.T.Helper()

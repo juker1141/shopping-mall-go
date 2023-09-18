@@ -37,12 +37,14 @@ CREATE TABLE "carts" (
 CREATE TABLE "coupons" (
   "id" bigserial PRIMARY KEY,
   "title" varchar NOT NULL,
-  "code" varchar NOT NULL,
+  "code" varchar UNIQUE NOT NULL,
   "percent" int NOT NULL,
   "created_by" varchar NOT NULL,
   "start_at" timestamptz NOT NULL DEFAULT (now()),
-  "expires_at" timestamptz NOT NULL DEFAULT '2100-01-01 00:00:00Z',
+  "expires_at" timestamptz NOT NULL DEFAULT '9527-09-13 00:00:00Z',
   "created_at" timestamptz NOT NULL DEFAULT (now())
+  
+  CONSTRAINT check_dates CHECK (start_at < expires_at)
 );
 
 CREATE TABLE "products" (

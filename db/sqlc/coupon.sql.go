@@ -87,6 +87,27 @@ func (q *Queries) GetCoupon(ctx context.Context, id int64) (Coupon, error) {
 	return i, err
 }
 
+const getCouponByCode = `-- name: GetCouponByCode :one
+SELECT id, title, code, percent, created_by, start_at, expires_at, created_at FROM coupons
+WHERE code = $1 LIMIT 1
+`
+
+func (q *Queries) GetCouponByCode(ctx context.Context, code string) (Coupon, error) {
+	row := q.db.QueryRow(ctx, getCouponByCode, code)
+	var i Coupon
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Code,
+		&i.Percent,
+		&i.CreatedBy,
+		&i.StartAt,
+		&i.ExpiresAt,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getCouponsCount = `-- name: GetCouponsCount :one
 SELECT COUNT(*) FROM coupons
 `

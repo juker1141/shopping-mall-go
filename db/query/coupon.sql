@@ -14,6 +14,10 @@ INSERT INTO coupons (
 SELECT * FROM coupons
 WHERE id = $1 LIMIT 1;
 
+-- name: GetCouponByCode :one
+SELECT * FROM coupons
+WHERE code = $1 LIMIT 1;
+
 -- name: ListCoupons :many
 SELECT * FROM coupons
 WHERE

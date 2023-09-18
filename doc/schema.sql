@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-13T07:10:05.533Z
+-- Generated at: 2023-09-15T04:20:17.282Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -78,7 +78,7 @@ CREATE TABLE "carts" (
 CREATE TABLE "coupons" (
   "id" bigserial PRIMARY KEY,
   "title" varchar NOT NULL,
-  "code" varchar NOT NULL,
+  "code" varchar UNIQUE NOT NULL,
   "percent" int NOT NULL,
   "created_by" varchar NOT NULL,
   "start_at" timestamptz NOT NULL DEFAULT (now()),

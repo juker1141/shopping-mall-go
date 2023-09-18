@@ -118,6 +118,9 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.GET("/coupon/:id", server.getCoupon)
 	adminRoutes.PATCH("/coupon/:id", server.updateCoupon)
 	adminRoutes.DELETE("/coupon/:id", server.deleteCoupon)
+
+	// 檢查優惠卷是否有效
+	adminRoutes.POST("/coupon/check", server.checkCoupon)
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {

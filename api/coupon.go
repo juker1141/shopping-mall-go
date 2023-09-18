@@ -2,6 +2,7 @@ package api
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
+	"github.com/juker1141/shopping-mall-go/util"
 )
 
 type createCouponRequest struct {
@@ -54,13 +56,18 @@ func (server *Server) createCoupon(ctx *gin.Context) {
 	}
 
 	if req.ExpiresAt.IsZero() {
-		arg.ExpiresAt = time.Time{}
+		// 將過期時間設定為永不過期
+		arg.ExpiresAt = util.NeverExpires
 	} else {
 		arg.ExpiresAt = req.ExpiresAt
 	}
 
 	coupon, err := server.store.CreateCoupon(ctx, arg)
 	if err != nil {
+		if errors.Is(err, db.ErrCheckDateFailed) {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
@@ -136,6 +143,10 @@ func (server *Server) updateCoupon(ctx *gin.Context) {
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		if errors.Is(err, db.ErrCheckDateFailed) {
+			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -227,5 +238,53 @@ func (server *Server) deleteCoupon(ctx *gin.Context) {
 	rsp := deleteResult{
 		Message: "Delete coupon success.",
 	}
+	ctx.JSON(http.StatusOK, rsp)
+}
+
+type checkCouponRequest struct {
+	Code string `json:"code" binding:"required"`
+}
+
+type checkCouponResponse struct {
+	Message string `json:"message"`
+}
+
+func (server *Server) checkCoupon(ctx *gin.Context) {
+	var req checkCouponRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	coupon, err := server.store.GetCouponByCode(ctx, req.Code)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	now := time.Now()
+
+	if now.Before(coupon.StartAt) {
+		err := fmt.Errorf("%s (code: %s) is not yet effective", coupon.Title, coupon.Code)
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if now.After(coupon.ExpiresAt) {
+		err := fmt.Errorf("%s (code: %s) has expired", coupon.Title, coupon.Code)
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	result := fmt.Sprintf("%s (code: %s) is a valid coupon.", coupon.Title, coupon.Code)
+
+	rsp := checkCouponResponse{
+		Message: result,
+	}
+
 	ctx.JSON(http.StatusOK, rsp)
 }
