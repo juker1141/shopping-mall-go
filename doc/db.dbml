@@ -144,3 +144,37 @@ Table cart_coupons {
   }
 }
 
+Table orders as Orders {
+  id bigserial [pk]
+  is_paid bool [default: false]
+  status int [not null, default: 1]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table order_users {
+  order_id int [ref: > Orders.id]
+  user_id int [ref: > Users.id]
+
+  Indexes {
+    (order_id, user_id) [unique]
+  }
+}
+
+Table order_products {
+  order_id int [ref: > Orders.id]
+  product_id int [ref: > Products.id]
+  num int [not null, default: 1]
+
+  Indexes {
+    (order_id, product_id) [unique]
+  }
+}
+
+Table order_coupons {
+  order_id int [ref: > Orders.id]
+  coupon_id int [ref: > Coupons.id]
+
+  Indexes {
+    (order_id, coupon_id) [unique]
+  }
+}

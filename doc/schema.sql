@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-15T04:20:17.282Z
+-- Generated at: 2023-09-18T02:51:53.252Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -113,6 +113,29 @@ CREATE TABLE "cart_coupons" (
   "coupon_id" int
 );
 
+CREATE TABLE "orders" (
+  "id" bigserial PRIMARY KEY,
+  "is_paid" bool DEFAULT false,
+  "status" int NOT NULL DEFAULT 1,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "order_users" (
+  "order_id" int,
+  "user_id" int
+);
+
+CREATE TABLE "order_products" (
+  "order_id" int,
+  "product_id" int,
+  "num" int NOT NULL DEFAULT 1
+);
+
+CREATE TABLE "order_coupons" (
+  "order_id" int,
+  "coupon_id" int
+);
+
 CREATE INDEX ON "admin_users" ("account");
 
 CREATE UNIQUE INDEX ON "role_permissions" ("role_id", "permission_id");
@@ -134,6 +157,12 @@ CREATE INDEX ON "coupons" ("expires_at");
 CREATE UNIQUE INDEX ON "cart_products" ("cart_id", "product_id");
 
 CREATE UNIQUE INDEX ON "cart_coupons" ("cart_id", "coupon_id");
+
+CREATE UNIQUE INDEX ON "order_users" ("order_id", "user_id");
+
+CREATE UNIQUE INDEX ON "order_products" ("order_id", "product_id");
+
+CREATE UNIQUE INDEX ON "order_coupons" ("order_id", "coupon_id");
 
 COMMENT ON COLUMN "admin_users"."status" IS 'must be either 0 or 1';
 
@@ -166,3 +195,15 @@ ALTER TABLE "cart_products" ADD FOREIGN KEY ("product_id") REFERENCES "products"
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id");
 
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
+
+ALTER TABLE "order_users" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+
+ALTER TABLE "order_users" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "order_products" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+
+ALTER TABLE "order_products" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+
+ALTER TABLE "order_coupons" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+
+ALTER TABLE "order_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
