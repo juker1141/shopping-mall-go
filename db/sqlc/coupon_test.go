@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -62,6 +63,8 @@ func TestGetCoupon(t *testing.T) {
 func TestUpdateCouponAllField(t *testing.T) {
 	oldCoupon := createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 
+	now := time.Now()
+
 	arg := UpdateCouponParams{
 		ID: oldCoupon.ID,
 		Title: pgtype.Text{
@@ -77,11 +80,11 @@ func TestUpdateCouponAllField(t *testing.T) {
 			Valid: true,
 		},
 		StartAt: pgtype.Timestamptz{
-			Time:  time.Now(),
+			Time:  now,
 			Valid: true,
 		},
 		ExpiresAt: pgtype.Timestamptz{
-			Time:  time.Now(),
+			Time:  now.Add(time.Minute),
 			Valid: true,
 		},
 	}
@@ -284,9 +287,11 @@ func TestListCouponsSearchTitleButNoKey(t *testing.T) {
 
 func TestListCouponsSearchCode(t *testing.T) {
 	n := 3
-	code := util.RandomString(10)
+	// 關鍵字
+	keyCode := util.RandomString(3)
+	// 因為 code 有 unique 特性，需要亂數
 	for i := 0; i < n; i++ {
-		createRandomCoupon(t, util.RandomName(), code, time.Now())
+		createRandomCoupon(t, util.RandomName(), fmt.Sprintf("%s%s", keyCode, util.RandomString(7)), time.Now())
 	}
 	for i := 0; i < 10-n; i++ {
 		createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
@@ -294,7 +299,7 @@ func TestListCouponsSearchCode(t *testing.T) {
 
 	arg := ListCouponsParams{
 		Key:      KeyCode,
-		KeyValue: code,
+		KeyValue: keyCode,
 		Limit:    10,
 		Offset:   0,
 	}

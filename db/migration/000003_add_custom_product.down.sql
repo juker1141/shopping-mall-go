@@ -5,6 +5,7 @@ ALTER TABLE "cart_products" DROP CONSTRAINT IF EXISTS "cart_products_product_id_
 ALTER TABLE "cart_products" DROP CONSTRAINT IF EXISTS "cart_products_cart_id_fkey";
 ALTER TABLE "carts" DROP CONSTRAINT IF EXISTS "carts_owner_fkey";
 ALTER TABLE "users" DROP CONSTRAINT IF EXISTS "users_gender_id_fkey";
+ALTER TABLE "coupons" DROP CONSTRAINT "check_dates";
 
 -- Drop indexes
 DROP INDEX IF EXISTS "cart_coupons_cart_id_coupon_id_idx";
@@ -24,3 +25,4 @@ DROP TABLE IF EXISTS "coupons";
 DROP TABLE IF EXISTS "carts";
 DROP TABLE IF EXISTS "genders";
 DROP TABLE IF EXISTS "users";
+
