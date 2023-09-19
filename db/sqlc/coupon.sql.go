@@ -127,6 +127,7 @@ WHERE
     WHEN $1::varchar = 'code' THEN code ILIKE '%' || $2::varchar || '%'
     WHEN $1::varchar = 'start_time' THEN start_at >= $3::timestamptz
     WHEN $1::varchar = 'expires_time' THEN expires_at <= $3::timestamptz
+    ELSE TRUE
   END
 ORDER BY id
 LIMIT $5
