@@ -146,16 +146,8 @@ func (store *SQLStore) DeleteRoleTx(ctx context.Context, arg DeleteRoleTxParams)
 	var result DeleteRoleTxResult
 
 	err := store.execTx(ctx, func(q *Queries) error {
-		// 刪除帳號角色關聯
-		err := q.DeleteAdminUserRoleByRoleId(ctx, pgtype.Int4{
-			Int32: int32(arg.ID),
-			Valid: true,
-		})
-		if err != nil {
-			return err
-		}
 		// 刪除角色權限關聯
-		err = q.DeleteRolePermissionByRoleId(ctx, pgtype.Int4{
+		err := q.DeleteRolePermissionByRoleId(ctx, pgtype.Int4{
 			Int32: int32(arg.ID),
 			Valid: true,
 		})

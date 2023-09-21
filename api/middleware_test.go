@@ -115,7 +115,8 @@ func TestAuthMiddleware(t *testing.T) {
 }
 
 func TestPermissionMiddleware(t *testing.T) {
-	adminUser, _ := randomAdminUser(t, 1)
+	role := randomRole()
+	adminUser, _ := randomAdminUser(t, 1, role.ID)
 
 	testCases := []struct {
 		name          string

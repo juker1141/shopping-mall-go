@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
 	"github.com/juker1141/shopping-mall-go/util"
@@ -16,11 +17,11 @@ import (
 )
 
 type createAdminUserRequest struct {
-	Account  string  `json:"account" binding:"required,alphanum,min=8"`
-	FullName string  `json:"full_name" binding:"required,min=2,fullName"`
-	Status   int32   `json:"status" binding:"required,number"`
-	Password string  `json:"password" binding:"required,min=8"`
-	RolesID  []int64 `json:"roles_id" binding:"required"`
+	Account  string `json:"account" binding:"required,alphanum,min=8"`
+	FullName string `json:"full_name" binding:"required,min=2,fullName"`
+	Status   int32  `json:"status" binding:"required,number"`
+	Password string `json:"password" binding:"required,min=8"`
+	RoleID   int64  `json:"role_id" binding:"required"`
 }
 
 type adminUserResponse struct {
@@ -28,13 +29,14 @@ type adminUserResponse struct {
 	Account           string    `json:"account"`
 	FullName          string    `json:"full_name"`
 	Status            int32     `json:"status"`
+	RoleID            int64     `json:"role_id"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
 }
 
 type adminUserAPIResponse struct {
 	adminUserResponse
-	RoleList []db.Role `json:"role_list"`
+	Role db.Role `json:"role"`
 }
 
 func newAdminUserResponse(adminUser db.AdminUser) adminUserResponse {
@@ -43,6 +45,7 @@ func newAdminUserResponse(adminUser db.AdminUser) adminUserResponse {
 		Account:           adminUser.Account,
 		FullName:          adminUser.FullName,
 		Status:            adminUser.Status,
+		RoleID:            int64(adminUser.RoleID.Int32),
 		PasswordChangedAt: adminUser.PasswordChangedAt,
 		CreatedAt:         adminUser.CreatedAt,
 	}
@@ -61,20 +64,28 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	if len(req.RolesID) <= 0 || req.RolesID == nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	role, err := server.store.GetRole(ctx, req.RoleID)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	arg := db.CreateAdminUserTxParams{
+	arg := db.CreateAdminUserParams{
 		Account:        req.Account,
 		FullName:       req.FullName,
 		HashedPassword: hashedPassword,
 		Status:         req.Status,
-		RolesID:        req.RolesID,
+		RoleID: pgtype.Int4{
+			Int32: int32(role.ID),
+			Valid: true,
+		},
 	}
 
-	result, err := server.store.CreateAdminUserTx(context.Background(), arg)
+	adminUser, err := server.store.CreateAdminUser(context.Background(), arg)
 	if err != nil {
 		errCode := db.ErrorCode(err)
 		if errCode == db.ForeignKeyViolation || errCode == db.UniqueViolation {
@@ -86,8 +97,8 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 	}
 
 	rsp := adminUserAPIResponse{
-		adminUserResponse: newAdminUserResponse(result.AdminUser),
-		RoleList:          result.RoleList,
+		adminUserResponse: newAdminUserResponse(adminUser),
+		Role:              role,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -123,15 +134,19 @@ func (server *Server) listAdminUsers(ctx *gin.Context) {
 
 	var data []adminUserAPIResponse
 	for _, adminUser := range adminUsers {
-		roles, err := server.store.ListRolesForAdminUser(ctx, adminUser.ID)
+		role, err := server.store.GetRole(ctx, int64(adminUser.RoleID.Int32))
 		if err != nil {
+			if err == db.ErrRecordNotFound {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
 		data = append(data, adminUserAPIResponse{
 			adminUserResponse: newAdminUserResponse(adminUser),
-			RoleList:          roles,
+			Role:              role,
 		})
 	}
 
@@ -170,26 +185,30 @@ func (server *Server) getAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	roles, err := server.store.ListRolesForAdminUser(ctx, adminUser.ID)
+	role, err := server.store.GetRole(ctx, int64(adminUser.RoleID.Int32))
 	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
 	rsp := adminUserAPIResponse{
 		adminUserResponse: newAdminUserResponse(adminUser),
-		RoleList:          roles,
+		Role:              role,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
 }
 
 type updateAdminUserRequest struct {
-	FullName    string   `json:"full_name"`
-	OldPassword string   `json:"old_password"`
-	NewPassword string   `json:"new_password"`
-	Status      *int32   `json:"status"`
-	RolesID     *[]int64 `json:"roles_id"`
+	FullName    string `json:"full_name"`
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+	Status      *int32 `json:"status"`
+	RoleID      int64  `json:"role_id"`
 }
 
 func (server *Server) updateAdminUser(ctx *gin.Context) {
@@ -205,7 +224,7 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateAdminUserTxParams{
+	arg := db.UpdateAdminUserParams{
 		ID: uri.ID,
 	}
 
@@ -214,12 +233,18 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
-		arg.FullName = req.FullName
+		arg.FullName = pgtype.Text{
+			String: req.FullName,
+			Valid:  true,
+		}
 	}
 
 	if req.Status != nil {
 		if val.IsValidStatus(int(*req.Status)) {
-			arg.Status = req.Status
+			arg.Status = pgtype.Int4{
+				Int32: *req.Status,
+				Valid: true,
+			}
 		} else {
 			err := fmt.Errorf("invalid status input: %d", *req.Status)
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -227,13 +252,10 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		}
 	}
 
-	if req.RolesID != nil {
-		if len(*req.RolesID) > 0 {
-			arg.RolesID = *req.RolesID
-		} else {
-			err := fmt.Errorf("at least one role is required")
-			ctx.JSON(http.StatusBadRequest, errorResponse(err))
-			return
+	if req.RoleID != 0 {
+		arg.RoleID = pgtype.Int4{
+			Int32: int32(req.RoleID),
+			Valid: true,
 		}
 	}
 
@@ -261,10 +283,23 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 			return
 		}
 
-		arg.HashedPassword = hashedPassword
+		arg.HashedPassword = pgtype.Text{
+			String: hashedPassword,
+			Valid:  true,
+		}
 	}
 
-	result, err := server.store.UpdateAdminUserTx(ctx, arg)
+	adminUser, err := server.store.UpdateAdminUser(ctx, arg)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	role, err := server.store.GetRole(ctx, int64(adminUser.RoleID.Int32))
 	if err != nil {
 		if err == db.ErrRecordNotFound {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -275,8 +310,8 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	}
 
 	rsp := adminUserAPIResponse{
-		adminUserResponse: newAdminUserResponse(result.AdminUser),
-		RoleList:          result.RoleList,
+		adminUserResponse: newAdminUserResponse(adminUser),
+		Role:              role,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -289,11 +324,7 @@ func (server *Server) deleteAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.DeleteAdminUserTxParams{
-		ID: uri.ID,
-	}
-
-	result, err := server.store.DeleteAdminUserTx(ctx, arg)
+	err := server.store.DeleteAdminUser(ctx, uri.ID)
 	if err != nil {
 		if err == db.ErrRecordNotFound {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -303,7 +334,11 @@ func (server *Server) deleteAdminUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, result)
+	rsp := deleteResult{
+		Message: "Delete adminUser success.",
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 type getAdminUserInfoResponse struct {

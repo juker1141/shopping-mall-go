@@ -11,6 +11,7 @@ import (
 )
 
 func createRandomAdminUser(t *testing.T) AdminUser {
+	role := createRandomRole(t)
 	hashedPassword, err := util.HashPassword(util.RandomString(6))
 	require.NoError(t, err)
 
@@ -19,6 +20,10 @@ func createRandomAdminUser(t *testing.T) AdminUser {
 		FullName:       util.RandomName(),
 		HashedPassword: hashedPassword,
 		Status:         1,
+		RoleID: pgtype.Int4{
+			Int32: int32(role.ID),
+			Valid: true,
+		},
 	}
 
 	adminUser, err := testStore.CreateAdminUser(context.Background(), arg)
@@ -28,6 +33,7 @@ func createRandomAdminUser(t *testing.T) AdminUser {
 	require.Equal(t, arg.Account, adminUser.Account)
 	require.Equal(t, arg.FullName, adminUser.FullName)
 	require.Equal(t, arg.HashedPassword, adminUser.HashedPassword)
+	require.Equal(t, arg.RoleID.Int32, adminUser.RoleID.Int32)
 
 	require.True(t, adminUser.PasswordChangedAt.IsZero())
 	require.NotZero(t, adminUser.CreatedAt)
@@ -50,6 +56,7 @@ func TestGetAdminUser(t *testing.T) {
 	require.Equal(t, adminUser1.Account, adminUser2.Account)
 	require.Equal(t, adminUser1.FullName, adminUser2.FullName)
 	require.Equal(t, adminUser1.HashedPassword, adminUser2.HashedPassword)
+	require.Equal(t, adminUser1.RoleID.Int32, adminUser2.RoleID.Int32)
 	require.Equal(t, adminUser1.Status, adminUser2.Status)
 
 	require.WithinDuration(t, adminUser1.PasswordChangedAt, adminUser2.PasswordChangedAt, time.Second)
@@ -75,6 +82,7 @@ func TestUpdateAdminUserOnlyFullName(t *testing.T) {
 	require.Equal(t, oldAdminUser.Account, updateAdminUser.Account)
 	require.Equal(t, oldAdminUser.HashedPassword, updateAdminUser.HashedPassword)
 	require.Equal(t, oldAdminUser.Status, updateAdminUser.Status)
+	require.Equal(t, oldAdminUser.RoleID.Int32, oldAdminUser.RoleID.Int32)
 }
 
 func TestUpdateAdminUserOnlyStatus(t *testing.T) {
@@ -97,6 +105,7 @@ func TestUpdateAdminUserOnlyStatus(t *testing.T) {
 	require.Equal(t, oldAdminUser.Account, updateAdminUser.Account)
 	require.Equal(t, oldAdminUser.FullName, updateAdminUser.FullName)
 	require.Equal(t, oldAdminUser.HashedPassword, updateAdminUser.HashedPassword)
+	require.Equal(t, oldAdminUser.RoleID.Int32, oldAdminUser.RoleID.Int32)
 }
 
 func TestUpdateAdminUserOnlyPassword(t *testing.T) {
@@ -122,9 +131,34 @@ func TestUpdateAdminUserOnlyPassword(t *testing.T) {
 	require.Equal(t, oldAdminUser.Account, updateAdminUser.Account)
 	require.Equal(t, oldAdminUser.FullName, updateAdminUser.FullName)
 	require.Equal(t, oldAdminUser.Status, updateAdminUser.Status)
+	require.Equal(t, oldAdminUser.RoleID.Int32, oldAdminUser.RoleID.Int32)
+}
+
+func TestUpdateAdminUserOnlyRoleId(t *testing.T) {
+	role := createRandomRole(t)
+	oldAdminUser := createRandomAdminUser(t)
+
+	updateAdminUser, err := testStore.UpdateAdminUser(context.Background(), UpdateAdminUserParams{
+		ID: oldAdminUser.ID,
+		RoleID: pgtype.Int4{
+			Int32: int32(role.ID),
+			Valid: true,
+		},
+	})
+
+	require.NoError(t, err)
+	require.NotEmpty(t, updateAdminUser)
+
+	require.NotEqual(t, oldAdminUser.RoleID.Int32, updateAdminUser.RoleID.Int32)
+	require.Equal(t, int32(role.ID), updateAdminUser.RoleID.Int32)
+	require.Equal(t, oldAdminUser.Account, updateAdminUser.Account)
+	require.Equal(t, oldAdminUser.FullName, updateAdminUser.FullName)
+	require.Equal(t, oldAdminUser.Status, updateAdminUser.Status)
+	require.Equal(t, oldAdminUser.HashedPassword, oldAdminUser.HashedPassword)
 }
 
 func TestUpdateAdminUserAllFields(t *testing.T) {
+	role := createRandomRole(t)
 	oldAdminUser := createRandomAdminUser(t)
 
 	newFullName := util.RandomName()
@@ -147,6 +181,10 @@ func TestUpdateAdminUserAllFields(t *testing.T) {
 			String: newHashedPassword,
 			Valid:  true,
 		},
+		RoleID: pgtype.Int4{
+			Int32: int32(role.ID),
+			Valid: true,
+		},
 	})
 
 	require.NoError(t, err)
@@ -156,10 +194,12 @@ func TestUpdateAdminUserAllFields(t *testing.T) {
 	require.NotEqual(t, oldAdminUser.FullName, updateAdminUser.FullName)
 	require.NotEqual(t, oldAdminUser.Status, updateAdminUser.Status)
 	require.NotEqual(t, oldAdminUser.HashedPassword, updateAdminUser.HashedPassword)
+	require.NotEqual(t, oldAdminUser.RoleID.Int32, updateAdminUser.RoleID.Int32)
 
 	require.Equal(t, newFullName, updateAdminUser.FullName)
 	require.Equal(t, newStatus, updateAdminUser.Status)
 	require.Equal(t, newHashedPassword, updateAdminUser.HashedPassword)
+	require.Equal(t, int32(role.ID), updateAdminUser.RoleID.Int32)
 }
 
 func TestDeleteAdminUser(t *testing.T) {
@@ -213,6 +253,7 @@ func TestGetAdminUserByAccount(t *testing.T) {
 	require.Equal(t, adminUser1.FullName, adminUser2.FullName)
 	require.Equal(t, adminUser1.HashedPassword, adminUser2.HashedPassword)
 	require.Equal(t, adminUser1.Status, adminUser2.Status)
+	require.Equal(t, adminUser1.RoleID.Int32, adminUser2.RoleID.Int32)
 
 	require.WithinDuration(t, adminUser1.PasswordChangedAt, adminUser2.PasswordChangedAt, time.Second)
 	require.WithinDuration(t, adminUser1.CreatedAt, adminUser2.CreatedAt, time.Second)

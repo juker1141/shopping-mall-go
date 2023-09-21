@@ -13,9 +13,9 @@ type Store interface {
 	CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (RoleTxResult, error)
 	UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (RoleTxResult, error)
 	DeleteRoleTx(ctx context.Context, arg DeleteRoleTxParams) (DeleteRoleTxResult, error)
-	CreateAdminUserTx(ctx context.Context, arg CreateAdminUserTxParams) (AdminUserTxResult, error)
-	UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUserTxParams) (AdminUserTxResult, error)
-	DeleteAdminUserTx(ctx context.Context, arg DeleteAdminUserTxParams) (DeleteAdminUserTxResult, error)
+	// CreateAdminUserTx(ctx context.Context, arg CreateAdminUserTxParams) (AdminUserTxResult, error)
+	// UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUserTxParams) (AdminUserTxResult, error)
+	// DeleteAdminUserTx(ctx context.Context, arg DeleteAdminUserTxParams) (DeleteAdminUserTxResult, error)
 }
 
 // Store provides all functions to execute db queries and transactions

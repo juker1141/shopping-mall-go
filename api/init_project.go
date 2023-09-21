@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
 )
@@ -39,15 +40,18 @@ func (server *Server) InitProject() error {
 		return err
 	}
 
-	userArg := db.CreateAdminUserTxParams{
+	userArg := db.CreateAdminUserParams{
 		Account:        server.config.TestAccount,
 		FullName:       "測試管理者",
 		Status:         1,
 		HashedPassword: hashedPassword,
-		RolesID:        []int64{result.Role.ID},
+		RoleID: pgtype.Int4{
+			Int32: int32(result.Role.ID),
+			Valid: true,
+		},
 	}
 
-	_, err = server.store.CreateAdminUserTx(context.Background(), userArg)
+	_, err = server.store.CreateAdminUser(context.Background(), userArg)
 	if err != nil {
 		return err
 	}

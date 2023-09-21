@@ -15,6 +15,7 @@ Table admin_users as AdminUsers {
   account varchar [not null, unique]
   full_name varchar [not null]
   hashed_password varchar [not null]
+  role_id int [ref: > Roles.id]
   status int [not null, default: 1, note: 'must be either 0 or 1']
   password_changed_at timestamptz [not null, default: '0001-01-01 00:00:00Z']
   created_at timestamptz [not null, default: `now()`]
@@ -30,15 +31,6 @@ Table role_permissions {
   
   Indexes {
     (role_id, permission_id) [unique]
-  }
-}
-
-Table admin_user_roles {
-  admin_user_id int [ref: > AdminUsers.id]
-  role_id int [ref: > Roles.id]
-
-  Indexes {
-    (admin_user_id, role_id) [unique]
   }
 }
 
