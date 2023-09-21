@@ -7,7 +7,7 @@ import (
 	"github.com/juker1141/shopping-mall-go/util"
 )
 
-var permssions = []string{"帳號管理", "商品管理", "訂單管理", "優惠卷管理", "最新消息管理"}
+var permssions = []string{"後台帳號管理", "會員管理", "商品管理", "訂單管理", "優惠卷管理", "最新消息管理"}
 
 func (server *Server) InitProject() error {
 	adminUser, err := server.store.GetAdminUserByAccount(context.Background(), server.config.TestAccount)

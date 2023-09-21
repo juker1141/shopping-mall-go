@@ -15,6 +15,8 @@ CREATE TABLE "order_products" (
   "order_id" int,
   "product_id" int,
   "num" int NOT NULL DEFAULT 1
+
+  CONSTRAINT check_nums CHECK (num > 0)
 );
 
 CREATE TABLE "order_coupons" (

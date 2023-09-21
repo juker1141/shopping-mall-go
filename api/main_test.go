@@ -14,6 +14,7 @@ import (
 var (
 	emptyPermission    = []int64{}
 	accountPermissions = []int64{accountPermissionCode}
+	memberPermissions  = []int64{memberPermissionCode}
 	productPermissions = []int64{productPermissionCode}
 	// orderPermissions   = []int64{orderPermissionCode}
 	couponPermissions = []int64{couponPermissionCode}

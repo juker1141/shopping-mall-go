@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
+	"github.com/juker1141/shopping-mall-go/token"
 	"github.com/juker1141/shopping-mall-go/util"
 	"github.com/juker1141/shopping-mall-go/val"
 )
@@ -32,8 +33,8 @@ type adminUserResponse struct {
 }
 
 type adminUserAPIResponse struct {
-	AdminUser adminUserResponse `json:"admin_user"`
-	RoleList  []db.Role         `json:"role_list"`
+	adminUserResponse
+	RoleList []db.Role `json:"role_list"`
 }
 
 func newAdminUserResponse(adminUser db.AdminUser) adminUserResponse {
@@ -85,8 +86,8 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 	}
 
 	rsp := adminUserAPIResponse{
-		AdminUser: newAdminUserResponse(result.AdminUser),
-		RoleList:  result.RoleList,
+		adminUserResponse: newAdminUserResponse(result.AdminUser),
+		RoleList:          result.RoleList,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -129,8 +130,8 @@ func (server *Server) listAdminUsers(ctx *gin.Context) {
 		}
 
 		data = append(data, adminUserAPIResponse{
-			AdminUser: newAdminUserResponse(adminUser),
-			RoleList:  roles,
+			adminUserResponse: newAdminUserResponse(adminUser),
+			RoleList:          roles,
 		})
 	}
 
@@ -176,8 +177,8 @@ func (server *Server) getAdminUser(ctx *gin.Context) {
 	}
 
 	rsp := adminUserAPIResponse{
-		AdminUser: newAdminUserResponse(adminUser),
-		RoleList:  roles,
+		adminUserResponse: newAdminUserResponse(adminUser),
+		RoleList:          roles,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -274,8 +275,8 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 	}
 
 	rsp := adminUserAPIResponse{
-		AdminUser: newAdminUserResponse(result.AdminUser),
-		RoleList:  result.RoleList,
+		adminUserResponse: newAdminUserResponse(result.AdminUser),
+		RoleList:          result.RoleList,
 	}
 
 	ctx.JSON(http.StatusOK, rsp)
@@ -305,19 +306,61 @@ func (server *Server) deleteAdminUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
+type getAdminUserInfoResponse struct {
+	adminUserResponse
+	PermissionList []db.Permission `json:"permission_list"`
+}
+
+func (server *Server) getAdminUserInfo(ctx *gin.Context) {
+	payload, exists := ctx.Get(authorizationPayloadKey)
+	if !exists {
+		err := errors.New("can not get permission")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+
+	typePayload, ok := payload.(*token.Payload)
+	if !ok {
+		err := errors.New("payload is not of type Payload")
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
+	adminUser, err := server.store.GetAdminUserByAccount(ctx, typePayload.Account)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	permissionList, err := server.store.ListPermissionsForAdminUser(ctx, adminUser.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	rsp := getAdminUserInfoResponse{
+		adminUserResponse: newAdminUserResponse(adminUser),
+		PermissionList:    permissionList,
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}
+
 type loginAdminUserRequest struct {
 	Account  string `json:"account" binding:"required,alphanum,min=8"`
 	Password string `json:"password" binding:"required,min=8"`
 }
 
 type loginAdminUserResponse struct {
-	SessionID             uuid.UUID         `json:"session_id"`
-	AccessToken           string            `json:"access_token"`
-	AccessTokenExpiresAt  time.Time         `json:"access_token_expires_at"`
-	RefreshToken          string            `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time         `json:"refresh_token_expires_at"`
-	AdminUser             adminUserResponse `json:"admin_user"`
-	PermissionList        []db.Permission   `json:"permission_list"`
+	SessionID             uuid.UUID `json:"session_id"`
+	AccessToken           string    `json:"access_token"`
+	AccessTokenExpiresAt  time.Time `json:"access_token_expires_at"`
+	RefreshToken          string    `json:"refresh_token"`
+	RefreshTokenExpiresAt time.Time `json:"refresh_token_expires_at"`
+	adminUserResponse
+	PermissionList []db.Permission `json:"permission_list"`
 }
 
 func (server *Server) loginAdminUser(ctx *gin.Context) {
@@ -387,7 +430,7 @@ func (server *Server) loginAdminUser(ctx *gin.Context) {
 		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
 		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		AdminUser:             newAdminUserResponse(adminUser),
+		adminUserResponse:     newAdminUserResponse(adminUser),
 		PermissionList:        permissionList,
 	}
 

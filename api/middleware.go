@@ -94,9 +94,15 @@ func userHasPermission(requestedPath string, permissions_id []int64) bool {
 	switch {
 	case strings.Contains(requestedPath, "permission") ||
 		strings.Contains(requestedPath, "role") ||
-		strings.Contains(requestedPath, "manager") ||
-		strings.Contains(requestedPath, "member"):
+		strings.Contains(requestedPath, "manager"):
 		if val.ContainsNumber(permissions_id, accountPermissionCode) {
+			return true
+		} else {
+			return false
+		}
+	case
+		strings.Contains(requestedPath, "member"):
+		if val.ContainsNumber(permissions_id, memberPermissionCode) {
 			return true
 		} else {
 			return false

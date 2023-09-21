@@ -614,7 +614,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -676,7 +676,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				arg := db.UpdateUserParams{
 					ID: user.ID,
@@ -729,7 +729,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -760,7 +760,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				arg := db.UpdateUserParams{
 					ID: user.ID,
@@ -839,7 +839,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().GetUser(gomock.Any(), gomock.Any()).Times(1).Return(db.User{}, sql.ErrConnDone)
 
@@ -864,7 +864,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -887,7 +887,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -910,7 +910,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -933,7 +933,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -956,7 +956,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -977,7 +977,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
@@ -1001,7 +1001,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -1093,7 +1093,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -1142,7 +1142,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Any()).
@@ -1160,7 +1160,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Any()).
@@ -1178,7 +1178,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					GetUser(gomock.Any(), gomock.Any()).
@@ -1246,7 +1246,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				arg := db.ListUsersParams{
 					Limit:  int32(n),
@@ -1322,7 +1322,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				arg := db.ListUsersParams{
 					Limit:  int32(n),
@@ -1352,7 +1352,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					ListUsers(gomock.Any(), gomock.Any()).
@@ -1376,7 +1376,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					ListUsers(gomock.Any(), gomock.Any()).
@@ -1439,7 +1439,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -1488,7 +1488,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -1506,7 +1506,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
@@ -1524,7 +1524,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Any()).

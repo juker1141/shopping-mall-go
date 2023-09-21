@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
@@ -21,10 +22,11 @@ type Server struct {
 
 const (
 	accountPermissionCode = int64(1)
-	productPermissionCode = int64(2)
-	orderPermissionCode   = int64(3)
-	couponPermissionCode  = int64(4)
-	newsPermissionCode    = int64(5)
+	memberPermissionCode  = int64(2)
+	productPermissionCode = int64(3)
+	orderPermissionCode   = int64(4)
+	couponPermissionCode  = int64(5)
+	newsPermissionCode    = int64(6)
 )
 
 // NewServer creates a new HTTP server and setup routing.
@@ -52,6 +54,11 @@ func NewServer(config util.Config, store db.Store) (*Server, error) {
 
 func (server *Server) setupRouter() {
 	router := gin.Default()
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization")
+	router.Use(cors.New(corsConfig))
 
 	server.setupNoAuthRoutes(router)
 
@@ -92,14 +99,17 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.PATCH("/role/:id", server.updateRole)
 	adminRoutes.DELETE("/role/:id", server.deleteRole)
 
-	// 使用者
+	// 管理者
 	adminRoutes.POST("/manager-user", server.createAdminUser)
 	adminRoutes.GET("/manager-users", server.listAdminUsers)
 	adminRoutes.GET("/manager-user/:id", server.getAdminUser)
 	adminRoutes.PATCH("/manager-user/:id", server.updateAdminUser)
 	adminRoutes.DELETE("/manager-user/:id", server.deleteAdminUser)
 
-	// 顧客資料
+	// 管理者刷新權限
+	adminRoutes.GET("/manager-user/info", server.getAdminUserInfo)
+
+	// 會員資料
 	adminRoutes.GET("/member-users", server.listUsersByAdmin)
 	adminRoutes.GET("/member-user/:id", server.getUserByAdmin)
 	adminRoutes.PATCH("/member-user/:id", server.updateUserByAdmin)
