@@ -289,6 +289,7 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		}
 	}
 
+	fmt.Println("arg", arg)
 	adminUser, err := server.store.UpdateAdminUser(ctx, arg)
 	if err != nil {
 		if err == db.ErrRecordNotFound {

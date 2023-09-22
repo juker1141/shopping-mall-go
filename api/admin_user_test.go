@@ -757,6 +757,10 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 	invalidStatus := int32(3)
 
 	newRole := randomRole()
+	newRoleID := pgtype.Int4{
+		Int32: int32(newRole.ID),
+		Valid: true,
+	}
 
 	testCases := []struct {
 		name          string
@@ -772,7 +776,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			body: gin.H{
 				"full_name":    newName,
 				"status":       newStatus,
-				"role_id":      int64(adminUser.RoleID.Int32),
+				"role_id":      int64(newRoleID.Int32),
 				"old_password": password,
 				"new_password": newPassword,
 			},
@@ -793,7 +797,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 						Valid: true,
 					},
 					RoleID: pgtype.Int4{
-						Int32: adminUser.RoleID.Int32,
+						Int32: newRoleID.Int32,
 						Valid: true,
 					},
 				}
@@ -806,13 +810,23 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 				store.EXPECT().
 					UpdateAdminUser(gomock.Any(), EqUpdateAdminUserParams(arg, newPassword)).
 					Times(1).
-					Return(adminUser, nil)
+					Return(db.AdminUser{
+						ID:             adminUser.ID,
+						Account:        adminUser.Account,
+						FullName:       newName,
+						HashedPassword: newPassword,
+						RoleID: pgtype.Int4{
+							Int32: newRoleID.Int32,
+							Valid: true,
+						},
+						Status:    newStatus,
+						CreatedAt: adminUser.CreatedAt,
+					}, nil)
 
-				fmt.Println(newRole.ID, newRole)
 				store.EXPECT().
-					GetRole(gomock.Any(), gomock.Eq(int64(adminUser.RoleID.Int32))).
+					GetRole(gomock.Any(), gomock.Eq(int64(newRoleID.Int32))).
 					Times(1).
-					Return(role, nil)
+					Return(newRole, nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -933,10 +947,13 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 					},
 				}
 
+				newAdminUser := adminUser
+				newAdminUser.Status = 0
+
 				store.EXPECT().
-					UpdateAdminUser(gomock.Any(), EqUpdateAdminUserParams(arg, password)).
+					UpdateAdminUser(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
-					Return(adminUser, nil)
+					Return(newAdminUser, nil)
 
 				store.EXPECT().
 					GetRole(gomock.Any(), gomock.Eq(role.ID)).
@@ -967,10 +984,13 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 					},
 				}
 
+				newAdminUser := adminUser
+				newAdminUser.RoleID = newRoleID
+
 				store.EXPECT().
 					UpdateAdminUser(gomock.Any(), gomock.Eq(arg)).
 					Times(1).
-					Return(adminUser, nil)
+					Return(newAdminUser, nil)
 
 				store.EXPECT().
 					GetRole(gomock.Any(), gomock.Eq(newRole.ID)).
@@ -1175,30 +1195,6 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidRolesIDLength",
-			ID:   adminUser.ID,
-			body: gin.H{
-				"roles_id": []int64{},
-			},
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
-
-				store.EXPECT().
-					UpdateAdminUser(gomock.Any(), gomock.Any()).
-					Times(0)
-
-				store.EXPECT().
-					GetRole(gomock.Any(), gomock.Eq(role.ID)).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusBadRequest, recorder.Code)
-			},
-		},
-		{
 			name: "WrongPassword",
 			ID:   adminUser.ID,
 			body: gin.H{
@@ -1247,7 +1243,6 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			fmt.Println(tc.body)
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
