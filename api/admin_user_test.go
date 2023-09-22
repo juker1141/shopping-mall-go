@@ -1281,9 +1281,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 				store.EXPECT().
 					DeleteAdminUser(gomock.Any(), gomock.Eq(adminUser.ID)).
 					Times(1).
-					Return(deleteResult{
-						Message: "Delete adminUser success.",
-					}, nil)
+					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -1332,7 +1330,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 				store.EXPECT().
 					DeleteAdminUser(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(deleteResult{}, sql.ErrConnDone)
+					Return(sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -1350,7 +1348,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 				store.EXPECT().
 					DeleteAdminUser(gomock.Any(), gomock.Eq(adminUser.ID)).
 					Times(1).
-					Return(deleteResult{}, db.ErrRecordNotFound)
+					Return(db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
