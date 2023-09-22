@@ -969,6 +969,21 @@ func (mr *MockStoreMockRecorder) ListRoles(arg0, arg1 interface{}) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRoles", reflect.TypeOf((*MockStore)(nil).ListRoles), arg0, arg1)
 }
 
+// ListRolesOption mocks base method.
+func (m *MockStore) ListRolesOption(arg0 context.Context) ([]db.Role, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListRolesOption", arg0)
+	ret0, _ := ret[0].([]db.Role)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListRolesOption indicates an expected call of ListRolesOption.
+func (mr *MockStoreMockRecorder) ListRolesOption(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListRolesOption", reflect.TypeOf((*MockStore)(nil).ListRolesOption), arg0)
+}
+
 // ListUsers mocks base method.
 func (m *MockStore) ListUsers(arg0 context.Context, arg1 db.ListUsersParams) ([]db.User, error) {
 	m.ctrl.T.Helper()

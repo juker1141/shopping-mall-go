@@ -95,9 +95,10 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// 角色
 	adminRoutes.POST("/role", server.createRole)
 	adminRoutes.GET("/roles", server.listRoles)
+	adminRoutes.GET("/roles/option", server.listRolesOption)
 	adminRoutes.GET("/role/:id", server.getRole)
 	adminRoutes.PATCH("/role/:id", server.updateRole)
-	adminRoutes.DELETE("/role/:id", server.deleteRole)
+	// adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 管理者
 	adminRoutes.POST("/manager-user", server.createAdminUser)

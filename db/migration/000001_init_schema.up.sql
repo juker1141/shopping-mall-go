@@ -32,7 +32,6 @@ CREATE INDEX ON "admin_users" ("account");
 CREATE UNIQUE INDEX ON "role_permissions" ("role_id", "permission_id");
 
 
-
 COMMENT ON COLUMN "admin_users"."status" IS 'must be either 0 or 1';
 
 ALTER TABLE "admin_users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");

@@ -152,6 +152,24 @@ func (server *Server) listRoles(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, listResponse)
 }
 
+type listRolesOptionResponse struct {
+	Roles []db.Role `json:"roles"`
+}
+
+func (server *Server) listRolesOption(ctx *gin.Context) {
+	roles, err := server.store.ListRolesOption(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	listResponse := listRolesOptionResponse{
+		Roles: roles,
+	}
+
+	ctx.JSON(http.StatusOK, listResponse)
+}
+
 func (server *Server) getRole(ctx *gin.Context) {
 	var uri roleRoutesUri
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -183,22 +201,22 @@ func (server *Server) getRole(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-func (server *Server) deleteRole(ctx *gin.Context) {
-	var uri roleRoutesUri
-	if err := ctx.ShouldBindUri(&uri); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
+// func (server *Server) deleteRole(ctx *gin.Context) {
+// 	var uri roleRoutesUri
+// 	if err := ctx.ShouldBindUri(&uri); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+// 		return
+// 	}
 
-	arg := db.DeleteRoleTxParams{
-		ID: uri.ID,
-	}
+// 	arg := db.DeleteRoleTxParams{
+// 		ID: uri.ID,
+// 	}
 
-	result, err := server.store.DeleteRoleTx(ctx, arg)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
+// 	result, err := server.store.DeleteRoleTx(ctx, arg)
+// 	if err != nil {
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
 
-	ctx.JSON(http.StatusOK, result)
-}
+// 	ctx.JSON(http.StatusOK, result)
+// }

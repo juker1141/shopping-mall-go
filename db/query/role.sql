@@ -15,6 +15,10 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
+-- name: ListRolesOption :many
+SELECT * FROM roles
+ORDER BY id;
+
 -- name: GetRolesCount :one
 SELECT COUNT(*) FROM roles;
 
