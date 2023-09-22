@@ -3,10 +3,11 @@ CREATE TABLE "orders" (
   "id" bigserial PRIMARY KEY,
   "is_paid" bool DEFAULT false,
   "status_id" int,
-  "created_at" timestamptz NOT NULL DEFAULT (now())
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "orders_status" (
+CREATE TABLE "order_status" (
   "id" bigserial PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL
 );
@@ -47,5 +48,5 @@ ALTER TABLE "order_coupons" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("i
 
 ALTER TABLE "order_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
 
-ALTER TABLE "orders" ADD FOREIGN KEY ("status_id") REFERENCES "orders_status" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("status_id") REFERENCES "order_status" ("id");
 

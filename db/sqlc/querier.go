@@ -18,6 +18,8 @@ type Querier interface {
 	CreateCartProduct(ctx context.Context, arg CreateCartProductParams) (CartProduct, error)
 	CreateCoupon(ctx context.Context, arg CreateCouponParams) (Coupon, error)
 	CreateGender(ctx context.Context, name string) (Gender, error)
+	CreateOrder(ctx context.Context, statusID pgtype.Int4) (Order, error)
+	CreateOrderStatus(ctx context.Context, name string) (OrderStatus, error)
 	CreatePermission(ctx context.Context, name string) (Permission, error)
 	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
 	CreateRole(ctx context.Context, name string) (Role, error)
@@ -31,6 +33,7 @@ type Querier interface {
 	DeleteCartProductByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartProductByProductId(ctx context.Context, productID pgtype.Int4) error
 	DeleteCoupon(ctx context.Context, id int64) error
+	DeleteOrder(ctx context.Context, id int64) error
 	DeletePermission(ctx context.Context, id int64) error
 	DeleteProduct(ctx context.Context, id int64) error
 	DeleteRole(ctx context.Context, id int64) error
@@ -48,6 +51,9 @@ type Querier interface {
 	GetCouponByCode(ctx context.Context, code string) (Coupon, error)
 	GetCouponsCount(ctx context.Context) (int64, error)
 	GetGender(ctx context.Context, id int64) (Gender, error)
+	GetOrder(ctx context.Context, id int64) (Order, error)
+	GetOrderStatus(ctx context.Context, id int64) (OrderStatus, error)
+	GetOrdersCount(ctx context.Context) (int64, error)
 	GetPermission(ctx context.Context, id int64) (Permission, error)
 	GetProduct(ctx context.Context, id int64) (Product, error)
 	GetProductsCount(ctx context.Context) (int64, error)
@@ -65,6 +71,11 @@ type Querier interface {
 	ListCartProductByProductId(ctx context.Context, productID pgtype.Int4) ([]CartProduct, error)
 	ListCoupons(ctx context.Context, arg ListCouponsParams) ([]Coupon, error)
 	ListGenders(ctx context.Context) ([]Gender, error)
+	ListOrderStatus(ctx context.Context) ([]OrderStatus, error)
+	// -- name: GetOrderByCode :one
+	// SELECT * FROM orders
+	// WHERE code = $1 LIMIT 1;
+	ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order, error)
 	ListPermissions(ctx context.Context, arg ListPermissionsParams) ([]Permission, error)
 	ListPermissionsForAdminUser(ctx context.Context, id int64) ([]Permission, error)
 	ListPermissionsForRole(ctx context.Context, id int64) ([]Permission, error)
@@ -85,6 +96,7 @@ type Querier interface {
 	UpdateCart(ctx context.Context, arg UpdateCartParams) (Cart, error)
 	UpdateCartProduct(ctx context.Context, arg UpdateCartProductParams) (CartProduct, error)
 	UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error)
+	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
 	UpdateRole(ctx context.Context, arg UpdateRoleParams) (Role, error)

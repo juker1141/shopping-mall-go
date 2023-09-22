@@ -63,8 +63,9 @@ type Gender struct {
 type Order struct {
 	ID        int64       `json:"id"`
 	IsPaid    pgtype.Bool `json:"is_paid"`
-	Status    int32       `json:"status"`
+	StatusID  pgtype.Int4 `json:"status_id"`
 	CreatedAt time.Time   `json:"created_at"`
+	UpdatedAt time.Time   `json:"updated_at"`
 }
 
 type OrderCoupon struct {
@@ -76,6 +77,11 @@ type OrderProduct struct {
 	OrderID   pgtype.Int4 `json:"order_id"`
 	ProductID pgtype.Int4 `json:"product_id"`
 	Num       int32       `json:"num"`
+}
+
+type OrderStatus struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type OrderUser struct {
