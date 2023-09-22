@@ -139,8 +139,13 @@ Table cart_coupons {
 Table orders as Orders {
   id bigserial [pk]
   is_paid bool [default: false]
-  status int [not null, default: 1]
+  status_id int [ref: > OrdersStatus.id]
   created_at timestamptz [not null, default: `now()`]
+}
+
+Table orders_status as OrdersStatus {
+  id bigserial [pk]
+  name varchar [not null, unique]
 }
 
 Table order_users {

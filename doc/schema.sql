@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-21T13:54:38.159Z
+-- Generated at: 2023-09-22T08:40:05.245Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -112,8 +112,13 @@ CREATE TABLE "cart_coupons" (
 CREATE TABLE "orders" (
   "id" bigserial PRIMARY KEY,
   "is_paid" bool DEFAULT false,
-  "status" int NOT NULL DEFAULT 1,
+  "status_id" int,
   "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "orders_status" (
+  "id" bigserial PRIMARY KEY,
+  "name" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE "order_users" (
@@ -187,6 +192,8 @@ ALTER TABLE "cart_products" ADD FOREIGN KEY ("product_id") REFERENCES "products"
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id");
 
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("status_id") REFERENCES "orders_status" ("id");
 
 ALTER TABLE "order_users" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 

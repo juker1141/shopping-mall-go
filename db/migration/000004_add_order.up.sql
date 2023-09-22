@@ -2,8 +2,13 @@
 CREATE TABLE "orders" (
   "id" bigserial PRIMARY KEY,
   "is_paid" bool DEFAULT false,
-  "status" int NOT NULL DEFAULT 1,
+  "status_id" int,
   "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "orders_status" (
+  "id" bigserial PRIMARY KEY,
+  "name" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE "order_users" (
@@ -41,3 +46,6 @@ ALTER TABLE "order_products" ADD FOREIGN KEY ("product_id") REFERENCES "products
 ALTER TABLE "order_coupons" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
 
 ALTER TABLE "order_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("status_id") REFERENCES "orders_status" ("id");
+

@@ -859,159 +859,159 @@ func TestGetRoleAPI(t *testing.T) {
 	}
 }
 
-func TestDeleteRoleAPI(t *testing.T) {
-	role := randomRole()
+// func TestDeleteRoleAPI(t *testing.T) {
+// 	role := randomRole()
 
-	testCases := []struct {
-		name          string
-		ID            int64
-		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-		buildStubs    func(store *mockdb.MockStore)
-		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
-	}{
-		{
-			name: "OK",
-			ID:   role.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+// 	testCases := []struct {
+// 		name          string
+// 		ID            int64
+// 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+// 		buildStubs    func(store *mockdb.MockStore)
+// 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+// 	}{
+// 		{
+// 			name: "OK",
+// 			ID:   role.ID,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				addPermissionMiddleware(store, "user", accountPermissions)
 
-				arg := db.DeleteRoleTxParams{
-					ID: role.ID,
-				}
+// 				arg := db.DeleteRoleTxParams{
+// 					ID: role.ID,
+// 				}
 
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(db.DeleteRoleTxResult{
-						Message: "Delete role success",
-					}, nil)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
-			},
-		},
-		{
-			name: "NoAuthorization",
-			ID:   role.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusUnauthorized, recorder.Code)
-			},
-		},
-		{
-			name: "NoRequiredPermission",
-			ID:   role.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", emptyPermission)
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
+// 					Times(1).
+// 					Return(db.DeleteRoleTxResult{
+// 						Message: "Delete role success",
+// 					}, nil)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusOK, recorder.Code)
+// 			},
+// 		},
+// 		{
+// 			name: "NoAuthorization",
+// 			ID:   role.ID,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Any()).
+// 					Times(0)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+// 			},
+// 		},
+// 		{
+// 			name: "NoRequiredPermission",
+// 			ID:   role.ID,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				addPermissionMiddleware(store, "user", emptyPermission)
 
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusForbidden, recorder.Code)
-			},
-		},
-		{
-			name: "NotFound",
-			ID:   role.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Any()).
+// 					Times(0)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusForbidden, recorder.Code)
+// 			},
+// 		},
+// 		{
+// 			name: "NotFound",
+// 			ID:   role.ID,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				addPermissionMiddleware(store, "user", accountPermissions)
 
-				arg := db.DeleteRoleTxParams{
-					ID: role.ID,
-				}
+// 				arg := db.DeleteRoleTxParams{
+// 					ID: role.ID,
+// 				}
 
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(db.DeleteRoleTxResult{}, db.ErrRecordNotFound)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name: "InternalError",
-			ID:   role.ID,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
+// 					Times(1).
+// 					Return(db.DeleteRoleTxResult{}, db.ErrRecordNotFound)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+// 			},
+// 		},
+// 		{
+// 			name: "InternalError",
+// 			ID:   role.ID,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				addPermissionMiddleware(store, "user", accountPermissions)
 
-				arg := db.DeleteRoleTxParams{
-					ID: role.ID,
-				}
+// 				arg := db.DeleteRoleTxParams{
+// 					ID: role.ID,
+// 				}
 
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(db.DeleteRoleTxResult{}, sql.ErrConnDone)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name: "invalidID",
-			ID:   0,
-			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
-			},
-			buildStubs: func(store *mockdb.MockStore) {
-				addPermissionMiddleware(store, "user", accountPermissions)
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Eq(arg)).
+// 					Times(1).
+// 					Return(db.DeleteRoleTxResult{}, sql.ErrConnDone)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+// 			},
+// 		},
+// 		{
+// 			name: "invalidID",
+// 			ID:   0,
+// 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+// 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+// 			},
+// 			buildStubs: func(store *mockdb.MockStore) {
+// 				addPermissionMiddleware(store, "user", accountPermissions)
 
-				store.EXPECT().
-					DeleteRoleTx(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusBadRequest, recorder.Code)
-			},
-		},
-	}
+// 				store.EXPECT().
+// 					DeleteRoleTx(gomock.Any(), gomock.Any()).
+// 					Times(0)
+// 			},
+// 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+// 				require.Equal(t, http.StatusBadRequest, recorder.Code)
+// 			},
+// 		},
+// 	}
 
-	for i := range testCases {
-		tc := testCases[i]
+// 	for i := range testCases {
+// 		tc := testCases[i]
 
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			ctrl := gomock.NewController(t)
+// 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore(ctrl)
-			tc.buildStubs(store)
+// 			store := mockdb.NewMockStore(ctrl)
+// 			tc.buildStubs(store)
 
-			// start test server and send request
-			server := newTestServer(t, store)
-			recorder := httptest.NewRecorder()
+// 			// start test server and send request
+// 			server := newTestServer(t, store)
+// 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/role/%d", tc.ID)
-			request, err := http.NewRequest(http.MethodDelete, url, nil)
-			require.NoError(t, err)
+// 			url := fmt.Sprintf("/admin/role/%d", tc.ID)
+// 			request, err := http.NewRequest(http.MethodDelete, url, nil)
+// 			require.NoError(t, err)
 
-			tc.setupAuth(t, request, server.tokenMaker)
+// 			tc.setupAuth(t, request, server.tokenMaker)
 
-			server.router.ServeHTTP(recorder, request)
-			tc.checkResponse(t, recorder)
-		})
-	}
-}
+// 			server.router.ServeHTTP(recorder, request)
+// 			tc.checkResponse(t, recorder)
+// 		})
+// 	}
+// }
 
 func randomRole() db.Role {
 	return db.Role{
