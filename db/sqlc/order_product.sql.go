@@ -14,19 +14,21 @@ import (
 const createOrderProduct = `-- name: CreateOrderProduct :one
 INSERT INTO order_products (
   order_id,
-  product_id
+  product_id,
+  num
 ) VALUES (
-  $1, $2
+  $1, $2, $3
 ) RETURNING order_id, product_id, num
 `
 
 type CreateOrderProductParams struct {
 	OrderID   pgtype.Int4 `json:"order_id"`
 	ProductID pgtype.Int4 `json:"product_id"`
+	Num       int32       `json:"num"`
 }
 
 func (q *Queries) CreateOrderProduct(ctx context.Context, arg CreateOrderProductParams) (OrderProduct, error) {
-	row := q.db.QueryRow(ctx, createOrderProduct, arg.OrderID, arg.ProductID)
+	row := q.db.QueryRow(ctx, createOrderProduct, arg.OrderID, arg.ProductID, arg.Num)
 	var i OrderProduct
 	err := row.Scan(&i.OrderID, &i.ProductID, &i.Num)
 	return i, err
@@ -118,4 +120,25 @@ func (q *Queries) ListOrderProductByProductId(ctx context.Context, productID pgt
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateOrderProduct = `-- name: UpdateOrderProduct :one
+UPDATE order_products
+SET 
+  num = $3
+WHERE order_id = $1 AND product_id = $2
+RETURNING order_id, product_id, num
+`
+
+type UpdateOrderProductParams struct {
+	OrderID   pgtype.Int4 `json:"order_id"`
+	ProductID pgtype.Int4 `json:"product_id"`
+	Num       int32       `json:"num"`
+}
+
+func (q *Queries) UpdateOrderProduct(ctx context.Context, arg UpdateOrderProductParams) (OrderProduct, error) {
+	row := q.db.QueryRow(ctx, updateOrderProduct, arg.OrderID, arg.ProductID, arg.Num)
+	var i OrderProduct
+	err := row.Scan(&i.OrderID, &i.ProductID, &i.Num)
+	return i, err
 }

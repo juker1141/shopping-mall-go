@@ -12,6 +12,7 @@ import (
 func createRandomOrderProduct(t *testing.T) OrderProduct {
 	order := createRandomOrder(t)
 	product := createRandomProduct(t, util.RandomName())
+	num := int32(util.RandomInt(1, 10))
 
 	arg := CreateOrderProductParams{
 		OrderID: pgtype.Int4{
@@ -22,6 +23,7 @@ func createRandomOrderProduct(t *testing.T) OrderProduct {
 			Int32: int32(product.ID),
 			Valid: true,
 		},
+		Num: num,
 	}
 
 	orderProduct, err := testStore.CreateOrderProduct(context.Background(), arg)
@@ -30,6 +32,7 @@ func createRandomOrderProduct(t *testing.T) OrderProduct {
 
 	require.NotZero(t, orderProduct.OrderID)
 	require.NotZero(t, orderProduct.ProductID)
+	require.Equal(t, num, orderProduct.Num)
 
 	return orderProduct
 }
@@ -55,6 +58,7 @@ func TestGetOrderProduct(t *testing.T) {
 	orderProduct2, err := testStore.GetOrderProduct(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, orderProduct2)
+	require.Equal(t, orderProduct1.Num, orderProduct2.Num)
 }
 
 func TestDeleteOrderProductByOrderId(t *testing.T) {
@@ -117,6 +121,7 @@ func TestListOrderProductByOrderId(t *testing.T) {
 				Int32: int32(product.ID),
 				Valid: true,
 			},
+			Num: int32(util.RandomInt(1, 10)),
 		}
 		testStore.CreateOrderProduct(context.Background(), arg)
 	}
@@ -147,6 +152,7 @@ func TestListOrderProductByProductId(t *testing.T) {
 				Int32: int32(product.ID),
 				Valid: true,
 			},
+			Num: int32(util.RandomInt(1, 10)),
 		}
 		testStore.CreateOrderProduct(context.Background(), arg)
 	}
@@ -161,4 +167,28 @@ func TestListOrderProductByProductId(t *testing.T) {
 	for _, orderProduct := range orderProducts {
 		require.NotEmpty(t, orderProduct)
 	}
+}
+
+func TestUpdateOrderProduct(t *testing.T) {
+	oldOrderProduct := createRandomOrderProduct(t)
+
+	arg := UpdateOrderProductParams{
+		OrderID: pgtype.Int4{
+			Int32: oldOrderProduct.OrderID.Int32,
+			Valid: true,
+		},
+		ProductID: pgtype.Int4{
+			Int32: oldOrderProduct.ProductID.Int32,
+			Valid: true,
+		},
+		Num: int32(util.RandomInt(1, 10)),
+	}
+
+	newOrderProduct, err := testStore.UpdateOrderProduct(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, newOrderProduct)
+
+	require.Equal(t, oldOrderProduct.OrderID, newOrderProduct.OrderID)
+	require.Equal(t, oldOrderProduct.ProductID, newOrderProduct.ProductID)
+	require.NotEqual(t, oldOrderProduct.Num, newOrderProduct.Num)
 }

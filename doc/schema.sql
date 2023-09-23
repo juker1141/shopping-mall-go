@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-22T09:05:14.123Z
+-- Generated at: 2023-09-23T06:27:50.084Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -111,10 +111,20 @@ CREATE TABLE "cart_coupons" (
 
 CREATE TABLE "orders" (
   "id" bigserial PRIMARY KEY,
-  "is_paid" bool DEFAULT false,
-  "status_id" int,
+  "full_name" varchar NOT NULL,
+  "email" varchar NOT NULL,
+  "shipping_address" varchar NOT NULL,
+  "message" varchar,
+  "pay_method_id" int NOT NULL,
+  "is_paid" bool NOT NULL DEFAULT false,
+  "status_id" int NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "pay_methods" (
+  "id" bigserial PRIMARY KEY,
+  "name" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE "order_status" (
@@ -193,6 +203,8 @@ ALTER TABLE "cart_products" ADD FOREIGN KEY ("product_id") REFERENCES "products"
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id");
 
 ALTER TABLE "cart_coupons" ADD FOREIGN KEY ("coupon_id") REFERENCES "coupons" ("id");
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("pay_method_id") REFERENCES "pay_methods" ("id");
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("status_id") REFERENCES "order_status" ("id");
 

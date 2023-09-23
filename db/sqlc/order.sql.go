@@ -13,17 +13,43 @@ import (
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO orders (
+  full_name,
+  email,
+  shipping_address,
+  message,
+  pay_method_id,
   status_id
 ) VALUES (
-  $1
-) RETURNING id, is_paid, status_id, created_at, updated_at
+  $1, $2, $3, $4, $5, $6
+) RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at
 `
 
-func (q *Queries) CreateOrder(ctx context.Context, statusID pgtype.Int4) (Order, error) {
-	row := q.db.QueryRow(ctx, createOrder, statusID)
+type CreateOrderParams struct {
+	FullName        string      `json:"full_name"`
+	Email           string      `json:"email"`
+	ShippingAddress string      `json:"shipping_address"`
+	Message         pgtype.Text `json:"message"`
+	PayMethodID     pgtype.Int4 `json:"pay_method_id"`
+	StatusID        pgtype.Int4 `json:"status_id"`
+}
+
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
+	row := q.db.QueryRow(ctx, createOrder,
+		arg.FullName,
+		arg.Email,
+		arg.ShippingAddress,
+		arg.Message,
+		arg.PayMethodID,
+		arg.StatusID,
+	)
 	var i Order
 	err := row.Scan(
 		&i.ID,
+		&i.FullName,
+		&i.Email,
+		&i.ShippingAddress,
+		&i.Message,
+		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
 		&i.CreatedAt,
@@ -42,7 +68,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, is_paid, status_id, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at FROM orders
 WHERE id = $1 LIMIT 1
 `
 
@@ -51,6 +77,11 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 	var i Order
 	err := row.Scan(
 		&i.ID,
+		&i.FullName,
+		&i.Email,
+		&i.ShippingAddress,
+		&i.Message,
+		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
 		&i.CreatedAt,
@@ -72,7 +103,7 @@ func (q *Queries) GetOrdersCount(ctx context.Context) (int64, error) {
 
 const listOrders = `-- name: ListOrders :many
 
-SELECT id, is_paid, status_id, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at FROM orders
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -97,6 +128,11 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 		var i Order
 		if err := rows.Scan(
 			&i.ID,
+			&i.FullName,
+			&i.Email,
+			&i.ShippingAddress,
+			&i.Message,
+			&i.PayMethodID,
 			&i.IsPaid,
 			&i.StatusID,
 			&i.CreatedAt,
@@ -115,22 +151,37 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders
 SET 
-  is_paid = COALESCE($1, is_paid),
-  status_id = COALESCE($2, status_id),
-  updated_at = COALESCE($3, updated_at)
-WHERE id = $4
-RETURNING id, is_paid, status_id, created_at, updated_at
+  full_name = COALESCE($1, full_name),
+  email = COALESCE($2, email),
+  shipping_address = COALESCE($3, shipping_address),
+  message = COALESCE($4, message),
+  pay_method_id = COALESCE($5, pay_method_id),
+  is_paid = COALESCE($6, is_paid),
+  status_id = COALESCE($7, status_id),
+  updated_at = COALESCE($8, updated_at)
+WHERE id = $9
+RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at
 `
 
 type UpdateOrderParams struct {
-	IsPaid    pgtype.Bool        `json:"is_paid"`
-	StatusID  pgtype.Int4        `json:"status_id"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	ID        int64              `json:"id"`
+	FullName        pgtype.Text        `json:"full_name"`
+	Email           pgtype.Text        `json:"email"`
+	ShippingAddress pgtype.Text        `json:"shipping_address"`
+	Message         pgtype.Text        `json:"message"`
+	PayMethodID     pgtype.Int4        `json:"pay_method_id"`
+	IsPaid          pgtype.Bool        `json:"is_paid"`
+	StatusID        pgtype.Int4        `json:"status_id"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+	ID              int64              `json:"id"`
 }
 
 func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
 	row := q.db.QueryRow(ctx, updateOrder,
+		arg.FullName,
+		arg.Email,
+		arg.ShippingAddress,
+		arg.Message,
+		arg.PayMethodID,
 		arg.IsPaid,
 		arg.StatusID,
 		arg.UpdatedAt,
@@ -139,6 +190,11 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 	var i Order
 	err := row.Scan(
 		&i.ID,
+		&i.FullName,
+		&i.Email,
+		&i.ShippingAddress,
+		&i.Message,
+		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
 		&i.CreatedAt,

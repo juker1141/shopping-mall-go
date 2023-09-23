@@ -61,11 +61,16 @@ type Gender struct {
 }
 
 type Order struct {
-	ID        int64       `json:"id"`
-	IsPaid    pgtype.Bool `json:"is_paid"`
-	StatusID  pgtype.Int4 `json:"status_id"`
-	CreatedAt time.Time   `json:"created_at"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	ID              int64       `json:"id"`
+	FullName        string      `json:"full_name"`
+	Email           string      `json:"email"`
+	ShippingAddress string      `json:"shipping_address"`
+	Message         pgtype.Text `json:"message"`
+	PayMethodID     pgtype.Int4 `json:"pay_method_id"`
+	IsPaid          bool        `json:"is_paid"`
+	StatusID        pgtype.Int4 `json:"status_id"`
+	CreatedAt       time.Time   `json:"created_at"`
+	UpdatedAt       time.Time   `json:"updated_at"`
 }
 
 type OrderCoupon struct {
@@ -87,6 +92,11 @@ type OrderStatus struct {
 type OrderUser struct {
 	OrderID pgtype.Int4 `json:"order_id"`
 	UserID  pgtype.Int4 `json:"user_id"`
+}
+
+type PayMethod struct {
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }
 
 type Permission struct {
