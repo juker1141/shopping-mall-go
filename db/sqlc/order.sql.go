@@ -115,21 +115,27 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 const updateOrder = `-- name: UpdateOrder :one
 UPDATE orders
 SET 
-  is_paid = COALESCE($1, status_id),
-  status_id = COALESCE($1, status_id),
-  updated_at = COALESCE($2, updated_at)
-WHERE id = $3
+  is_paid = COALESCE($1, is_paid),
+  status_id = COALESCE($2, status_id),
+  updated_at = COALESCE($3, updated_at)
+WHERE id = $4
 RETURNING id, is_paid, status_id, created_at, updated_at
 `
 
 type UpdateOrderParams struct {
-	StatusID  pgtype.Bool        `json:"status_id"`
+	IsPaid    pgtype.Bool        `json:"is_paid"`
+	StatusID  pgtype.Int4        `json:"status_id"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
 	ID        int64              `json:"id"`
 }
 
 func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error) {
-	row := q.db.QueryRow(ctx, updateOrder, arg.StatusID, arg.UpdatedAt, arg.ID)
+	row := q.db.QueryRow(ctx, updateOrder,
+		arg.IsPaid,
+		arg.StatusID,
+		arg.UpdatedAt,
+		arg.ID,
+	)
 	var i Order
 	err := row.Scan(
 		&i.ID,

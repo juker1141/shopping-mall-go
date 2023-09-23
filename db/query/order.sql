@@ -22,7 +22,7 @@ OFFSET $2;
 -- name: UpdateOrder :one
 UPDATE orders
 SET 
-  is_paid = COALESCE(sqlc.narg(status_id), status_id),
+  is_paid = COALESCE(sqlc.narg(is_paid), is_paid),
   status_id = COALESCE(sqlc.narg(status_id), status_id),
   updated_at = COALESCE(sqlc.narg(updated_at), updated_at)
 WHERE id = sqlc.arg(id)

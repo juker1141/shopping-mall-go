@@ -36,6 +36,17 @@ func (q *Queries) GetOrderStatus(ctx context.Context, id int64) (OrderStatus, er
 	return i, err
 }
 
+const getOrderStatusCount = `-- name: GetOrderStatusCount :one
+SELECT COUNT(*) FROM order_status
+`
+
+func (q *Queries) GetOrderStatusCount(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, getOrderStatusCount)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const listOrderStatus = `-- name: ListOrderStatus :many
 SELECT id, name FROM order_status
 ORDER BY id
