@@ -17,11 +17,13 @@ INSERT INTO orders (
   email,
   shipping_address,
   message,
+  total_price,
+  final_price,
   pay_method_id,
   status_id
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
-) RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at
+  $1, $2, $3, $4, $5, $6, $7, $8
+) RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at
 `
 
 type CreateOrderParams struct {
@@ -29,8 +31,10 @@ type CreateOrderParams struct {
 	Email           string      `json:"email"`
 	ShippingAddress string      `json:"shipping_address"`
 	Message         pgtype.Text `json:"message"`
-	PayMethodID     pgtype.Int4 `json:"pay_method_id"`
-	StatusID        pgtype.Int4 `json:"status_id"`
+	TotalPrice      int32       `json:"total_price"`
+	FinalPrice      int32       `json:"final_price"`
+	PayMethodID     int32       `json:"pay_method_id"`
+	StatusID        int32       `json:"status_id"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
@@ -39,6 +43,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.Email,
 		arg.ShippingAddress,
 		arg.Message,
+		arg.TotalPrice,
+		arg.FinalPrice,
 		arg.PayMethodID,
 		arg.StatusID,
 	)
@@ -52,6 +58,8 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
+		&i.TotalPrice,
+		&i.FinalPrice,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -68,7 +76,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at FROM orders
 WHERE id = $1 LIMIT 1
 `
 
@@ -84,6 +92,8 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
+		&i.TotalPrice,
+		&i.FinalPrice,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -103,7 +113,7 @@ func (q *Queries) GetOrdersCount(ctx context.Context) (int64, error) {
 
 const listOrders = `-- name: ListOrders :many
 
-SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at FROM orders
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -135,6 +145,8 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 			&i.PayMethodID,
 			&i.IsPaid,
 			&i.StatusID,
+			&i.TotalPrice,
+			&i.FinalPrice,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -157,10 +169,12 @@ SET
   message = COALESCE($4, message),
   pay_method_id = COALESCE($5, pay_method_id),
   is_paid = COALESCE($6, is_paid),
-  status_id = COALESCE($7, status_id),
-  updated_at = COALESCE($8, updated_at)
-WHERE id = $9
-RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, created_at, updated_at
+  total_price = COALESCE($7, total_price),
+  final_price = COALESCE($8, final_price),
+  status_id = COALESCE($9, status_id),
+  updated_at = COALESCE($10, updated_at)
+WHERE id = $11
+RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at
 `
 
 type UpdateOrderParams struct {
@@ -170,6 +184,8 @@ type UpdateOrderParams struct {
 	Message         pgtype.Text        `json:"message"`
 	PayMethodID     pgtype.Int4        `json:"pay_method_id"`
 	IsPaid          pgtype.Bool        `json:"is_paid"`
+	TotalPrice      pgtype.Int4        `json:"total_price"`
+	FinalPrice      pgtype.Int4        `json:"final_price"`
 	StatusID        pgtype.Int4        `json:"status_id"`
 	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
 	ID              int64              `json:"id"`
@@ -183,6 +199,8 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		arg.Message,
 		arg.PayMethodID,
 		arg.IsPaid,
+		arg.TotalPrice,
+		arg.FinalPrice,
 		arg.StatusID,
 		arg.UpdatedAt,
 		arg.ID,
@@ -197,6 +215,8 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		&i.PayMethodID,
 		&i.IsPaid,
 		&i.StatusID,
+		&i.TotalPrice,
+		&i.FinalPrice,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

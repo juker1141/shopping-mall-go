@@ -66,9 +66,11 @@ type Order struct {
 	Email           string      `json:"email"`
 	ShippingAddress string      `json:"shipping_address"`
 	Message         pgtype.Text `json:"message"`
-	PayMethodID     pgtype.Int4 `json:"pay_method_id"`
+	PayMethodID     int32       `json:"pay_method_id"`
 	IsPaid          bool        `json:"is_paid"`
-	StatusID        pgtype.Int4 `json:"status_id"`
+	StatusID        int32       `json:"status_id"`
+	TotalPrice      int32       `json:"total_price"`
+	FinalPrice      int32       `json:"final_price"`
 	CreatedAt       time.Time   `json:"created_at"`
 	UpdatedAt       time.Time   `json:"updated_at"`
 }

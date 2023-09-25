@@ -27,14 +27,8 @@ func createRandomOrder(t *testing.T) Order {
 			String: message,
 			Valid:  true,
 		},
-		PayMethodID: pgtype.Int4{
-			Int32: int32(payMethod.ID),
-			Valid: true,
-		},
-		StatusID: pgtype.Int4{
-			Int32: int32(orderStatus.ID),
-			Valid: true,
-		},
+		PayMethodID: int32(payMethod.ID),
+		StatusID:    int32(orderStatus.ID),
 	}
 
 	order, err := testStore.CreateOrder(context.Background(), arg)
@@ -47,8 +41,8 @@ func createRandomOrder(t *testing.T) Order {
 	require.Equal(t, shippingAddress, order.ShippingAddress)
 	require.Equal(t, message, order.Message.String)
 	require.False(t, order.IsPaid)
-	require.Equal(t, int32(payMethod.ID), order.PayMethodID.Int32)
-	require.Equal(t, int32(orderStatus.ID), order.StatusID.Int32)
+	require.Equal(t, int32(payMethod.ID), order.PayMethodID)
+	require.Equal(t, int32(orderStatus.ID), order.StatusID)
 
 	require.NotZero(t, order.CreatedAt)
 	require.NotZero(t, order.UpdatedAt)
@@ -72,8 +66,8 @@ func TestGetOrder(t *testing.T) {
 	require.Equal(t, order1.Email, order2.Email)
 	require.Equal(t, order1.ShippingAddress, order2.ShippingAddress)
 	require.Equal(t, order1.IsPaid, order2.IsPaid)
-	require.Equal(t, order1.PayMethodID.Int32, order2.PayMethodID.Int32)
-	require.Equal(t, order1.StatusID.Int32, order2.StatusID.Int32)
+	require.Equal(t, order1.PayMethodID, order2.PayMethodID)
+	require.Equal(t, order1.StatusID, order2.StatusID)
 	require.Equal(t, order1.Message.String, order2.Message.String)
 
 	require.WithinDuration(t, order1.CreatedAt, order2.CreatedAt, time.Second)
@@ -133,7 +127,7 @@ func TestUpdateOrder(t *testing.T) {
 	require.NotEqual(t, oldOrder.ShippingAddress, newOrder.ShippingAddress)
 	require.NotEqual(t, oldOrder.IsPaid, newOrder.IsPaid)
 	require.NotEqual(t, oldOrder.Message.String, newOrder.Message.String)
-	require.NotEqual(t, oldOrder.StatusID.Int32, newOrder.StatusID.Int32)
+	require.NotEqual(t, oldOrder.StatusID, newOrder.StatusID)
 	require.NotEqual(t, oldOrder.IsPaid, newOrder.IsPaid)
 
 	require.WithinDuration(t, newUpdatedTime, newOrder.UpdatedAt, time.Second)

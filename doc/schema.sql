@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-23T06:27:50.084Z
+-- Generated at: 2023-09-23T08:42:54.502Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -115,8 +115,10 @@ CREATE TABLE "orders" (
   "email" varchar NOT NULL,
   "shipping_address" varchar NOT NULL,
   "message" varchar,
-  "pay_method_id" int NOT NULL,
   "is_paid" bool NOT NULL DEFAULT false,
+  "total_price" int NOT NULL,
+  "final_price" int NOT NULL,
+  "pay_method_id" int NOT NULL,
   "status_id" int NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
@@ -183,6 +185,10 @@ COMMENT ON COLUMN "carts"."total_price" IS 'must be positive';
 COMMENT ON COLUMN "carts"."final_price" IS 'must be positive';
 
 COMMENT ON COLUMN "products"."status" IS 'must be either 0 or 1';
+
+COMMENT ON COLUMN "orders"."total_price" IS 'must be positive';
+
+COMMENT ON COLUMN "orders"."final_price" IS 'must be positive';
 
 ALTER TABLE "admin_users" ADD FOREIGN KEY ("role_id") REFERENCES "roles" ("id");
 

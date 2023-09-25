@@ -5,8 +5,10 @@ CREATE TABLE "orders" (
   "email" varchar NOT NULL,
   "shipping_address" varchar NOT NULL,
   "message" varchar,
-  "pay_method_id" int NOT NULL,
   "is_paid" bool NOT NULL DEFAULT false,
+  "total_price" int NOT NULL,
+  "final_price" int NOT NULL,
+  "pay_method_id" int NOT NULL,
   "status_id" int NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "updated_at" timestamptz NOT NULL DEFAULT (now())
@@ -39,6 +41,10 @@ CREATE TABLE "order_coupons" (
   "order_id" int,
   "coupon_id" int
 );
+
+COMMENT ON COLUMN "orders"."total_price" IS 'must be positive';
+
+COMMENT ON COLUMN "orders"."final_price" IS 'must be positive';
 
 CREATE UNIQUE INDEX ON "order_users" ("order_id", "user_id");
 

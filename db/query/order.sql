@@ -4,10 +4,12 @@ INSERT INTO orders (
   email,
   shipping_address,
   message,
+  total_price,
+  final_price,
   pay_method_id,
   status_id
 ) VALUES (
-  $1, $2, $3, $4, $5, $6
+  $1, $2, $3, $4, $5, $6, $7, $8
 ) RETURNING *;
 
 -- name: GetOrder :one
@@ -33,6 +35,8 @@ SET
   message = COALESCE(sqlc.narg(message), message),
   pay_method_id = COALESCE(sqlc.narg(pay_method_id), pay_method_id),
   is_paid = COALESCE(sqlc.narg(is_paid), is_paid),
+  total_price = COALESCE(sqlc.narg(total_price), total_price),
+  final_price = COALESCE(sqlc.narg(final_price), final_price),
   status_id = COALESCE(sqlc.narg(status_id), status_id),
   updated_at = COALESCE(sqlc.narg(updated_at), updated_at)
 WHERE id = sqlc.arg(id)

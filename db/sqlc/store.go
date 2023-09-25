@@ -13,6 +13,9 @@ type Store interface {
 	CreateRoleTx(ctx context.Context, arg CreateRoleTxParams) (RoleTxResult, error)
 	UpdateRoleTx(ctx context.Context, arg UpdateRoleTxParams) (RoleTxResult, error)
 	DeleteRoleTx(ctx context.Context, arg DeleteRoleTxParams) (DeleteRoleTxResult, error)
+	CreateOrderTx(ctx context.Context, arg CreateOrderTxParams) (OrderTxResult, error)
+	UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParams) (OrderTxResult, error)
+	DeleteOrderTx(ctx context.Context, arg DeleteOrderTxParams) error
 	// CreateAdminUserTx(ctx context.Context, arg CreateAdminUserTxParams) (AdminUserTxResult, error)
 	// UpdateAdminUserTx(ctx context.Context, arg UpdateAdminUserTxParams) (AdminUserTxResult, error)
 	// DeleteAdminUserTx(ctx context.Context, arg DeleteAdminUserTxParams) (DeleteAdminUserTxResult, error)
