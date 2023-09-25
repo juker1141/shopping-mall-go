@@ -11,28 +11,34 @@ import (
 
 const createOrderStatus = `-- name: CreateOrderStatus :one
 INSERT INTO order_status (
-  name
+  name,
+  description
 ) VALUES (
-  $1
-) RETURNING id, name
+  $1, $2
+) RETURNING id, name, description
 `
 
-func (q *Queries) CreateOrderStatus(ctx context.Context, name string) (OrderStatus, error) {
-	row := q.db.QueryRow(ctx, createOrderStatus, name)
+type CreateOrderStatusParams struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+func (q *Queries) CreateOrderStatus(ctx context.Context, arg CreateOrderStatusParams) (OrderStatus, error) {
+	row := q.db.QueryRow(ctx, createOrderStatus, arg.Name, arg.Description)
 	var i OrderStatus
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.Description)
 	return i, err
 }
 
 const getOrderStatus = `-- name: GetOrderStatus :one
-SELECT id, name FROM order_status
+SELECT id, name, description FROM order_status
 WHERE id = $1 LIMIT 1
 `
 
 func (q *Queries) GetOrderStatus(ctx context.Context, id int64) (OrderStatus, error) {
 	row := q.db.QueryRow(ctx, getOrderStatus, id)
 	var i OrderStatus
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(&i.ID, &i.Name, &i.Description)
 	return i, err
 }
 
@@ -48,7 +54,7 @@ func (q *Queries) GetOrderStatusCount(ctx context.Context) (int64, error) {
 }
 
 const listOrderStatus = `-- name: ListOrderStatus :many
-SELECT id, name FROM order_status
+SELECT id, name, description FROM order_status
 ORDER BY id
 `
 
@@ -61,7 +67,7 @@ func (q *Queries) ListOrderStatus(ctx context.Context) ([]OrderStatus, error) {
 	items := []OrderStatus{}
 	for rows.Next() {
 		var i OrderStatus
-		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.Description); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

@@ -10,13 +10,20 @@ import (
 
 func createRandomOrderStatus(t *testing.T) OrderStatus {
 	name := util.RandomName()
+	description := util.RandomString(20)
 
-	orderStatus, err := testStore.CreateOrderStatus(context.Background(), name)
+	arg := CreateOrderStatusParams{
+		Name:        name,
+		Description: description,
+	}
+
+	orderStatus, err := testStore.CreateOrderStatus(context.Background(), arg)
 	require.NoError(t, err)
 	require.NotEmpty(t, orderStatus)
 
 	require.NotZero(t, orderStatus.ID)
 	require.Equal(t, name, orderStatus.Name)
+	require.Equal(t, description, orderStatus.Description)
 	return orderStatus
 }
 
@@ -33,6 +40,7 @@ func TestGetOrderStatus(t *testing.T) {
 
 	require.Equal(t, orderStatus1.ID, orderStatus2.ID)
 	require.Equal(t, orderStatus1.Name, orderStatus2.Name)
+	require.Equal(t, orderStatus1.Description, orderStatus2.Description)
 }
 
 func TestListOrderStatusAndCount(t *testing.T) {

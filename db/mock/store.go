@@ -173,7 +173,7 @@ func (mr *MockStoreMockRecorder) CreateOrderProduct(arg0, arg1 interface{}) *gom
 }
 
 // CreateOrderStatus mocks base method.
-func (m *MockStore) CreateOrderStatus(arg0 context.Context, arg1 string) (db.OrderStatus, error) {
+func (m *MockStore) CreateOrderStatus(arg0 context.Context, arg1 db.CreateOrderStatusParams) (db.OrderStatus, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrderStatus", arg0, arg1)
 	ret0, _ := ret[0].(db.OrderStatus)

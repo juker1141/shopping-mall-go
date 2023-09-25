@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-23T08:42:54.502Z
+-- Generated at: 2023-09-25T04:06:46.142Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -131,7 +131,8 @@ CREATE TABLE "pay_methods" (
 
 CREATE TABLE "order_status" (
   "id" bigserial PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "name" varchar UNIQUE NOT NULL,
+  "description" varchar NOT NULL
 );
 
 CREATE TABLE "order_users" (

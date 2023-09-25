@@ -66,13 +66,15 @@ type Order struct {
 	Email           string      `json:"email"`
 	ShippingAddress string      `json:"shipping_address"`
 	Message         pgtype.Text `json:"message"`
-	PayMethodID     int32       `json:"pay_method_id"`
 	IsPaid          bool        `json:"is_paid"`
-	StatusID        int32       `json:"status_id"`
-	TotalPrice      int32       `json:"total_price"`
-	FinalPrice      int32       `json:"final_price"`
-	CreatedAt       time.Time   `json:"created_at"`
-	UpdatedAt       time.Time   `json:"updated_at"`
+	// must be positive
+	TotalPrice int32 `json:"total_price"`
+	// must be positive
+	FinalPrice  int32     `json:"final_price"`
+	PayMethodID int32     `json:"pay_method_id"`
+	StatusID    int32     `json:"status_id"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type OrderCoupon struct {
@@ -87,8 +89,9 @@ type OrderProduct struct {
 }
 
 type OrderStatus struct {
-	ID   int64  `json:"id"`
-	Name string `json:"name"`
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 type OrderUser struct {

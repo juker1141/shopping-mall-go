@@ -17,29 +17,27 @@ func createRandomOrderTx(t *testing.T) OrderTxResult {
 	coupon := createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 
 	n := 3
-	orderProducts := make([]CreateOrderProduct, n)
+	orderProducts := make([]OrderProductParams, n)
 	productList := make([]Product, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = CreateOrderProduct{
-			ProductID: product.ID,
-			Num:       util.RandomInt(1, 10),
+		orderProducts[i] = OrderProductParams{
+			ID:  product.ID,
+			Num: util.RandomInt(1, 10),
 		}
 		productList[i] = product
 	}
 
 	arg := CreateOrderTxParams{
-		UserID:           user.ID,
-		FullName:         user.FullName,
-		Email:            user.Email,
-		ShippingAddress:  user.ShippingAddress,
-		Message:          util.RandomString(20),
-		TotalPrice:       util.RandomPrice(),
-		FinalPrice:       util.RandomPrice(),
-		PayMethodID:      payMethod.ID,
-		StatusID:         status.ID,
-		OrderProductList: orderProducts,
-		CouponID:         coupon.ID,
+		UserID:          user.ID,
+		FullName:        user.FullName,
+		Email:           user.Email,
+		ShippingAddress: user.ShippingAddress,
+		Message:         util.RandomString(20),
+		PayMethodID:     payMethod.ID,
+		StatusID:        status.ID,
+		OrderProducts:   orderProducts,
+		CouponID:        coupon.ID,
 	}
 
 	result, err := testStore.CreateOrderTx(context.Background(), arg)
@@ -49,8 +47,8 @@ func createRandomOrderTx(t *testing.T) OrderTxResult {
 	require.Equal(t, user.FullName, result.FullName)
 	require.Equal(t, user.Email, result.Email)
 	require.Equal(t, user.ShippingAddress, result.ShippingAddress)
-	require.Equal(t, arg.TotalPrice, result.TotalPrice)
-	require.Equal(t, arg.FinalPrice, result.FinalPrice)
+	require.NotZero(t, result.TotalPrice)
+	require.NotZero(t, result.FinalPrice)
 	require.Equal(t, arg.Message, result.Message.String)
 	require.Equal(t, productList, result.ProductList)
 	require.Equal(t, int32(payMethod.ID), result.PayMethodID)
@@ -98,27 +96,25 @@ func TestCreateOrderTxEmptyMessageEmptyCoupon(t *testing.T) {
 	status := createRandomOrderStatus(t)
 
 	n := 3
-	orderProducts := make([]CreateOrderProduct, n)
+	orderProducts := make([]OrderProductParams, n)
 	productList := make([]Product, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = CreateOrderProduct{
-			ProductID: product.ID,
-			Num:       util.RandomInt(1, 10),
+		orderProducts[i] = OrderProductParams{
+			ID:  product.ID,
+			Num: util.RandomInt(1, 10),
 		}
 		productList[i] = product
 	}
 
 	arg := CreateOrderTxParams{
-		UserID:           user.ID,
-		FullName:         user.FullName,
-		Email:            user.Email,
-		ShippingAddress:  user.ShippingAddress,
-		TotalPrice:       util.RandomPrice(),
-		FinalPrice:       util.RandomPrice(),
-		PayMethodID:      payMethod.ID,
-		StatusID:         status.ID,
-		OrderProductList: orderProducts,
+		UserID:          user.ID,
+		FullName:        user.FullName,
+		Email:           user.Email,
+		ShippingAddress: user.ShippingAddress,
+		PayMethodID:     payMethod.ID,
+		StatusID:        status.ID,
+		OrderProducts:   orderProducts,
 	}
 
 	result, err := testStore.CreateOrderTx(context.Background(), arg)
@@ -128,8 +124,8 @@ func TestCreateOrderTxEmptyMessageEmptyCoupon(t *testing.T) {
 	require.Equal(t, user.FullName, result.FullName)
 	require.Equal(t, user.Email, result.Email)
 	require.Equal(t, user.ShippingAddress, result.ShippingAddress)
-	require.Equal(t, arg.TotalPrice, result.TotalPrice)
-	require.Equal(t, arg.FinalPrice, result.FinalPrice)
+	require.NotZero(t, result.TotalPrice)
+	require.NotZero(t, result.FinalPrice)
 	require.Empty(t, result.Message.String)
 	require.Equal(t, productList, result.ProductList)
 	require.Equal(t, int32(payMethod.ID), result.PayMethodID)
@@ -187,29 +183,29 @@ func TestUpdateOrderTx(t *testing.T) {
 	newPrice := util.RandomPrice()
 
 	n := 3
-	orderProducts := make([]CreateOrderProduct, n)
+	orderProducts := make([]OrderProductParams, n)
 	productList := make([]Product, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = CreateOrderProduct{
-			ProductID: product.ID,
-			Num:       util.RandomInt(1, 10),
+		orderProducts[i] = OrderProductParams{
+			ID:  product.ID,
+			Num: util.RandomInt(1, 10),
 		}
 		productList[i] = product
 	}
 
 	arg := UpdateOrderTxParams{
-		ID:               oldResult.ID,
-		FullName:         util.RandomName(),
-		Email:            util.RandomEmail(),
-		ShippingAddress:  util.RandomAddress(),
-		Message:          util.RandomString(10),
-		TotalPrice:       &newPrice,
-		FinalPrice:       &newPrice,
-		PayMethodID:      newPayMethod.ID,
-		StatusID:         newStatus.ID,
-		OrderProductList: orderProducts,
-		CouponID:         coupon.ID,
+		ID:              oldResult.ID,
+		FullName:        util.RandomName(),
+		Email:           util.RandomEmail(),
+		ShippingAddress: util.RandomAddress(),
+		Message:         util.RandomString(10),
+		TotalPrice:      &newPrice,
+		FinalPrice:      &newPrice,
+		PayMethodID:     newPayMethod.ID,
+		StatusID:        newStatus.ID,
+		OrderProducts:   orderProducts,
+		CouponID:        coupon.ID,
 	}
 
 	newResult, err := testStore.UpdateOrderTx(context.Background(), arg)

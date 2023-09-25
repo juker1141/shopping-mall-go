@@ -21,7 +21,8 @@ CREATE TABLE "pay_methods" (
 
 CREATE TABLE "order_status" (
   "id" bigserial PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "name" varchar UNIQUE NOT NULL,
+  "description" varchar NOT NULL
 );
 
 CREATE TABLE "order_users" (

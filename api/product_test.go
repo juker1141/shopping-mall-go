@@ -1321,13 +1321,14 @@ func TestDeleteProductAPI(t *testing.T) {
 
 func randomProduct() db.Product {
 	targetPath := filepath.Join("static", "products", "fake_product.png")
+	price := util.RandomPrice()
 
 	return db.Product{
 		ID:          util.RandomID(),
 		Title:       util.RandomName(),
 		Category:    util.RandomName(),
-		OriginPrice: util.RandomPrice(),
-		Price:       util.RandomPrice(),
+		OriginPrice: price,
+		Price:       price - 10,
 		Unit:        util.RandomName(),
 		Description: util.RandomString(20),
 		Content:     util.RandomString(20),

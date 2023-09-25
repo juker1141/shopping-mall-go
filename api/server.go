@@ -123,6 +123,9 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.PATCH("/product/:id", server.updateProduct)
 	adminRoutes.DELETE("/product/:id", server.deleteProduct)
 
+	// 訂單
+	adminRoutes.POST("/order", server.createOrder)
+
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
 	adminRoutes.GET("/coupons", server.listCoupons)

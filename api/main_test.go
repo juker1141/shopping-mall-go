@@ -16,8 +16,8 @@ var (
 	accountPermissions = []int64{accountPermissionCode}
 	memberPermissions  = []int64{memberPermissionCode}
 	productPermissions = []int64{productPermissionCode}
-	// orderPermissions   = []int64{orderPermissionCode}
-	couponPermissions = []int64{couponPermissionCode}
+	orderPermissions   = []int64{orderPermissionCode}
+	couponPermissions  = []int64{couponPermissionCode}
 	// newsPermissions    = []int64{newsPermissionCode}
 )
 

@@ -23,7 +23,7 @@ INSERT INTO orders (
   status_id
 ) VALUES (
   $1, $2, $3, $4, $5, $6, $7, $8
-) RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at
+) RETURNING id, full_name, email, shipping_address, message, is_paid, total_price, final_price, pay_method_id, status_id, created_at, updated_at
 `
 
 type CreateOrderParams struct {
@@ -55,11 +55,11 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		&i.Email,
 		&i.ShippingAddress,
 		&i.Message,
-		&i.PayMethodID,
 		&i.IsPaid,
-		&i.StatusID,
 		&i.TotalPrice,
 		&i.FinalPrice,
+		&i.PayMethodID,
+		&i.StatusID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -76,7 +76,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id int64) error {
 }
 
 const getOrder = `-- name: GetOrder :one
-SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, is_paid, total_price, final_price, pay_method_id, status_id, created_at, updated_at FROM orders
 WHERE id = $1 LIMIT 1
 `
 
@@ -89,11 +89,11 @@ func (q *Queries) GetOrder(ctx context.Context, id int64) (Order, error) {
 		&i.Email,
 		&i.ShippingAddress,
 		&i.Message,
-		&i.PayMethodID,
 		&i.IsPaid,
-		&i.StatusID,
 		&i.TotalPrice,
 		&i.FinalPrice,
+		&i.PayMethodID,
+		&i.StatusID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -113,7 +113,7 @@ func (q *Queries) GetOrdersCount(ctx context.Context) (int64, error) {
 
 const listOrders = `-- name: ListOrders :many
 
-SELECT id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at FROM orders
+SELECT id, full_name, email, shipping_address, message, is_paid, total_price, final_price, pay_method_id, status_id, created_at, updated_at FROM orders
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -142,11 +142,11 @@ func (q *Queries) ListOrders(ctx context.Context, arg ListOrdersParams) ([]Order
 			&i.Email,
 			&i.ShippingAddress,
 			&i.Message,
-			&i.PayMethodID,
 			&i.IsPaid,
-			&i.StatusID,
 			&i.TotalPrice,
 			&i.FinalPrice,
+			&i.PayMethodID,
+			&i.StatusID,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -174,7 +174,7 @@ SET
   status_id = COALESCE($9, status_id),
   updated_at = COALESCE($10, updated_at)
 WHERE id = $11
-RETURNING id, full_name, email, shipping_address, message, pay_method_id, is_paid, status_id, total_price, final_price, created_at, updated_at
+RETURNING id, full_name, email, shipping_address, message, is_paid, total_price, final_price, pay_method_id, status_id, created_at, updated_at
 `
 
 type UpdateOrderParams struct {
@@ -212,11 +212,11 @@ func (q *Queries) UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order
 		&i.Email,
 		&i.ShippingAddress,
 		&i.Message,
-		&i.PayMethodID,
 		&i.IsPaid,
-		&i.StatusID,
 		&i.TotalPrice,
 		&i.FinalPrice,
+		&i.PayMethodID,
+		&i.StatusID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

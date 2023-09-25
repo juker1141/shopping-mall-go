@@ -1,8 +1,9 @@
 -- name: CreateOrderStatus :one
 INSERT INTO order_status (
-  name
+  name,
+  description
 ) VALUES (
-  $1
+  $1, $2
 ) RETURNING *;
 
 -- name: GetOrderStatus :one

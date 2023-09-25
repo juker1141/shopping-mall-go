@@ -21,7 +21,7 @@ type Querier interface {
 	CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error)
 	CreateOrderCoupon(ctx context.Context, arg CreateOrderCouponParams) (OrderCoupon, error)
 	CreateOrderProduct(ctx context.Context, arg CreateOrderProductParams) (OrderProduct, error)
-	CreateOrderStatus(ctx context.Context, name string) (OrderStatus, error)
+	CreateOrderStatus(ctx context.Context, arg CreateOrderStatusParams) (OrderStatus, error)
 	CreateOrderUser(ctx context.Context, arg CreateOrderUserParams) (OrderUser, error)
 	CreatePayMethod(ctx context.Context, name string) (PayMethod, error)
 	CreatePermission(ctx context.Context, name string) (Permission, error)

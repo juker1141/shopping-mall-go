@@ -159,6 +159,7 @@ Table pay_methods as PayMethods{
 Table order_status as OrderStatus {
   id bigserial [pk]
   name varchar [not null, unique]
+  description varchar [not null]
 }
 
 Table order_users {

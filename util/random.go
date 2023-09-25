@@ -95,5 +95,5 @@ func RandomPostCode() string {
 }
 
 func RandomPrice() int32 {
-	return int32(RandomInt(1, 1000))
+	return int32(RandomInt(50, 1000))
 }
