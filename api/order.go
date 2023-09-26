@@ -240,3 +240,71 @@ func (server *Server) listOrders(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+type updateOrderRequest struct {
+	FullName        string                    `json:"full_name" binding:"required,fullName"`
+	Email           string                    `json:"email" binding:"required"`
+	ShippingAddress string                    `json:"shipping_address" binding:"required"`
+	Message         string                    `json:"message"`
+	PayMethodID     int64                     `json:"pay_method_id" binding:"required"`
+	OrderProducts   []db.OrderTxProductParams `json:"order_products" binding:"required,min=1"`
+	CouponID        int64                     `json:"coupon_id"`
+}
+
+func (server *Server) updateOrder(ctx *gin.Context) {
+	var uri orderRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	var req updateOrderRequest
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	arg := db.UpdateOrderTxParams{
+		ID: uri.ID,
+	}
+
+	if req.FullName != "" {
+		arg.FullName = req.FullName
+	}
+
+	if req.Email != "" {
+		arg.Email = req.Email
+	}
+
+	if req.ShippingAddress != "" {
+		arg.ShippingAddress = req.ShippingAddress
+	}
+
+	if req.Message != "" {
+		arg.Message = req.Message
+	}
+
+	if req.PayMethodID != 0 {
+		arg.PayMethodID = req.PayMethodID
+	}
+
+	if req.OrderProducts != nil && len(req.OrderProducts) != 0 {
+		arg.OrderProducts = req.OrderProducts
+	}
+
+	if req.CouponID != 0 {
+		arg.CouponID = req.CouponID
+	}
+
+	result, err := server.store.UpdateOrderTx(ctx, arg)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, result)
+}

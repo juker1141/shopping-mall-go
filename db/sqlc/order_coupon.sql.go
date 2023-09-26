@@ -119,3 +119,23 @@ func (q *Queries) ListOrderCouponByOrderId(ctx context.Context, orderID pgtype.I
 	}
 	return items, nil
 }
+
+const updateOrderCouponByOrderId = `-- name: UpdateOrderCouponByOrderId :one
+UPDATE order_coupons
+SET 
+  coupon_id = $2
+WHERE order_id = $1
+RETURNING order_id, coupon_id
+`
+
+type UpdateOrderCouponByOrderIdParams struct {
+	OrderID  pgtype.Int4 `json:"order_id"`
+	CouponID pgtype.Int4 `json:"coupon_id"`
+}
+
+func (q *Queries) UpdateOrderCouponByOrderId(ctx context.Context, arg UpdateOrderCouponByOrderIdParams) (OrderCoupon, error) {
+	row := q.db.QueryRow(ctx, updateOrderCouponByOrderId, arg.OrderID, arg.CouponID)
+	var i OrderCoupon
+	err := row.Scan(&i.OrderID, &i.CouponID)
+	return i, err
+}

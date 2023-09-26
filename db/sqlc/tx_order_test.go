@@ -189,8 +189,6 @@ func TestUpdateOrderTx(t *testing.T) {
 	newStatus := createRandomOrderStatus(t)
 	coupon := createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 
-	newPrice := util.RandomPrice()
-
 	n := 3
 	orderProducts := make([]OrderTxProductParams, n)
 	productList := make([]OrderTxProductResult, n)
@@ -214,8 +212,6 @@ func TestUpdateOrderTx(t *testing.T) {
 		Email:           util.RandomEmail(),
 		ShippingAddress: util.RandomAddress(),
 		Message:         util.RandomString(10),
-		TotalPrice:      &newPrice,
-		FinalPrice:      &newPrice,
 		PayMethodID:     newPayMethod.ID,
 		StatusID:        newStatus.ID,
 		OrderProducts:   orderProducts,

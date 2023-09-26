@@ -127,6 +127,7 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.POST("/order", server.createOrder)
 	adminRoutes.GET("/orders", server.listOrders)
 	adminRoutes.GET("/order/:id", server.getOrder)
+	adminRoutes.PATCH("/order/:id", server.updateOrder)
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)

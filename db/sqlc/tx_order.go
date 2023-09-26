@@ -55,7 +55,6 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 			// 取得商品
 			product, err := q.GetProduct(ctx, orderProduct.ID)
 			if err != nil {
-				fmt.Println("get product err", err)
 				return err
 			}
 			totalPrice = totalPrice + (int32(orderProduct.Num) * product.OriginPrice)
@@ -97,7 +96,6 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 		// 建立訂單
 		result.Order, err = q.CreateOrder(ctx, orderArg)
 		if err != nil {
-			fmt.Println("create order", err)
 			return err
 		}
 
@@ -113,14 +111,12 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 			},
 		})
 		if err != nil {
-			fmt.Println("create order user err", err)
 			return err
 		}
 
 		// 取得訂單狀態
 		result.Status, err = q.GetOrderStatus(ctx, arg.StatusID)
 		if err != nil {
-			fmt.Println("get order status err", err)
 			return err
 		}
 
@@ -138,7 +134,6 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 				Num: int32(orderProduct.Num),
 			})
 			if err != nil {
-				fmt.Println("get order product err", err)
 				return err
 			}
 		}
@@ -172,8 +167,6 @@ type UpdateOrderTxParams struct {
 	Email           string                 `json:"email"`
 	ShippingAddress string                 `json:"shipping_address"`
 	Message         string                 `json:"message"`
-	TotalPrice      *int32                 `json:"total_price"`
-	FinalPrice      *int32                 `json:"final_price"`
 	PayMethodID     int64                  `json:"pay_method_id"`
 	StatusID        int64                  `json:"status_id"`
 	OrderProducts   []OrderTxProductParams `json:"order_products"`
@@ -222,20 +215,6 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 			}
 		}
 
-		if arg.TotalPrice != nil {
-			orderArg.TotalPrice = pgtype.Int4{
-				Int32: *arg.TotalPrice,
-				Valid: true,
-			}
-		}
-
-		if arg.FinalPrice != nil {
-			orderArg.FinalPrice = pgtype.Int4{
-				Int32: *arg.FinalPrice,
-				Valid: true,
-			}
-		}
-
 		if arg.PayMethodID != 0 {
 			orderArg.PayMethodID = pgtype.Int4{
 				Int32: int32(arg.PayMethodID),
@@ -246,6 +225,49 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 		if arg.StatusID != 0 {
 			orderArg.StatusID = pgtype.Int4{
 				Int32: int32(arg.StatusID),
+				Valid: true,
+			}
+		}
+
+		var productList []OrderTxProductResult
+		var totalPrice int32
+		var finalPrice int32
+		if arg.OrderProducts != nil && len(arg.OrderProducts) > 0 {
+			for _, orderProduct := range arg.OrderProducts {
+				if orderProduct.Num <= 0 {
+					err := fmt.Errorf("product num must be positive")
+					return err
+				}
+				// 取得商品
+				product, err := q.GetProduct(ctx, orderProduct.ID)
+				if err != nil {
+					return err
+				}
+				totalPrice = totalPrice + (int32(orderProduct.Num) * product.OriginPrice)
+				finalPrice = finalPrice + (int32(orderProduct.Num) * product.Price)
+				productList = append(productList, OrderTxProductResult{
+					Product: product,
+					Num:     orderProduct.Num,
+				})
+			}
+		}
+
+		if arg.CouponID != 0 && finalPrice != 0 {
+			coupon, err := q.GetCoupon(ctx, arg.CouponID)
+			if err != nil {
+				return err
+			}
+
+			finalPrice = finalPrice * coupon.Percent / 100
+		}
+
+		if arg.OrderProducts != nil && len(arg.OrderProducts) != 0 {
+			orderArg.TotalPrice = pgtype.Int4{
+				Int32: totalPrice,
+				Valid: true,
+			}
+			orderArg.FinalPrice = pgtype.Int4{
+				Int32: finalPrice,
 				Valid: true,
 			}
 		}
@@ -262,7 +284,6 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 			return err
 		}
 
-		var productList []OrderTxProductResult
 		if arg.OrderProducts != nil && len(arg.OrderProducts) > 0 {
 			// 如果需要更新訂單商品，先把之前建立的關聯移除
 			err = q.DeleteOrderProductByOrderId(ctx, pgtype.Int4{
@@ -274,11 +295,6 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 			}
 
 			for _, orderProduct := range arg.OrderProducts {
-				// 取得商品
-				product, err := q.GetProduct(ctx, orderProduct.ID)
-				if err != nil {
-					return err
-				}
 
 				// 建立訂單跟商品的關聯及數量
 				_, err = q.CreateOrderProduct(ctx, CreateOrderProductParams{
@@ -287,7 +303,7 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 						Valid: true,
 					},
 					ProductID: pgtype.Int4{
-						Int32: int32(product.ID),
+						Int32: int32(orderProduct.ID),
 						Valid: true,
 					},
 					Num: int32(orderProduct.Num),
@@ -295,11 +311,6 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 				if err != nil {
 					return err
 				}
-
-				productList = append(productList, OrderTxProductResult{
-					Product: product,
-					Num:     orderProduct.Num,
-				})
 			}
 		} else {
 			// 如果沒有更新訂單商品，還是要去取得目前的商品
@@ -322,29 +333,22 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 				})
 			}
 		}
-
 		result.ProductList = productList
 
 		if arg.CouponID != 0 {
-			// 如果需要更改，先將之前建立的關聯移除
-			err := q.DeleteOrderCouponByOrderId(ctx, pgtype.Int4{
-				Int32: int32(result.Order.ID),
-				Valid: true,
-			})
-			if err != nil {
-				return err
-			}
-
-			_, err = q.CreateOrderCoupon(ctx, CreateOrderCouponParams{
+			// 更新關聯表
+			arg := UpdateOrderCouponByOrderIdParams{
 				OrderID: pgtype.Int4{
-					Int32: int32(result.Order.ID),
+					Int32: int32(result.ID),
 					Valid: true,
 				},
 				CouponID: pgtype.Int4{
 					Int32: int32(arg.CouponID),
 					Valid: true,
 				},
-			})
+			}
+
+			_, err := q.UpdateOrderCouponByOrderId(ctx, arg)
 			if err != nil {
 				return err
 			}

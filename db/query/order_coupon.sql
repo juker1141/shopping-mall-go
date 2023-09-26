@@ -19,6 +19,13 @@ WHERE order_id = $1;
 SELECT * FROM order_coupons
 WHERE coupon_id = $1;
 
+-- name: UpdateOrderCouponByOrderId :one
+UPDATE order_coupons
+SET 
+  coupon_id = $2
+WHERE order_id = $1
+RETURNING *;
+
 -- name: DeleteOrderCouponByOrderId :exec
 DELETE FROM order_coupons
 WHERE order_id = $1;

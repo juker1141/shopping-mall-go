@@ -163,3 +163,26 @@ func TestListOrderCouponByCouponId(t *testing.T) {
 		require.NotEmpty(t, orderCoupon)
 	}
 }
+
+func TestUpdateOrderCouponByOrderId(t *testing.T) {
+	oldOrderCoupon := createRandomOrderCoupon(t)
+	newCoupon := createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
+
+	arg := UpdateOrderCouponByOrderIdParams{
+		OrderID: pgtype.Int4{
+			Int32: oldOrderCoupon.OrderID.Int32,
+			Valid: true,
+		},
+		CouponID: pgtype.Int4{
+			Int32: int32(newCoupon.ID),
+			Valid: true,
+		},
+	}
+
+	newOrderCoupon, err := testStore.UpdateOrderCouponByOrderId(context.Background(), arg)
+	require.NoError(t, err)
+	require.NotEmpty(t, newOrderCoupon)
+	require.Equal(t, oldOrderCoupon.OrderID.Int32, newOrderCoupon.OrderID.Int32)
+	require.NotEqual(t, oldOrderCoupon.CouponID.Int32, int32(newCoupon.ID))
+	require.Equal(t, int32(newCoupon.ID), newOrderCoupon.CouponID.Int32)
+}

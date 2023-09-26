@@ -120,6 +120,7 @@ type Querier interface {
 	UpdateCartProduct(ctx context.Context, arg UpdateCartProductParams) (CartProduct, error)
 	UpdateCoupon(ctx context.Context, arg UpdateCouponParams) (Coupon, error)
 	UpdateOrder(ctx context.Context, arg UpdateOrderParams) (Order, error)
+	UpdateOrderCouponByOrderId(ctx context.Context, arg UpdateOrderCouponByOrderIdParams) (OrderCoupon, error)
 	UpdateOrderProduct(ctx context.Context, arg UpdateOrderProductParams) (OrderProduct, error)
 	UpdatePermission(ctx context.Context, arg UpdatePermissionParams) (Permission, error)
 	UpdateProduct(ctx context.Context, arg UpdateProductParams) (Product, error)
