@@ -87,6 +87,72 @@ func (server *Server) createOrder(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, result)
 }
 
+type orderRoutesUri struct {
+	ID int64 `uri:"id" binding:"required,min=1"`
+}
+
+func (server *Server) getOrder(ctx *gin.Context) {
+	var uri orderRoutesUri
+	if err := ctx.ShouldBindUri(&uri); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	order, err := server.store.GetOrder(ctx, uri.ID)
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	status, err := server.store.GetOrderStatus(ctx, int64(order.StatusID))
+	if err != nil {
+		if err == db.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	orderProducts, err := server.store.ListOrderProductByOrderId(ctx, pgtype.Int4{
+		Int32: int32(order.ID),
+		Valid: true,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	var productList []db.OrderTxProductResult
+	for _, orderProduct := range orderProducts {
+		product, err := server.store.GetProduct(ctx, int64(orderProduct.ProductID.Int32))
+		if err != nil {
+			if err == db.ErrRecordNotFound {
+				ctx.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		productList = append(productList, db.OrderTxProductResult{
+			Product: product,
+			Num:     int64(orderProduct.Num),
+		})
+	}
+
+	rsp := db.OrderTxResult{
+		Order:       order,
+		ProductList: productList,
+		Status:      status,
+	}
+
+	ctx.JSON(http.StatusOK, rsp)
+}
+
 type listOrdersQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
 	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`

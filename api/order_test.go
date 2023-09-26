@@ -370,6 +370,191 @@ func TestCreateOrderAPI(t *testing.T) {
 	}
 }
 
+func TestGetOrderAPI(t *testing.T) {
+	paymethod := randomPayMethod()
+	status := defaultOrderStatus()
+	totalPrice := int32(0)
+	finalPrice := int32(0)
+
+	n := 5
+
+	productList := make([]db.Product, n)
+	for i := range productList {
+		product := randomProduct()
+		productList[i] = product
+	}
+	order := randomOrder(paymethod.ID, status.ID, totalPrice, finalPrice)
+
+	var orderProducts []db.OrderProduct
+	for i := range productList {
+		num := util.RandomInt(1, 10)
+		totalPrice = totalPrice + int32(num*int64(productList[i].OriginPrice))
+		finalPrice = finalPrice + int32(num*int64(productList[i].Price))
+		orderProducts = append(orderProducts, db.OrderProduct{
+			OrderID: pgtype.Int4{
+				Int32: int32(order.ID),
+				Valid: true,
+			},
+			ProductID: pgtype.Int4{
+				Int32: int32(productList[i].ID),
+				Valid: true,
+			},
+			Num: int32(num),
+		})
+	}
+
+	testCases := []struct {
+		name          string
+		ID            int64
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			ID:   order.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", orderPermissions)
+
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Eq(order.ID)).
+					Times(1).
+					Return(order, nil)
+
+				store.EXPECT().
+					GetOrderStatus(gomock.Any(), gomock.Eq(int64(order.StatusID))).
+					Times(1).
+					Return(status, nil)
+
+				store.EXPECT().ListOrderProductByOrderId(gomock.Any(), gomock.Eq(pgtype.Int4{
+					Int32: int32(order.ID),
+					Valid: true,
+				})).Times(1).Return(orderProducts, nil)
+
+				for i, orderProduct := range orderProducts {
+					store.EXPECT().
+						GetProduct(gomock.Any(), gomock.Eq(int64(orderProduct.ProductID.Int32))).
+						Times(1).
+						Return(productList[i], nil)
+				}
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "NoAuthorization",
+			ID:   order.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name: "NoRequiredPermission",
+			ID:   order.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", emptyPermission)
+
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Eq(order.ID)).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
+			name: "NotFound",
+			ID:   order.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", orderPermissions)
+
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Eq(order.ID)).
+					Times(1).
+					Return(db.Order{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "InternalError",
+			ID:   order.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", orderPermissions)
+
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Eq(order.ID)).
+					Times(1).
+					Return(db.Order{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidID",
+			ID:   0,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				addPermissionMiddleware(store, "user", orderPermissions)
+
+				store.EXPECT().
+					GetOrder(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := newTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := fmt.Sprintf("/admin/order/%d", tc.ID)
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
+	}
+}
+
 func TestListOrdersAPI(t *testing.T) {
 	paymethod := randomPayMethod()
 	status := defaultOrderStatus()
