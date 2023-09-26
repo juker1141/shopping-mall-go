@@ -17,15 +17,19 @@ func createRandomOrderTx(t *testing.T) OrderTxResult {
 	coupon := createRandomCoupon(t, util.RandomName(), util.RandomString(10), time.Now())
 
 	n := 3
-	orderProducts := make([]OrderProductParams, n)
-	productList := make([]Product, n)
+	orderProducts := make([]OrderTxProductParams, n)
+	productList := make([]OrderTxProductResult, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = OrderProductParams{
+		num := util.RandomInt(1, 10)
+		orderProducts[i] = OrderTxProductParams{
 			ID:  product.ID,
-			Num: util.RandomInt(1, 10),
+			Num: num,
 		}
-		productList[i] = product
+		productList[i] = OrderTxProductResult{
+			Product: product,
+			Num:     num,
+		}
 	}
 
 	arg := CreateOrderTxParams{
@@ -96,15 +100,20 @@ func TestCreateOrderTxEmptyMessageEmptyCoupon(t *testing.T) {
 	status := createRandomOrderStatus(t)
 
 	n := 3
-	orderProducts := make([]OrderProductParams, n)
-	productList := make([]Product, n)
+	orderProducts := make([]OrderTxProductParams, n)
+	productList := make([]OrderTxProductResult, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = OrderProductParams{
+		num := util.RandomInt(1, 10)
+
+		orderProducts[i] = OrderTxProductParams{
 			ID:  product.ID,
-			Num: util.RandomInt(1, 10),
+			Num: num,
 		}
-		productList[i] = product
+		productList[i] = OrderTxProductResult{
+			Product: product,
+			Num:     num,
+		}
 	}
 
 	arg := CreateOrderTxParams{
@@ -183,15 +192,20 @@ func TestUpdateOrderTx(t *testing.T) {
 	newPrice := util.RandomPrice()
 
 	n := 3
-	orderProducts := make([]OrderProductParams, n)
-	productList := make([]Product, n)
+	orderProducts := make([]OrderTxProductParams, n)
+	productList := make([]OrderTxProductResult, n)
 	for i := 0; i < n; i++ {
 		product := createRandomProduct(t, util.RandomName())
-		orderProducts[i] = OrderProductParams{
+		num := util.RandomInt(1, 10)
+
+		orderProducts[i] = OrderTxProductParams{
 			ID:  product.ID,
-			Num: util.RandomInt(1, 10),
+			Num: num,
 		}
-		productList[i] = product
+		productList[i] = OrderTxProductResult{
+			Product: product,
+			Num:     num,
+		}
 	}
 
 	arg := UpdateOrderTxParams{

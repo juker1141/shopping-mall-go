@@ -125,6 +125,7 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 
 	// 訂單
 	adminRoutes.POST("/order", server.createOrder)
+	adminRoutes.GET("/orders", server.listOrders)
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
@@ -138,9 +139,11 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 }
 
 func (server *Server) setupAuthRoutes(router *gin.Engine) {
-	// authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
+	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	// 前台使用者
 	// authRoutes.PATCH("/user/:id", server.updateUser)
+	// 會員 下訂單
+	authRoutes.POST("/order", server.createOrder)
 }
 
 // Start runs the HTTP server on a specific address

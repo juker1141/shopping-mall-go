@@ -8,28 +8,33 @@ import (
 	"github.com/juker1141/shopping-mall-go/val"
 )
 
-type OrderProductParams struct {
+type OrderTxProductParams struct {
 	ID  int64 `json:"id"`
 	Num int64 `json:"num"`
 }
 
 // OrderTxParams contains the input parameters of the role create
 type CreateOrderTxParams struct {
-	UserID          int64                `json:"user_id"`
-	FullName        string               `json:"full_name"`
-	Email           string               `json:"email"`
-	ShippingAddress string               `json:"shipping_address"`
-	Message         string               `json:"message"`
-	PayMethodID     int64                `json:"pay_method_id"`
-	StatusID        int64                `json:"status_id"`
-	OrderProducts   []OrderProductParams `json:"order_products"`
-	CouponID        int64                `json:"coupon_id"`
+	UserID          int64                  `json:"user_id"`
+	FullName        string                 `json:"full_name"`
+	Email           string                 `json:"email"`
+	ShippingAddress string                 `json:"shipping_address"`
+	Message         string                 `json:"message"`
+	PayMethodID     int64                  `json:"pay_method_id"`
+	StatusID        int64                  `json:"status_id"`
+	OrderProducts   []OrderTxProductParams `json:"order_products"`
+	CouponID        int64                  `json:"coupon_id"`
+}
+
+type OrderTxProductResult struct {
+	Product
+	Num int64 `json:"num"`
 }
 
 type OrderTxResult struct {
 	Order
-	ProductList []Product   `json:"product_list"`
-	Status      OrderStatus `json:"status"`
+	ProductList []OrderTxProductResult `json:"product_list"`
+	Status      OrderStatus            `json:"status"`
 }
 
 // It creates a order, orderUser, orderProduct, orderCoupon, and get orderStatus within a single database trasaction
@@ -39,7 +44,7 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
-		var productList []Product
+		var productList []OrderTxProductResult
 		var totalPrice int32
 		var finalPrice int32
 		for _, orderProduct := range arg.OrderProducts {
@@ -50,11 +55,15 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 			// 取得商品
 			product, err := q.GetProduct(ctx, orderProduct.ID)
 			if err != nil {
+				fmt.Println("get product err", err)
 				return err
 			}
 			totalPrice = totalPrice + (int32(orderProduct.Num) * product.OriginPrice)
 			finalPrice = finalPrice + (int32(orderProduct.Num) * product.Price)
-			productList = append(productList, product)
+			productList = append(productList, OrderTxProductResult{
+				Product: product,
+				Num:     orderProduct.Num,
+			})
 		}
 
 		if arg.CouponID != 0 {
@@ -88,6 +97,7 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 		// 建立訂單
 		result.Order, err = q.CreateOrder(ctx, orderArg)
 		if err != nil {
+			fmt.Println("create order", err)
 			return err
 		}
 
@@ -103,12 +113,14 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 			},
 		})
 		if err != nil {
+			fmt.Println("create order user err", err)
 			return err
 		}
 
 		// 取得訂單狀態
 		result.Status, err = q.GetOrderStatus(ctx, arg.StatusID)
 		if err != nil {
+			fmt.Println("get order status err", err)
 			return err
 		}
 
@@ -126,6 +138,7 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 				Num: int32(orderProduct.Num),
 			})
 			if err != nil {
+				fmt.Println("get order product err", err)
 				return err
 			}
 		}
@@ -154,17 +167,17 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 }
 
 type UpdateOrderTxParams struct {
-	ID              int64                `json:"id"`
-	FullName        string               `json:"full_name"`
-	Email           string               `json:"email"`
-	ShippingAddress string               `json:"shipping_address"`
-	Message         string               `json:"message"`
-	TotalPrice      *int32               `json:"total_price"`
-	FinalPrice      *int32               `json:"final_price"`
-	PayMethodID     int64                `json:"pay_method_id"`
-	StatusID        int64                `json:"status_id"`
-	OrderProducts   []OrderProductParams `json:"order_products"`
-	CouponID        int64                `json:"coupon_id"`
+	ID              int64                  `json:"id"`
+	FullName        string                 `json:"full_name"`
+	Email           string                 `json:"email"`
+	ShippingAddress string                 `json:"shipping_address"`
+	Message         string                 `json:"message"`
+	TotalPrice      *int32                 `json:"total_price"`
+	FinalPrice      *int32                 `json:"final_price"`
+	PayMethodID     int64                  `json:"pay_method_id"`
+	StatusID        int64                  `json:"status_id"`
+	OrderProducts   []OrderTxProductParams `json:"order_products"`
+	CouponID        int64                  `json:"coupon_id"`
 }
 
 func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParams) (OrderTxResult, error) {
@@ -249,7 +262,7 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 			return err
 		}
 
-		var productList []Product
+		var productList []OrderTxProductResult
 		if arg.OrderProducts != nil && len(arg.OrderProducts) > 0 {
 			// 如果需要更新訂單商品，先把之前建立的關聯移除
 			err = q.DeleteOrderProductByOrderId(ctx, pgtype.Int4{
@@ -283,7 +296,10 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 					return err
 				}
 
-				productList = append(productList, product)
+				productList = append(productList, OrderTxProductResult{
+					Product: product,
+					Num:     orderProduct.Num,
+				})
 			}
 		} else {
 			// 如果沒有更新訂單商品，還是要去取得目前的商品
@@ -300,7 +316,10 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 				if err != nil {
 					return err
 				}
-				productList = append(productList, product)
+				productList = append(productList, OrderTxProductResult{
+					Product: product,
+					Num:     int64(orderProduct.Num),
+				})
 			}
 		}
 

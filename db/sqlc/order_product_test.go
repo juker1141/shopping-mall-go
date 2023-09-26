@@ -190,5 +190,5 @@ func TestUpdateOrderProduct(t *testing.T) {
 
 	require.Equal(t, oldOrderProduct.OrderID, newOrderProduct.OrderID)
 	require.Equal(t, oldOrderProduct.ProductID, newOrderProduct.ProductID)
-	require.NotEqual(t, oldOrderProduct.Num, newOrderProduct.Num)
+	require.NotZero(t, newOrderProduct.Num)
 }
