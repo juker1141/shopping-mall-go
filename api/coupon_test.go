@@ -60,11 +60,11 @@ func TestCreateCouponAPI(t *testing.T) {
 	centerTime := time.Now()
 
 	templateBody := gin.H{
-		"title":      coupon.Title,
-		"code":       coupon.Code,
-		"percent":    coupon.Percent,
-		"start_at":   coupon.StartAt,
-		"expires_at": coupon.ExpiresAt,
+		"title":     coupon.Title,
+		"code":      coupon.Code,
+		"percent":   coupon.Percent,
+		"startAt":   coupon.StartAt,
+		"expiresAt": coupon.ExpiresAt,
 	}
 
 	testCases := []struct {
@@ -135,10 +135,10 @@ func TestCreateCouponAPI(t *testing.T) {
 		{
 			name: "OK_OnlyInputStartTime",
 			body: gin.H{
-				"title":    coupon.Title,
-				"code":     coupon.Code,
-				"percent":  coupon.Percent,
-				"start_at": coupon.StartAt,
+				"title":   coupon.Title,
+				"code":    coupon.Code,
+				"percent": coupon.Percent,
+				"startAt": coupon.StartAt,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -167,10 +167,10 @@ func TestCreateCouponAPI(t *testing.T) {
 		{
 			name: "OK_OnlyInputExpiresTime",
 			body: gin.H{
-				"title":      coupon.Title,
-				"code":       coupon.Code,
-				"percent":    coupon.Percent,
-				"expires_at": coupon.ExpiresAt,
+				"title":     coupon.Title,
+				"code":      coupon.Code,
+				"percent":   coupon.Percent,
+				"expiresAt": coupon.ExpiresAt,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -274,11 +274,11 @@ func TestCreateCouponAPI(t *testing.T) {
 		{
 			name: "CheckDateIsFailed",
 			body: gin.H{
-				"title":      coupon.Title,
-				"code":       coupon.Code,
-				"percent":    coupon.Percent,
-				"start_at":   centerTime,
-				"expires_at": centerTime.Add(-5 * time.Minute),
+				"title":     coupon.Title,
+				"code":      coupon.Code,
+				"percent":   coupon.Percent,
+				"startAt":   centerTime,
+				"expiresAt": centerTime.Add(-5 * time.Minute),
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -372,11 +372,11 @@ func TestUpdateCouponAPI(t *testing.T) {
 	centerTime := time.Now()
 
 	templateBody := gin.H{
-		"title":      coupon.Title,
-		"code":       coupon.Code,
-		"percent":    coupon.Percent,
-		"start_at":   coupon.StartAt,
-		"expires_at": coupon.ExpiresAt,
+		"title":     coupon.Title,
+		"code":      coupon.Code,
+		"percent":   coupon.Percent,
+		"startAt":   coupon.StartAt,
+		"expiresAt": coupon.ExpiresAt,
 	}
 
 	testCases := []struct {
@@ -473,10 +473,10 @@ func TestUpdateCouponAPI(t *testing.T) {
 			name: "OK_OnlyInputStartTime",
 			ID:   coupon.ID,
 			body: gin.H{
-				"title":    coupon.Title,
-				"code":     coupon.Code,
-				"percent":  coupon.Percent,
-				"start_at": coupon.StartAt,
+				"title":   coupon.Title,
+				"code":    coupon.Code,
+				"percent": coupon.Percent,
+				"startAt": coupon.StartAt,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -517,10 +517,10 @@ func TestUpdateCouponAPI(t *testing.T) {
 			name: "OK_OnlyInputExpiresTime",
 			ID:   coupon.ID,
 			body: gin.H{
-				"title":      coupon.Title,
-				"code":       coupon.Code,
-				"percent":    coupon.Percent,
-				"expires_at": coupon.ExpiresAt,
+				"title":     coupon.Title,
+				"code":      coupon.Code,
+				"percent":   coupon.Percent,
+				"expiresAt": coupon.ExpiresAt,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -701,8 +701,8 @@ func TestUpdateCouponAPI(t *testing.T) {
 			name: "CheckDateIsFailed",
 			ID:   coupon.ID,
 			body: gin.H{
-				"start_at":   centerTime,
-				"expires_at": centerTime.Add(-5 * time.Minute),
+				"startAt":   centerTime,
+				"expiresAt": centerTime.Add(-5 * time.Minute),
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1306,7 +1306,7 @@ func TestListCouponsAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
