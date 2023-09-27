@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/juker1141/shopping-mall-go/db/mock"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
@@ -32,16 +33,16 @@ func TestCreateRoleAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		body          db.CreateRoleTxParams
+		body          gin.H
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
-			body: db.CreateRoleTxParams{
-				Name:          role.Name,
-				PermissionsID: permissionsID,
+			body: gin.H{
+				"name":          role.Name,
+				"permissionsId": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -66,9 +67,9 @@ func TestCreateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "NoAuthorization",
-			body: db.CreateRoleTxParams{
-				Name:          role.Name,
-				PermissionsID: permissionsID,
+			body: gin.H{
+				"name":          role.Name,
+				"permissionsId": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -83,9 +84,9 @@ func TestCreateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "NoRequiredPermission",
-			body: db.CreateRoleTxParams{
-				Name:          role.Name,
-				PermissionsID: permissionsID,
+			body: gin.H{
+				"name":          role.Name,
+				"permissionsId": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -103,9 +104,9 @@ func TestCreateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "InternalError",
-			body: db.CreateRoleTxParams{
-				Name:          role.Name,
-				PermissionsID: permissionsID,
+			body: gin.H{
+				"name":          role.Name,
+				"permissionsId": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -129,9 +130,9 @@ func TestCreateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "InvalidJSONName",
-			body: db.CreateRoleTxParams{
-				Name:          "",
-				PermissionsID: permissionsID,
+			body: gin.H{
+				"name":          "",
+				"permissionsId": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -149,9 +150,9 @@ func TestCreateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "InvalidJSONPermissionsID",
-			body: db.CreateRoleTxParams{
-				Name:          role.Name,
-				PermissionsID: nil,
+			body: gin.H{
+				"name":          role.Name,
+				"permissionsId": nil,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -211,17 +212,18 @@ func TestUpdateRoleAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		body          db.UpdateRoleTxParams
+		ID            int64
+		body          gin.H
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				Name:          updateRoleName,
-				PermissionsID: updatedPermissionsID,
+			ID:   role.ID,
+			body: gin.H{
+				"name":          updateRoleName,
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -247,10 +249,10 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "NoAuthorization",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				Name:          updateRoleName,
-				PermissionsID: updatedPermissionsID,
+			ID:   role.ID,
+			body: gin.H{
+				"name":          updateRoleName,
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -265,10 +267,10 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "NoRequiredPermission",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				Name:          updateRoleName,
-				PermissionsID: updatedPermissionsID,
+			ID:   role.ID,
+			body: gin.H{
+				"name":          updateRoleName,
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -286,9 +288,9 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "OnlyUpdateRoleName",
-			body: db.UpdateRoleTxParams{
-				ID:   role.ID,
-				Name: updateRoleName,
+			ID:   role.ID,
+			body: gin.H{
+				"name": updateRoleName,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -313,9 +315,9 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "OnlyUpdateRolePermission",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				PermissionsID: updatedPermissionsID,
+			ID:   role.ID,
+			body: gin.H{
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -340,10 +342,10 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "InternalError",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				Name:          updateRoleName,
-				PermissionsID: updatedPermissionsID,
+			ID:   role.ID,
+			body: gin.H{
+				"name":          updateRoleName,
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -362,10 +364,10 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "ErrorID",
-			body: db.UpdateRoleTxParams{
-				ID:            -1,
-				Name:          updateRoleName,
-				PermissionsID: updatedPermissionsID,
+			ID:   -1,
+			body: gin.H{
+				"name":          updateRoleName,
+				"permissionsId": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -383,9 +385,9 @@ func TestUpdateRoleAPI(t *testing.T) {
 		},
 		{
 			name: "InvalidPermissionsIDLength",
-			body: db.UpdateRoleTxParams{
-				ID:            role.ID,
-				PermissionsID: []int64{},
+			ID:   role.ID,
+			body: gin.H{
+				"permissionsId": []int64{},
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -419,7 +421,7 @@ func TestUpdateRoleAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := fmt.Sprintf("/admin/role/%d", tc.body.ID)
+			url := fmt.Sprintf("/admin/role/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -610,7 +612,7 @@ func TestListRolesAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
