@@ -76,16 +76,16 @@ func TestCreateUserAPI(t *testing.T) {
 	cart := randomCart(user.Account)
 
 	templateBody := gin.H{
-		"account":          user.Account,
-		"email":            user.Email,
-		"full_name":        user.FullName,
-		"password":         password,
-		"gender_id":        user.GenderID.Int32,
-		"cellphone":        user.Cellphone,
-		"address":          user.Address,
-		"shipping_address": user.ShippingAddress,
-		"post_code":        user.PostCode,
-		"status":           user.Status,
+		"account":         user.Account,
+		"email":           user.Email,
+		"fullName":        user.FullName,
+		"password":        password,
+		"genderId":        user.GenderID.Int32,
+		"cellphone":       user.Cellphone,
+		"address":         user.Address,
+		"shippingAddress": user.ShippingAddress,
+		"postCode":        user.PostCode,
+		"status":          user.Status,
 	}
 
 	testCases := []struct {
@@ -223,16 +223,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          "invalid-user#1",
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         "invalid-user#1",
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -249,16 +249,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        "invalid_FullName#@",
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        "invalid_FullName#@",
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -275,16 +275,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         "psw",
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        "psw",
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -301,16 +301,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            "invalidEmail",
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         user.Account,
+				"email":           "invalidEmail",
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -327,16 +327,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        4,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        4,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.CreateUserParams{
@@ -370,16 +370,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        "123456789",
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           user.Status,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       "123456789",
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -396,16 +396,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           "0",
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          "0",
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -422,16 +422,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.gif",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           1,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          1,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -448,16 +448,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "other",
 			fileName:       "fake_avatar.pdf",
 			body: gin.H{
-				"account":          user.Account,
-				"email":            user.Email,
-				"full_name":        user.FullName,
-				"password":         password,
-				"gender_id":        user.GenderID.Int32,
-				"cellphone":        user.Cellphone,
-				"address":          user.Address,
-				"shipping_address": user.ShippingAddress,
-				"post_code":        user.PostCode,
-				"status":           1,
+				"account":         user.Account,
+				"email":           user.Email,
+				"fullName":        user.FullName,
+				"password":        password,
+				"genderId":        user.GenderID.Int32,
+				"cellphone":       user.Cellphone,
+				"address":         user.Address,
+				"shippingAddress": user.ShippingAddress,
+				"postCode":        user.PostCode,
+				"status":          1,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
@@ -500,9 +500,9 @@ func TestCreateUserAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "avatar_file", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "avatarFile", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("avatar_file", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("avatarFile", tc.fileName)
 				}
 
 				require.NoError(t, err)
@@ -582,14 +582,14 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 	invalidStatus := int32(3)
 
 	templateBody := gin.H{
-		"full_name":        newName,
-		"cellphone":        newPhone,
-		"address":          newAddress,
-		"shipping_address": newAddress,
-		"post_code":        newPostCode,
-		"status":           newStatus,
-		"old_password":     password,
-		"new_password":     newPassword,
+		"fullName":        newName,
+		"cellphone":       newPhone,
+		"address":         newAddress,
+		"shippingAddress": newAddress,
+		"postCode":        newPostCode,
+		"status":          newStatus,
+		"oldPassword":     password,
+		"newPassword":     newPassword,
 	}
 
 	testCases := []struct {
@@ -665,12 +665,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"full_name":        newName,
-				"cellphone":        newPhone,
-				"address":          newAddress,
-				"shipping_address": newAddress,
-				"post_code":        newPostCode,
-				"status":           newStatus,
+				"fullName":        newName,
+				"cellphone":       newPhone,
+				"address":         newAddress,
+				"shippingAddress": newAddress,
+				"postCode":        newPostCode,
+				"status":          newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -722,8 +722,8 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"old_password": password,
-				"new_password": newPassword,
+				"oldPassword": password,
+				"newPassword": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -782,12 +782,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"full_name":        newName,
-				"cellphone":        newPhone,
-				"address":          newAddress,
-				"shipping_address": newAddress,
-				"post_code":        newPostCode,
-				"status":           newStatus,
+				"fullName":        newName,
+				"cellphone":       newPhone,
+				"address":         newAddress,
+				"shippingAddress": newAddress,
+				"postCode":        newPostCode,
+				"status":          newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -807,12 +807,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"full_name":        newName,
-				"cellphone":        newPhone,
-				"address":          newAddress,
-				"shipping_address": newAddress,
-				"post_code":        newPostCode,
-				"status":           newStatus,
+				"fullName":        newName,
+				"cellphone":       newPhone,
+				"address":         newAddress,
+				"shippingAddress": newAddress,
+				"postCode":        newPostCode,
+				"status":          newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -858,7 +858,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"full_name": "invalid-name",
+				"fullName": "invalid-name",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -994,8 +994,8 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"new_password": "aa345678",
-				"old_password": "za345678",
+				"newPassword": "aa345678",
+				"oldPassword": "za345678",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1048,9 +1048,9 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "avatar_file", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "avatarFile", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("avatar_file", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("avatarFile", tc.fileName)
 				}
 
 				require.NoError(t, err)
@@ -1411,7 +1411,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
@@ -1704,7 +1704,7 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	var gotUser db.User
+	var gotUser userResponse
 	err = json.Unmarshal(data, &gotUser)
 
 	require.NoError(t, err)
