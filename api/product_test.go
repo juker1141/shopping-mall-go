@@ -51,15 +51,15 @@ func TestCreateProductAPI(t *testing.T) {
 	product := randomProduct()
 
 	templateBody := gin.H{
-		"title":        product.Title,
-		"category":     product.Category,
-		"origin_price": product.OriginPrice,
-		"price":        product.Price,
-		"unit":         product.Unit,
-		"description":  product.Description,
-		"content":      product.Content,
-		"status":       1,
-		"image_url":    product.ImageUrl,
+		"title":       product.Title,
+		"category":    product.Category,
+		"originPrice": product.OriginPrice,
+		"price":       product.Price,
+		"unit":        product.Unit,
+		"description": product.Description,
+		"content":     product.Content,
+		"status":      1,
+		"imageUrl":    product.ImageUrl,
 	}
 
 	testCases := []struct {
@@ -222,15 +222,15 @@ func TestCreateProductAPI(t *testing.T) {
 			fileType:      "image",
 			fileName:      "fake_product.png",
 			body: gin.H{
-				"title":        "aa",
-				"category":     product.Category,
-				"origin_price": product.OriginPrice,
-				"price":        product.Price,
-				"unit":         product.Unit,
-				"description":  product.Description,
-				"content":      product.Content,
-				"status":       1,
-				"image_url":    product.ImageUrl,
+				"title":       "aa",
+				"category":    product.Category,
+				"originPrice": product.OriginPrice,
+				"price":       product.Price,
+				"unit":        product.Unit,
+				"description": product.Description,
+				"content":     product.Content,
+				"status":      1,
+				"imageUrl":    product.ImageUrl,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -252,15 +252,15 @@ func TestCreateProductAPI(t *testing.T) {
 			fileType:      "image",
 			fileName:      "fake_product.gif",
 			body: gin.H{
-				"title":        product.Title,
-				"category":     product.Category,
-				"origin_price": product.OriginPrice,
-				"price":        product.Price,
-				"unit":         product.Unit,
-				"description":  product.Description,
-				"content":      product.Content,
-				"status":       1,
-				"image_url":    product.ImageUrl,
+				"title":       product.Title,
+				"category":    product.Category,
+				"originPrice": product.OriginPrice,
+				"price":       product.Price,
+				"unit":        product.Unit,
+				"description": product.Description,
+				"content":     product.Content,
+				"status":      1,
+				"imageUrl":    product.ImageUrl,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -282,15 +282,15 @@ func TestCreateProductAPI(t *testing.T) {
 			fileType:      "other",
 			fileName:      "fake_product.pdf",
 			body: gin.H{
-				"title":        product.Title,
-				"category":     product.Category,
-				"origin_price": product.OriginPrice,
-				"price":        product.Price,
-				"unit":         product.Unit,
-				"description":  product.Description,
-				"content":      product.Content,
-				"status":       1,
-				"image_url":    product.ImageUrl,
+				"title":       product.Title,
+				"category":    product.Category,
+				"originPrice": product.OriginPrice,
+				"price":       product.Price,
+				"unit":        product.Unit,
+				"description": product.Description,
+				"content":     product.Content,
+				"status":      1,
+				"imageUrl":    product.ImageUrl,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -338,9 +338,9 @@ func TestCreateProductAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "image_file", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "imageFile", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("image_file", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("imageFile", tc.fileName)
 				}
 				require.NoError(t, err)
 
@@ -392,15 +392,15 @@ func TestUpdateProductAPI(t *testing.T) {
 	product := randomProduct()
 
 	templateBody := gin.H{
-		"title":        product.Title,
-		"category":     product.Category,
-		"origin_price": product.OriginPrice,
-		"price":        product.Price,
-		"unit":         product.Unit,
-		"description":  product.Description,
-		"content":      product.Content,
-		"status":       1,
-		"image_url":    product.ImageUrl,
+		"title":       product.Title,
+		"category":    product.Category,
+		"originPrice": product.OriginPrice,
+		"price":       product.Price,
+		"unit":        product.Unit,
+		"description": product.Description,
+		"content":     product.Content,
+		"status":      1,
+		"imageUrl":    product.ImageUrl,
 	}
 
 	invalidStatus := int32(3)
@@ -551,16 +551,16 @@ func TestUpdateProductAPI(t *testing.T) {
 			fileType:      "image",
 			fileName:      "fake_product.png",
 			body: gin.H{
-				"title":        product.Title,
-				"category":     product.Category,
-				"origin_price": product.OriginPrice,
-				"price":        product.Price,
-				"unit":         product.Unit,
-				"description":  product.Description,
-				"content":      product.Content,
-				"status":       1,
-				"image_url":    product.ImageUrl,
-				"images_url":   images_url,
+				"title":       product.Title,
+				"category":    product.Category,
+				"originPrice": product.OriginPrice,
+				"price":       product.Price,
+				"unit":        product.Unit,
+				"description": product.Description,
+				"content":     product.Content,
+				"status":      1,
+				"imageUrl":    product.ImageUrl,
+				"imagesUrl":   images_url,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -785,10 +785,10 @@ func TestUpdateProductAPI(t *testing.T) {
 
 			for key, value := range tc.body {
 				switch key {
-				case "images_url":
+				case "imagesUrl":
 					if values, ok := value.([]string); ok {
 						for _, v := range values {
-							fieldWriter, err := writer.CreateFormField("images_url")
+							fieldWriter, err := writer.CreateFormField("imagesUrl")
 							require.NoError(t, err)
 							_, err = fieldWriter.Write([]byte(v))
 							require.NoError(t, err)
@@ -809,9 +809,9 @@ func TestUpdateProductAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "image_file", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "imageFile", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("image_file", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("imageFile", tc.fileName)
 				}
 				require.NoError(t, err)
 
@@ -1032,7 +1032,7 @@ func TestListProductsAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
