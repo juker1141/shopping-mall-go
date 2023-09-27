@@ -18,20 +18,20 @@ import (
 
 type createAdminUserRequest struct {
 	Account  string `json:"account" binding:"required,alphanum,min=8"`
-	FullName string `json:"full_name" binding:"required,min=2,fullName"`
+	FullName string `json:"fullName" binding:"required,min=2,fullName"`
 	Status   int32  `json:"status" binding:"required,number"`
 	Password string `json:"password" binding:"required,min=8"`
-	RoleID   int64  `json:"role_id" binding:"required"`
+	RoleID   int64  `json:"roleId" binding:"required"`
 }
 
 type adminUserResponse struct {
 	ID                int64     `json:"id"`
 	Account           string    `json:"account"`
-	FullName          string    `json:"full_name"`
+	FullName          string    `json:"fullName"`
 	Status            int32     `json:"status"`
-	RoleID            int64     `json:"role_id"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
-	CreatedAt         time.Time `json:"created_at"`
+	RoleID            int64     `json:"roleId"`
+	PasswordChangedAt time.Time `json:"passwordChangedAt"`
+	CreatedAt         time.Time `json:"createdAt"`
 }
 
 type adminUserAPIResponse struct {
@@ -106,7 +106,7 @@ func (server *Server) createAdminUser(ctx *gin.Context) {
 
 type listAdminUsersQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
 }
 
 type listAdminUsersResponse struct {
@@ -204,11 +204,11 @@ func (server *Server) getAdminUser(ctx *gin.Context) {
 }
 
 type updateAdminUserRequest struct {
-	FullName    string `json:"full_name"`
-	OldPassword string `json:"old_password"`
-	NewPassword string `json:"new_password"`
+	FullName    string `json:"fullName"`
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
 	Status      *int32 `json:"status"`
-	RoleID      int64  `json:"role_id"`
+	RoleID      int64  `json:"roleId"`
 }
 
 func (server *Server) updateAdminUser(ctx *gin.Context) {
@@ -289,7 +289,6 @@ func (server *Server) updateAdminUser(ctx *gin.Context) {
 		}
 	}
 
-	fmt.Println("arg", arg)
 	adminUser, err := server.store.UpdateAdminUser(ctx, arg)
 	if err != nil {
 		if err == db.ErrRecordNotFound {
@@ -344,7 +343,7 @@ func (server *Server) deleteAdminUser(ctx *gin.Context) {
 
 type getAdminUserInfoResponse struct {
 	adminUserResponse
-	PermissionList []db.Permission `json:"permission_list"`
+	PermissionList []db.Permission `json:"permissionList"`
 }
 
 func (server *Server) getAdminUserInfo(ctx *gin.Context) {
@@ -390,13 +389,13 @@ type loginAdminUserRequest struct {
 }
 
 type loginAdminUserResponse struct {
-	SessionID             uuid.UUID `json:"session_id"`
-	AccessToken           string    `json:"access_token"`
-	AccessTokenExpiresAt  time.Time `json:"access_token_expires_at"`
-	RefreshToken          string    `json:"refresh_token"`
-	RefreshTokenExpiresAt time.Time `json:"refresh_token_expires_at"`
+	SessionID             uuid.UUID `json:"sessionId"`
+	AccessToken           string    `json:"accessToken"`
+	AccessTokenExpiresAt  time.Time `json:"accessTokenExpiresAt"`
+	RefreshToken          string    `json:"refreshToken"`
+	RefreshTokenExpiresAt time.Time `json:"refreshTokenExpiresAt"`
 	adminUserResponse
-	PermissionList []db.Permission `json:"permission_list"`
+	PermissionList []db.Permission `json:"permissionList"`
 }
 
 func (server *Server) loginAdminUser(ctx *gin.Context) {
