@@ -1063,7 +1063,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			// 結束FormData
 			writer.Close()
 
-			url := fmt.Sprintf("/admin/member-user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodPatch, url, body)
 			require.NoError(t, err)
 			request.Header.Set("Content-Type", writer.FormDataContentType())
@@ -1203,7 +1203,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/member-user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -1405,7 +1405,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/member-users"
+			url := "/admin/memberUsers"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -1549,7 +1549,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/member-user/%d", tc.ID)
+			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 

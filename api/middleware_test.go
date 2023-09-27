@@ -127,7 +127,7 @@ func TestPermissionMiddleware(t *testing.T) {
 	}{
 		{
 			name: "OK",
-			path: "/admin/manager-user",
+			path: "/admin/managerUser",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, adminUser.Account, time.Minute)
 			},
@@ -156,7 +156,7 @@ func TestPermissionMiddleware(t *testing.T) {
 		},
 		{
 			name: "PermissionEmpty",
-			path: "/admin/manager-user",
+			path: "/admin/managerUser",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, adminUser.Account, time.Minute)
 			},

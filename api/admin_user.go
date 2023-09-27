@@ -360,6 +360,7 @@ func (server *Server) getAdminUserInfo(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
 		return
 	}
+
 	adminUser, err := server.store.GetAdminUserByAccount(ctx, typePayload.Account)
 	if err != nil {
 		if err == db.ErrRecordNotFound {

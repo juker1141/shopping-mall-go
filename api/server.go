@@ -78,7 +78,7 @@ func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
 	// 登入後台
 	router.POST("/admin/login", server.loginAdminUser)
 	// Renew Token
-	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
+	router.POST("/admin/tokens/renewAccess", server.renewAccessToken)
 	// user 註冊
 	router.POST("/user", server.createUser)
 }
@@ -101,20 +101,20 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 管理者
-	adminRoutes.POST("/manager-user", server.createAdminUser)
-	adminRoutes.GET("/manager-users", server.listAdminUsers)
-	adminRoutes.GET("/manager-user/:id", server.getAdminUser)
-	adminRoutes.PATCH("/manager-user/:id", server.updateAdminUser)
-	adminRoutes.DELETE("/manager-user/:id", server.deleteAdminUser)
+	adminRoutes.POST("/managerUser", server.createAdminUser)
+	adminRoutes.GET("/managerUsers", server.listAdminUsers)
+	adminRoutes.GET("/managerUser/:id", server.getAdminUser)
+	adminRoutes.PATCH("/managerUser/:id", server.updateAdminUser)
+	adminRoutes.DELETE("/managerUser/:id", server.deleteAdminUser)
 
 	// 管理者刷新權限
-	adminRoutes.GET("/manager-user/info", server.getAdminUserInfo)
+	adminRoutes.GET("/managerUser/info", server.getAdminUserInfo)
 
 	// 會員資料
-	adminRoutes.GET("/member-users", server.listUsersByAdmin)
-	adminRoutes.GET("/member-user/:id", server.getUserByAdmin)
-	adminRoutes.PATCH("/member-user/:id", server.updateUserByAdmin)
-	adminRoutes.DELETE("/member-user/:id", server.deleteUserByAdmin)
+	adminRoutes.GET("/memberUsers", server.listUsersByAdmin)
+	adminRoutes.GET("/memberUser/:id", server.getUserByAdmin)
+	adminRoutes.PATCH("/memberUser/:id", server.updateUserByAdmin)
+	adminRoutes.DELETE("/memberUser/:id", server.deleteUserByAdmin)
 
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
@@ -129,8 +129,10 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	adminRoutes.GET("/order/:id", server.getOrder)
 	adminRoutes.PATCH("/order/:id", server.updateOrder)
 
-	// 訂單狀態
+	// 取得訂單狀態
 	adminRoutes.GET("/order/statuses/option", server.listOrderStatusesOption)
+	// 付款方式
+	adminRoutes.GET("/order/payMethods/option", server.listPayMethodsOption)
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
@@ -149,6 +151,10 @@ func (server *Server) setupAuthRoutes(router *gin.Engine) {
 	// authRoutes.PATCH("/user/:id", server.updateUser)
 	// 會員 下訂單
 	authRoutes.POST("/order", server.createOrder)
+	// 取得訂單狀態
+	authRoutes.GET("/order/statuses/option", server.listOrderStatusesOption)
+	// 付款方式
+	authRoutes.GET("/order/payMethods/option", server.listPayMethodsOption)
 }
 
 // Start runs the HTTP server on a specific address

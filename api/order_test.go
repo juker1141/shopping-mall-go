@@ -564,14 +564,13 @@ func TestListOrdersAPI(t *testing.T) {
 	n := 5
 
 	productList := make([]db.Product, n)
-	for i := range productList {
-		product := randomProduct()
-		productList[i] = product
-	}
 
 	orderList := make([]db.Order, n)
 	var orderProducts []db.OrderProduct
 	for i := range orderList {
+		product := randomProduct()
+		productList[i] = product
+
 		num := util.RandomInt(1, 10)
 		totalPrice = totalPrice + int32(num*int64(productList[i].OriginPrice))
 		finalPrice = finalPrice + int32(num*int64(productList[i].Price))
@@ -785,13 +784,6 @@ func TestListOrdersAPI(t *testing.T) {
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(t, recorder)
 		})
-	}
-}
-
-func randomPayMethod() db.PayMethod {
-	return db.PayMethod{
-		ID:   util.RandomID(),
-		Name: util.RandomName(),
 	}
 }
 
