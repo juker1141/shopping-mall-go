@@ -65,12 +65,12 @@ func TestCreateOrderAPI(t *testing.T) {
 	message := util.RandomString(20)
 
 	templateBody := gin.H{
-		"full_name":        order.FullName,
-		"email":            order.Email,
-		"shipping_address": order.ShippingAddress,
-		"message":          message,
-		"pay_method_id":    paymethod.ID,
-		"order_products":   orderProducts,
+		"fullName":        order.FullName,
+		"email":           order.Email,
+		"shippingAddress": order.ShippingAddress,
+		"message":         message,
+		"payMethodId":     paymethod.ID,
+		"orderProducts":   orderProducts,
 	}
 
 	testCases := []struct {
@@ -118,13 +118,13 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "OKWithCoupon",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"coupon_id":        coupon.ID,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   orderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"couponId":        coupon.ID,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   orderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -162,13 +162,13 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "NoAuthorization",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"coupon_id":        coupon.ID,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   orderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"couponId":        coupon.ID,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   orderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -188,13 +188,13 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "NoRequiredPermission",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"coupon_id":        coupon.ID,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   orderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"couponId":        coupon.ID,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   orderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -217,12 +217,12 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   invalidOrderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   invalidOrderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -246,12 +246,12 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "InvalidProductNum",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   invalidOrderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   invalidOrderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -287,12 +287,12 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "InvalidPayMethodID",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"message":          message,
-				"pay_method_id":    0,
-				"order_products":   invalidOrderProducts,
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"message":         message,
+				"payMethodId":     0,
+				"orderProducts":   invalidOrderProducts,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -315,12 +315,12 @@ func TestCreateOrderAPI(t *testing.T) {
 		{
 			name: "InvalidOrderProductLength",
 			body: gin.H{
-				"full_name":        order.FullName,
-				"email":            order.Email,
-				"shipping_address": order.ShippingAddress,
-				"message":          message,
-				"pay_method_id":    paymethod.ID,
-				"order_products":   []db.OrderProduct{},
+				"fullName":        order.FullName,
+				"email":           order.Email,
+				"shippingAddress": order.ShippingAddress,
+				"message":         message,
+				"payMethodId":     paymethod.ID,
+				"orderProducts":   []db.OrderProduct{},
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -778,7 +778,7 @@ func TestListOrdersAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
