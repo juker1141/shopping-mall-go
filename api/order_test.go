@@ -558,39 +558,31 @@ func TestGetOrderAPI(t *testing.T) {
 func TestListOrdersAPI(t *testing.T) {
 	paymethod := randomPayMethod()
 	status := defaultOrderStatus()
-	totalPrice := int32(0)
-	finalPrice := int32(0)
-
 	n := 5
 
-	productList := make([]db.Product, n)
-
 	orderList := make([]db.Order, n)
-	var orderProducts []db.OrderProduct
-	for i := range orderList {
+	productList := make([]db.Product, n)
+	orderProducts := make([]db.OrderProduct, n)
+
+	for i := 0; i < n; i++ {
 		product := randomProduct()
+		order := randomOrder(paymethod.ID, status.ID, 0, 0)
 		productList[i] = product
-
-		num := util.RandomInt(1, 10)
-		totalPrice = totalPrice + int32(num*int64(productList[i].OriginPrice))
-		finalPrice = finalPrice + int32(num*int64(productList[i].Price))
-
-		order := randomOrder(paymethod.ID, status.ID, totalPrice, finalPrice)
 		orderList[i] = order
 
-		for productIndex := range productList {
-			orderProducts = append(orderProducts, db.OrderProduct{
-				OrderID: pgtype.Int4{
-					Int32: int32(order.ID),
-					Valid: true,
-				},
-				ProductID: pgtype.Int4{
-					Int32: int32(productList[productIndex].ID),
-					Valid: true,
-				},
-				Num: int32(num),
-			})
+		orderProduct := db.OrderProduct{
+			OrderID: pgtype.Int4{
+				Int32: int32(order.ID),
+				Valid: true,
+			},
+			ProductID: pgtype.Int4{
+				Int32: int32(product.ID),
+				Valid: true,
+			},
+			Num: int32(util.RandomInt(1, 10)),
 		}
+
+		orderProducts[i] = orderProduct
 	}
 
 	type Query struct {
@@ -633,6 +625,8 @@ func TestListOrdersAPI(t *testing.T) {
 						Times(1).
 						Return(status, nil)
 
+					sortOrderProducts := getOrderProductByOrderId(order.ID, orderProducts)
+
 					store.EXPECT().
 						ListOrderProductByOrderId(gomock.Any(), gomock.Eq(pgtype.Int4{
 							Int32: int32(order.ID),
@@ -640,15 +634,14 @@ func TestListOrdersAPI(t *testing.T) {
 						})).
 						Times(1).
 						Return(
-							getOrderProductByOrderId(order.ID, orderProducts),
+							sortOrderProducts,
 							nil,
 						)
 
-					for i, orderProduct := range getOrderProductByOrderId(order.ID, orderProducts) {
+					for _, sortOrderProduct := range sortOrderProducts {
 						store.EXPECT().
-							GetProduct(gomock.Any(), gomock.Eq(int64(orderProduct.ProductID.Int32))).
-							Times(1).
-							Return(productList[i], nil)
+							GetProduct(gomock.Any(), gomock.Eq(int64(sortOrderProduct.ProductID.Int32))).
+							Times(1)
 					}
 				}
 

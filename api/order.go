@@ -163,6 +163,12 @@ type listOrdersResponse struct {
 	Data  []db.OrderTxResult `json:"data"`
 }
 
+type orderResult struct {
+	Data   db.OrderTxResult
+	Status int
+	Err    error
+}
+
 func (server *Server) listOrders(ctx *gin.Context) {
 	var query listOrdersQuery
 	if err := ctx.ShouldBindQuery(&query); err != nil {
@@ -181,50 +187,74 @@ func (server *Server) listOrders(ctx *gin.Context) {
 		return
 	}
 
-	var data []db.OrderTxResult
+	// Create a channel to collect results
+	resultCh := make(chan orderResult)
+	defer close(resultCh)
+
 	for _, order := range orders {
-		status, err := server.store.GetOrderStatus(ctx, int64(order.StatusID))
-		if err != nil {
-			if err == db.ErrRecordNotFound {
-				ctx.JSON(http.StatusNotFound, errorResponse(err))
+		go func(order db.Order, resultCh chan<- orderResult) {
+			var result orderResult
+
+			status, err := server.store.GetOrderStatus(ctx, int64(order.StatusID))
+			if err != nil {
+				result.Err = err
+				resultCh <- result
 				return
 			}
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
 
-		orderProducts, err := server.store.ListOrderProductByOrderId(ctx, pgtype.Int4{
-			Int32: int32(order.ID),
-			Valid: true,
-		})
-		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-			return
-		}
-
-		var productList []db.OrderTxProductResult
-		for _, orderProduct := range orderProducts {
-			product, err := server.store.GetProduct(ctx, int64(orderProduct.ProductID.Int32))
+			orderProducts, err := server.store.ListOrderProductByOrderId(ctx, pgtype.Int4{
+				Int32: int32(order.ID),
+				Valid: true,
+			})
 			if err != nil {
-				if err == db.ErrRecordNotFound {
-					ctx.JSON(http.StatusNotFound, errorResponse(err))
+				result.Err = err
+				resultCh <- result
+				return
+			}
+
+			var productList []db.OrderTxProductResult
+			for _, orderProduct := range orderProducts {
+				product, err := server.store.GetProduct(ctx, int64(orderProduct.ProductID.Int32))
+				if err != nil {
+					result.Err = err
+					resultCh <- result
 					return
 				}
-				ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-				return
+
+				productList = append(productList, db.OrderTxProductResult{
+					Product: product,
+					Num:     int64(orderProduct.Num),
+				})
 			}
 
-			productList = append(productList, db.OrderTxProductResult{
-				Product: product,
-				Num:     int64(orderProduct.Num),
-			})
-		}
+			result.Data = db.OrderTxResult{
+				Order:       order,
+				ProductList: productList,
+				Status:      status,
+			}
 
-		data = append(data, db.OrderTxResult{
-			Order:       order,
-			ProductList: productList,
-			Status:      status,
-		})
+			resultCh <- result
+		}(order, resultCh)
+	}
+
+	var results []orderResult
+	for range orders {
+		result := <-resultCh
+		if result.Err != nil {
+			if result.Err == db.ErrRecordNotFound {
+				ctx.JSON(http.StatusNotFound, errorResponse(result.Err))
+			} else {
+				ctx.JSON(http.StatusInternalServerError, errorResponse(result.Err))
+			}
+			return
+		}
+		results = append(results, result)
+	}
+
+	// Collect and organize results
+	var data []db.OrderTxResult
+	for _, result := range results {
+		data = append(data, result.Data)
 	}
 
 	counts, err := server.store.GetOrdersCount(ctx)
