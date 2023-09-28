@@ -10,7 +10,7 @@ import (
 
 var permssions = []string{"後台帳號管理", "會員管理", "商品管理", "訂單管理", "優惠卷管理", "最新消息管理"}
 
-var orderStatuslist = []db.CreateOrderStatusParams{
+var orderStatuses = []db.CreateOrderStatusParams{
 	{
 		Name:        "待付款",
 		Description: "客戶已提交付款信息，但尚未確認款項已成功付款。",
@@ -56,6 +56,8 @@ var orderStatuslist = []db.CreateOrderStatusParams{
 		Description: "系統或客服正在等待客戶的回覆或進一步信息，以解決某些問題。",
 	},
 }
+
+var payMethods = []string{"貨到付款", "信用卡", "銀行轉帳"}
 
 func (server *Server) InitProject() error {
 	adminUser, err := server.store.GetAdminUserByAccount(context.Background(), server.config.TestAccount)
@@ -103,13 +105,20 @@ func (server *Server) InitProject() error {
 		return err
 	}
 
-	for _, orderStatus := range orderStatuslist {
+	for _, orderStatus := range orderStatuses {
 		arg := db.CreateOrderStatusParams{
 			Name:        orderStatus.Name,
 			Description: orderStatus.Description,
 		}
 
 		_, err := server.store.CreateOrderStatus(context.Background(), arg)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, payMethod := range payMethods {
+		_, err := server.store.CreatePayMethod(context.Background(), payMethod)
 		if err != nil {
 			return err
 		}
