@@ -146,7 +146,7 @@ func TestGetPermissionAPI(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start test server and send request
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/permission/%d", tc.ID)
@@ -279,7 +279,7 @@ func TestCreatePermissionAPI(t *testing.T) {
 			tc.buildStubs(store)
 
 			// start test server and send request
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -453,7 +453,7 @@ func TestListPermissionsAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/permissions"
@@ -657,7 +657,7 @@ func TestUpdatePermissionAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.arg)

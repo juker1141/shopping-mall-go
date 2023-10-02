@@ -92,7 +92,7 @@ func TestAuthMiddleware(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			server := newTestServer(t, nil)
+			server := newTestServer(t, nil, nil)
 
 			authPath := "/auth"
 			server.router.GET(
@@ -192,7 +192,7 @@ func TestPermissionMiddleware(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 
 			server.router.GET(
 				tc.path,

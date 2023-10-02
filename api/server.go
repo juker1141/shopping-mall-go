@@ -10,14 +10,16 @@ import (
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/juker1141/shopping-mall-go/worker"
 )
 
 // Server serves HTTP requests for our banking service.
 type Server struct {
-	config     util.Config
-	store      db.Store
-	tokenMaker token.Maker
-	router     *gin.Engine
+	config          util.Config
+	store           db.Store
+	tokenMaker      token.Maker
+	router          *gin.Engine
+	taskDistributor worker.TaskDistributor
 }
 
 const (
@@ -30,16 +32,17 @@ const (
 )
 
 // NewServer creates a new HTTP server and setup routing.
-func NewServer(config util.Config, store db.Store) (*Server, error) {
+func NewServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) (*Server, error) {
 	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
 	if err != nil {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 
 	server := &Server{
-		config:     config,
-		store:      store,
-		tokenMaker: tokenMaker,
+		config:          config,
+		store:           store,
+		tokenMaker:      tokenMaker,
+		taskDistributor: taskDistributor,
 	}
 
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {

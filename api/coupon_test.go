@@ -316,7 +316,7 @@ func TestCreateCouponAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -743,7 +743,7 @@ func TestUpdateCouponAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -886,7 +886,7 @@ func TestGetCouponAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/coupon/%d", tc.ID)
@@ -1092,7 +1092,7 @@ func TestCheckCouponAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -1297,7 +1297,7 @@ func TestListCouponsAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/coupons"
@@ -1440,7 +1440,7 @@ func TestDeleteCouponAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/coupon/%d", tc.ID)

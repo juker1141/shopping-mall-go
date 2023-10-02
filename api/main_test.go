@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/juker1141/shopping-mall-go/worker"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,13 +22,13 @@ var (
 	// newsPermissions    = []int64{newsPermissionCode}
 )
 
-func newTestServer(t *testing.T, store db.Store) *Server {
+func newTestServer(t *testing.T, store db.Store, taskDistributor worker.TaskDistributor) *Server {
 	config := util.Config{
 		TokenSymmetricKey:   util.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
 
-	server, err := NewServer(config, store)
+	server, err := NewServer(config, store, taskDistributor)
 	require.NoError(t, err)
 
 	return server

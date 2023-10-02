@@ -10,10 +10,12 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hibiken/asynq"
 	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
 	"github.com/juker1141/shopping-mall-go/val"
+	"github.com/juker1141/shopping-mall-go/worker"
 )
 
 var defaultAvaterPath = filepath.Join("static", "avatar_images", "default_avatar.png")
@@ -63,20 +65,36 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateUserParams{
-		Account:  req.Account,
-		Email:    req.Email,
-		FullName: req.FullName,
-		GenderID: pgtype.Int4{
-			Int32: req.GenderId,
-			Valid: true,
+	arg := db.CreateUserTxParams{
+		CreateUserParams: db.CreateUserParams{
+			Account:  req.Account,
+			Email:    req.Email,
+			FullName: req.FullName,
+			GenderID: pgtype.Int4{
+				Int32: req.GenderId,
+				Valid: true,
+			},
+			HashedPassword:  hashedPassword,
+			Cellphone:       req.Cellphone,
+			Address:         req.Address,
+			ShippingAddress: req.ShippingAddress,
+			PostCode:        req.PostCode,
+			Status:          req.Status,
 		},
-		HashedPassword:  hashedPassword,
-		Cellphone:       req.Cellphone,
-		Address:         req.Address,
-		ShippingAddress: req.ShippingAddress,
-		PostCode:        req.PostCode,
-		Status:          req.Status,
+		AfterCreate: func(user db.User) error {
+			// TODO: user db transaction
+			taskPayload := &worker.PayloadSendVerifyEmail{
+				Account: user.Account,
+			}
+
+			opt := []asynq.Option{
+				asynq.MaxRetry(10),
+				asynq.ProcessIn(10 * time.Second),
+				asynq.Queue(worker.QueueCritical),
+			}
+
+			return server.taskDistributor.DistributeTaskSendVerifyEmail(ctx, taskPayload, opt...)
+		},
 	}
 
 	if req.AvatarFile != nil {
@@ -109,12 +127,12 @@ func (server *Server) createUser(ctx *gin.Context) {
 			return
 		}
 
-		arg.AvatarUrl = targetPath
+		arg.CreateUserParams.AvatarUrl = targetPath
 	} else {
-		arg.AvatarUrl = defaultAvaterPath
+		arg.CreateUserParams.AvatarUrl = defaultAvaterPath
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	txResult, err := server.store.CreateUserTx(ctx, arg)
 	if err != nil {
 		errCode := db.ErrorCode(err)
 		if errCode == db.ForeignKeyViolation || errCode == db.UniqueViolation {
@@ -127,7 +145,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 
 	_, err = server.store.CreateCart(ctx, db.CreateCartParams{
 		Owner: pgtype.Text{
-			String: user.Account,
+			String: txResult.User.Account,
 			Valid:  true,
 		},
 		TotalPrice: 0,
@@ -138,7 +156,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	rsp := newUserResponse(user)
+	rsp := newUserResponse(txResult.User)
 
 	ctx.JSON(http.StatusOK, rsp)
 }

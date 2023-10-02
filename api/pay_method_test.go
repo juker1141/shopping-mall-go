@@ -104,7 +104,7 @@ func TestListPayMethodsOption(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/order/payMethods/option"

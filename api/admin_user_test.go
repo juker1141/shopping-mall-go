@@ -351,7 +351,7 @@ func TestCreateAdminUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -519,7 +519,7 @@ func TestGetAdminUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/managerUser/%d", tc.ID)
@@ -665,7 +665,7 @@ func TestGetAdminUserInfoAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/managerUser/info"
@@ -847,7 +847,7 @@ func TestListAdminUsersAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/managerUsers"
@@ -1391,7 +1391,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -1517,7 +1517,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/managerUser/%d", tc.ID)
@@ -1630,7 +1630,7 @@ func TestLoginAdminUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)

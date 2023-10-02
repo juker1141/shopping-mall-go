@@ -180,7 +180,7 @@ func TestCreateRoleAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -415,7 +415,7 @@ func TestUpdateRoleAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
@@ -603,7 +603,7 @@ func TestListRolesAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/roles"
@@ -710,7 +710,7 @@ func TestListRolesOptionAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/roles/option"
@@ -846,7 +846,7 @@ func TestGetRoleAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/role/%d", tc.ID)
@@ -1000,7 +1000,7 @@ func TestGetRoleAPI(t *testing.T) {
 // 			tc.buildStubs(store)
 
 // 			// start test server and send request
-// 			server := newTestServer(t, store)
+// 			server := newTestServer(t, store, nil)
 // 			recorder := httptest.NewRecorder()
 
 // 			url := fmt.Sprintf("/admin/role/%d", tc.ID)

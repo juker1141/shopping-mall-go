@@ -43,5 +43,9 @@ server:
 
 mock:
 	mockgen -build_flags=--mod=mod -package mockdb -destination db/mock/store.go github.com/juker1141/shopping-mall-go/db/sqlc Store
+	mockgen -build_flags=--mod=mod -package mockwk -destination worker/mock/distributor.go github.com/juker1141/shopping-mall-go/worker TaskDistributor
 
-.PHONY: postgres createdb dropdb migrateup migratedown new_migration db_docs db_schema sqlc test server mock
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7-alpine
+
+.PHONY: postgres createdb dropdb migrateup migratedown new_migration db_docs db_schema sqlc test server mock redis

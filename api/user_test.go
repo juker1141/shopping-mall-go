@@ -23,6 +23,8 @@ import (
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/token"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/juker1141/shopping-mall-go/worker"
+	mockwk "github.com/juker1141/shopping-mall-go/worker/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -94,7 +96,7 @@ func TestCreateUserAPI(t *testing.T) {
 		fileType       string
 		fileName       string
 		body           gin.H
-		buildStubs     func(store *mockdb.MockStore)
+		buildStubs     func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor)
 		checkResponse  func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
 		{
@@ -103,7 +105,7 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				arg := db.CreateUserParams{
 					Account:  user.Account,
 					Email:    user.Email,
@@ -135,6 +137,15 @@ func TestCreateUserAPI(t *testing.T) {
 				}
 
 				store.EXPECT().CreateCart(gomock.Any(), gomock.Eq(cartArg)).Times(1).Return(cart, nil)
+
+				taskPayload := &worker.PayloadSendVerifyEmail{
+					Account: user.Account,
+				}
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), taskPayload, gomock.Any()).
+					Times(1).
+					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -147,7 +158,7 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				arg := db.CreateUserParams{
 					Account:  user.Account,
 					Email:    user.Email,
@@ -179,6 +190,15 @@ func TestCreateUserAPI(t *testing.T) {
 				}
 
 				store.EXPECT().CreateCart(gomock.Any(), gomock.Eq(cartArg)).Times(1).Return(cart, nil)
+
+				taskPayload := &worker.PayloadSendVerifyEmail{
+					Account: user.Account,
+				}
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), taskPayload, gomock.Any()).
+					Times(1).
+					Return(nil)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -191,11 +211,15 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.User{}, sql.ErrConnDone)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -207,11 +231,15 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.User{}, db.ErrUniqueViolation)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusConflict, recorder.Code)
@@ -234,9 +262,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -260,9 +292,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -286,9 +322,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -312,9 +352,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -338,7 +382,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				arg := db.CreateUserParams{
 					Account:  user.Account,
 					Email:    user.Email,
@@ -359,6 +403,10 @@ func TestCreateUserAPI(t *testing.T) {
 					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
 					Times(1).
 					Return(db.User{}, db.ErrUniqueViolation)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusConflict, recorder.Code)
@@ -381,9 +429,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          user.Status,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -407,9 +459,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          "0",
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -433,9 +489,13 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          1,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -459,7 +519,7 @@ func TestCreateUserAPI(t *testing.T) {
 				"postCode":        user.PostCode,
 				"status":          1,
 			},
-			buildStubs: func(store *mockdb.MockStore) {
+			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -478,9 +538,14 @@ func TestCreateUserAPI(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockdb.NewMockStore(ctrl)
-			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			taskCtrl := gomock.NewController(t)
+			defer taskCtrl.Finish()
+			taskDistributor := mockwk.NewMockTaskDistributor(taskCtrl)
+
+			tc.buildStubs(store, taskDistributor)
+
+			server := newTestServer(t, store, taskDistributor)
 			recorder := httptest.NewRecorder()
 
 			body := &bytes.Buffer{}
@@ -1028,7 +1093,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			body := &bytes.Buffer{}
@@ -1200,7 +1265,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
@@ -1402,7 +1467,7 @@ func TestListUsersByAdminAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := "/admin/memberUsers"
@@ -1546,7 +1611,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
@@ -1646,7 +1711,7 @@ func TestLoginUserAPI(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := newTestServer(t, store)
+			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
 			jsonData, err := json.Marshal(tc.body)
