@@ -30,6 +30,7 @@ type Querier interface {
 	CreateRolePermission(ctx context.Context, arg CreateRolePermissionParams) (RolePermission, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	CreateVerifyEmail(ctx context.Context, arg CreateVerifyEmailParams) (VerifyEmail, error)
 	DeleteAdminUser(ctx context.Context, id int64) error
 	DeleteCart(ctx context.Context, id int64) error
 	DeleteCartCouponByCartId(ctx context.Context, cartID pgtype.Int4) error

@@ -1,6 +1,6 @@
 -- SQL dump generated using DBML (dbml-lang.org)
 -- Database: PostgreSQL
--- Generated at: 2023-09-25T04:06:46.142Z
+-- Generated at: 2023-10-02T06:01:05.767Z
 
 CREATE TABLE "permissions" (
   "id" bigserial PRIMARY KEY,
@@ -54,8 +54,19 @@ CREATE TABLE "users" (
   "hashed_password" varchar NOT NULL,
   "status" int NOT NULL DEFAULT 1,
   "avatar_url" varchar NOT NULL,
+  "is_email_verified" bool NOT NULL DEFAULT false,
   "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01 00:00:00Z',
   "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE TABLE "verify_emails" (
+  "id" bigserial PRIMARY KEY,
+  "user_id" int,
+  "email" varchar NOT NULL,
+  "secret_code" varchar NOT NULL,
+  "is_used" bool NOT NULL DEFAULT false,
+  "created_at" timestamptz NOT NULL DEFAULT (now()),
+  "expires_at" timestamptz NOT NULL DEFAULT (now() + interval '15 minutes')
 );
 
 CREATE TABLE "genders" (
@@ -200,6 +211,8 @@ ALTER TABLE "role_permissions" ADD FOREIGN KEY ("permission_id") REFERENCES "per
 ALTER TABLE "sessions" ADD FOREIGN KEY ("account") REFERENCES "admin_users" ("account");
 
 ALTER TABLE "users" ADD FOREIGN KEY ("gender_id") REFERENCES "genders" ("id");
+
+ALTER TABLE "verify_emails" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
 ALTER TABLE "carts" ADD FOREIGN KEY ("owner") REFERENCES "users" ("account");
 

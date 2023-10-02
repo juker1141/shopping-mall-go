@@ -58,12 +58,23 @@ Table users as Users {
   hashed_password varchar [not null]
   status int [not null, default: 1, note: 'must be either 0 or 1']
   avatar_url varchar [not null]
+  is_email_verified bool [not null, default: false]
   password_changed_at timestamptz [not null, default: '0001-01-01 00:00:00Z']
   created_at timestamptz [not null, default: `now()`]
 
   Indexes {
     account
   }
+}
+
+Table verify_emails {
+  id bigserial [pk]
+  user_id int [ref: > Users.id]
+  email varchar [not null]
+  secret_code varchar [not null]
+  is_used bool [not null, default: false]
+  created_at timestamptz [not null, default: `now()`]
+  expires_at timestamptz [not null, default: `now() + interval '15 minutes'`]
 }
 
 Table genders as Genders {
