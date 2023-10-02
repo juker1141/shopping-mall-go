@@ -28,34 +28,40 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-type eqCreateUserParamsMatcher struct {
-	arg      db.CreateUserParams
+type eqCreateUserTxParamsMatcher struct {
+	arg      db.CreateUserTxParams
 	password string
+	user     db.User
 }
 
-func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
-	arg, ok := x.(db.CreateUserParams)
+func (expected eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
+	actualArg, ok := x.(db.CreateUserTxParams)
 	if !ok {
 		return false
 	}
 
-	err := util.CheckPassword(e.password, arg.HashedPassword)
+	err := util.CheckPassword(expected.password, actualArg.HashedPassword)
 	if err != nil {
 		return false
 	}
 
-	e.arg.HashedPassword = arg.HashedPassword
-	e.arg.AvatarUrl = arg.AvatarUrl
+	expected.arg.HashedPassword = actualArg.HashedPassword
+	if !reflect.DeepEqual(expected.arg.CreateUserParams, actualArg.CreateUserParams) {
+		return false
+	}
 
-	return reflect.DeepEqual(e.arg, arg)
+	// call the AfterCreate function here
+	err = actualArg.AfterCreate(expected.user)
+
+	return err == nil
 }
 
-func (e eqCreateUserParamsMatcher) String() string {
+func (e eqCreateUserTxParamsMatcher) String() string {
 	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
 }
 
-func EqCreateUserParams(arg db.CreateUserParams, password string) gomock.Matcher {
-	return eqCreateUserParamsMatcher{arg, password}
+func eqCreateUserTxParams(arg db.CreateUserTxParams, password string, user db.User) gomock.Matcher {
+	return eqCreateUserTxParamsMatcher{arg, password, user}
 }
 
 var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
@@ -106,26 +112,28 @@ func TestCreateUserAPI(t *testing.T) {
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
-				arg := db.CreateUserParams{
-					Account:  user.Account,
-					Email:    user.Email,
-					FullName: user.FullName,
-					GenderID: pgtype.Int4{
-						Int32: user.GenderID.Int32,
-						Valid: true,
+				arg := db.CreateUserTxParams{
+					CreateUserParams: db.CreateUserParams{
+						Account:  user.Account,
+						Email:    user.Email,
+						FullName: user.FullName,
+						GenderID: pgtype.Int4{
+							Int32: user.GenderID.Int32,
+							Valid: true,
+						},
+						Cellphone:       user.Cellphone,
+						Address:         user.Address,
+						ShippingAddress: user.ShippingAddress,
+						PostCode:        user.PostCode,
+						Status:          user.Status,
+						AvatarUrl:       user.AvatarUrl,
 					},
-					Cellphone:       user.Cellphone,
-					Address:         user.Address,
-					ShippingAddress: user.ShippingAddress,
-					PostCode:        user.PostCode,
-					Status:          user.Status,
-					AvatarUrl:       user.AvatarUrl,
 				}
 
 				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
+					CreateUserTx(gomock.Any(), eqCreateUserTxParams(arg, password, user)).
 					Times(1).
-					Return(user, nil)
+					Return(db.UserTxResult{User: user}, nil)
 
 				cartArg := db.CreateCartParams{
 					Owner: pgtype.Text{
@@ -159,26 +167,28 @@ func TestCreateUserAPI(t *testing.T) {
 			fileName:       "fake_avatar.png",
 			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
-				arg := db.CreateUserParams{
-					Account:  user.Account,
-					Email:    user.Email,
-					FullName: user.FullName,
-					GenderID: pgtype.Int4{
-						Int32: user.GenderID.Int32,
-						Valid: true,
+				arg := db.CreateUserTxParams{
+					CreateUserParams: db.CreateUserParams{
+						Account:  user.Account,
+						Email:    user.Email,
+						FullName: user.FullName,
+						GenderID: pgtype.Int4{
+							Int32: user.GenderID.Int32,
+							Valid: true,
+						},
+						Cellphone:       user.Cellphone,
+						Address:         user.Address,
+						ShippingAddress: user.ShippingAddress,
+						PostCode:        user.PostCode,
+						Status:          user.Status,
+						AvatarUrl:       user.AvatarUrl,
 					},
-					Cellphone:       user.Cellphone,
-					Address:         user.Address,
-					ShippingAddress: user.ShippingAddress,
-					PostCode:        user.PostCode,
-					Status:          user.Status,
-					AvatarUrl:       user.AvatarUrl,
 				}
 
 				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
+					CreateUserTx(gomock.Any(), eqCreateUserTxParams(arg, password, user)).
 					Times(1).
-					Return(user, nil)
+					Return(db.UserTxResult{User: user}, nil)
 
 				cartArg := db.CreateCartParams{
 					Owner: pgtype.Text{
@@ -213,9 +223,9 @@ func TestCreateUserAPI(t *testing.T) {
 			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.User{}, sql.ErrConnDone)
+					Return(db.UserTxResult{}, sql.ErrConnDone)
 
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -233,9 +243,9 @@ func TestCreateUserAPI(t *testing.T) {
 			body:           templateBody,
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.User{}, db.ErrUniqueViolation)
+					Return(db.UserTxResult{}, sql.ErrConnDone)
 
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -264,7 +274,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -294,7 +304,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -324,7 +334,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -354,7 +364,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -383,26 +393,28 @@ func TestCreateUserAPI(t *testing.T) {
 				"status":          user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
-				arg := db.CreateUserParams{
-					Account:  user.Account,
-					Email:    user.Email,
-					FullName: user.FullName,
-					GenderID: pgtype.Int4{
-						Int32: 4,
-						Valid: true,
+				arg := db.CreateUserTxParams{
+					CreateUserParams: db.CreateUserParams{
+						Account:  user.Account,
+						Email:    user.Email,
+						FullName: user.FullName,
+						GenderID: pgtype.Int4{
+							Int32: 4,
+							Valid: true,
+						},
+						Cellphone:       user.Cellphone,
+						Address:         user.Address,
+						ShippingAddress: user.ShippingAddress,
+						PostCode:        user.PostCode,
+						Status:          user.Status,
+						AvatarUrl:       user.AvatarUrl,
 					},
-					Cellphone:       user.Cellphone,
-					Address:         user.Address,
-					ShippingAddress: user.ShippingAddress,
-					PostCode:        user.PostCode,
-					Status:          user.Status,
-					AvatarUrl:       user.AvatarUrl,
 				}
 
 				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(arg, password)).
+					CreateUser(gomock.Any(), eqCreateUserTxParams(arg, password, user)).
 					Times(1).
-					Return(db.User{}, db.ErrUniqueViolation)
+					Return(db.UserTxResult{}, db.ErrUniqueViolation)
 
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -431,7 +443,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -461,7 +473,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -491,7 +503,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 
 				taskDistributor.EXPECT().
@@ -521,7 +533,7 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
