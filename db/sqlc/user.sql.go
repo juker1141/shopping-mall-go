@@ -213,9 +213,10 @@ SET
   shipping_address = COALESCE($6, shipping_address),
   post_code = COALESCE($7, post_code),
   avatar_url = COALESCE($8, avatar_url),
-  status = COALESCE($9, status)
+  status = COALESCE($9, status),
+  is_email_verified = COALESCE($10, is_email_verified)
 WHERE
-  id = $10
+  id = $11
 RETURNING id, account, email, full_name, gender_id, cellphone, address, shipping_address, post_code, hashed_password, status, avatar_url, password_changed_at, created_at, is_email_verified
 `
 
@@ -229,6 +230,7 @@ type UpdateUserParams struct {
 	PostCode          pgtype.Text        `json:"post_code"`
 	AvatarUrl         pgtype.Text        `json:"avatar_url"`
 	Status            pgtype.Int4        `json:"status"`
+	IsEmailVerified   pgtype.Bool        `json:"is_email_verified"`
 	ID                int64              `json:"id"`
 }
 
@@ -243,6 +245,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		arg.PostCode,
 		arg.AvatarUrl,
 		arg.Status,
+		arg.IsEmailVerified,
 		arg.ID,
 	)
 	var i User

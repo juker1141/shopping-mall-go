@@ -82,8 +82,10 @@ func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
 	router.POST("/admin/login", server.loginAdminUser)
 	// Renew Token
 	router.POST("/admin/tokens/renewAccess", server.renewAccessToken)
-	// user 註冊
+	// 會員 註冊
 	router.POST("/user", server.createUser)
+	// 會員註冊驗證信 驗證
+	router.GET("/verifyEmail", server.VerifyEmail)
 }
 
 func (server *Server) setupAdminRoutes(router *gin.Engine) {
@@ -152,8 +154,10 @@ func (server *Server) setupAuthRoutes(router *gin.Engine) {
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 	// 前台使用者
 	// authRoutes.PATCH("/user/:id", server.updateUser)
+
 	// 會員 下訂單
 	authRoutes.POST("/order", server.createOrder)
+
 	// 取得訂單狀態
 	authRoutes.GET("/order/statuses/option", server.listOrderStatusesOption)
 	// 付款方式

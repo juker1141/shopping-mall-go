@@ -40,7 +40,8 @@ SET
   shipping_address = COALESCE(sqlc.narg(shipping_address), shipping_address),
   post_code = COALESCE(sqlc.narg(post_code), post_code),
   avatar_url = COALESCE(sqlc.narg(avatar_url), avatar_url),
-  status = COALESCE(sqlc.narg(status), status)
+  status = COALESCE(sqlc.narg(status), status),
+  is_email_verified = COALESCE(sqlc.narg(is_email_verified), is_email_verified)
 WHERE
   id = sqlc.arg(id)
 RETURNING *;
