@@ -60,7 +60,6 @@ func TestGetCartProduct(t *testing.T) {
 
 func TestUpdateCartProduct(t *testing.T) {
 	oldCartProduct := createRandomCartProduct(t)
-	newNum := int32(util.RandomInt(1, 100))
 
 	arg := UpdateCartProductParams{
 		CartID: pgtype.Int4{
@@ -72,7 +71,7 @@ func TestUpdateCartProduct(t *testing.T) {
 			Valid: true,
 		},
 		Num: pgtype.Int4{
-			Int32: newNum,
+			Int32: oldCartProduct.Num + 10,
 			Valid: true,
 		},
 	}
