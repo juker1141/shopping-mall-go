@@ -85,7 +85,7 @@ func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
 	// 會員 註冊
 	router.POST("/user", server.createUser)
 	// 會員註冊驗證信 驗證
-	router.GET("/verifyEmail", server.VerifyEmail)
+	router.GET("/user/verifyEmail", server.VerifyEmail)
 }
 
 func (server *Server) setupAdminRoutes(router *gin.Engine) {
