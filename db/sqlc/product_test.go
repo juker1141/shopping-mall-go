@@ -140,11 +140,11 @@ func TestUpdateProductAllField(t *testing.T) {
 			Valid:  true,
 		},
 		OriginPrice: pgtype.Int4{
-			Int32: util.RandomPrice(),
+			Int32: oldProduct.OriginPrice + 100,
 			Valid: true,
 		},
 		Price: pgtype.Int4{
-			Int32: util.RandomPrice(),
+			Int32: oldProduct.Price + 100,
 			Valid: true,
 		},
 		Unit: pgtype.Text{
@@ -224,11 +224,11 @@ func TestUpdateProductOnlyPrice(t *testing.T) {
 	arg := UpdateProductParams{
 		ID: oldProduct.ID,
 		OriginPrice: pgtype.Int4{
-			Int32: util.RandomPrice(),
+			Int32: oldProduct.OriginPrice + 100,
 			Valid: true,
 		},
 		Price: pgtype.Int4{
-			Int32: util.RandomPrice(),
+			Int32: oldProduct.Price + 100,
 			Valid: true,
 		},
 	}

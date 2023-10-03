@@ -34,24 +34,25 @@ type eqCreateUserTxParamsMatcher struct {
 	user     db.User
 }
 
-func (expected eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
-	actualArg, ok := x.(db.CreateUserTxParams)
+func (e eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
+	arg, ok := x.(db.CreateUserTxParams)
 	if !ok {
 		return false
 	}
 
-	err := util.CheckPassword(expected.password, actualArg.HashedPassword)
+	err := util.CheckPassword(e.password, arg.HashedPassword)
 	if err != nil {
 		return false
 	}
 
-	expected.arg.HashedPassword = actualArg.HashedPassword
-	if !reflect.DeepEqual(expected.arg.CreateUserParams, actualArg.CreateUserParams) {
+	e.arg.HashedPassword = arg.HashedPassword
+	e.arg.AvatarUrl = arg.AvatarUrl
+	if !reflect.DeepEqual(e.arg.CreateUserParams, arg.CreateUserParams) {
 		return false
 	}
 
 	// call the AfterCreate function here
-	err = actualArg.AfterCreate(expected.user)
+	err = arg.AfterCreate(e.user)
 
 	return err == nil
 }
@@ -245,7 +246,7 @@ func TestCreateUserAPI(t *testing.T) {
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.UserTxResult{}, sql.ErrConnDone)
+					Return(db.UserTxResult{}, db.ErrUniqueViolation)
 
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
@@ -412,13 +413,13 @@ func TestCreateUserAPI(t *testing.T) {
 				}
 
 				store.EXPECT().
-					CreateUser(gomock.Any(), eqCreateUserTxParams(arg, password, user)).
+					CreateUserTx(gomock.Any(), eqCreateUserTxParams(arg, password, user)).
 					Times(1).
-					Return(db.UserTxResult{}, db.ErrUniqueViolation)
+					Return(db.UserTxResult{}, db.ErrForeignKeyViolation)
 
 				taskDistributor.EXPECT().
 					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
-					Times(0)
+					Times(1)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusConflict, recorder.Code)

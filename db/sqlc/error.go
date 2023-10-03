@@ -15,6 +15,10 @@ const (
 
 var ErrRecordNotFound = pgx.ErrNoRows
 
+var ErrForeignKeyViolation = &pgconn.PgError{
+	Code: ForeignKeyViolation,
+}
+
 var ErrUniqueViolation = &pgconn.PgError{
 	Code: UniqueViolation,
 }
