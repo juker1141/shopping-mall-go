@@ -1,10 +1,16 @@
 name: Deploy to production CD
 
 on:
+  push:
+    branches: ["main"]
   workflow_run:
     workflows: ["Deploy to production CI"]
     types:
       - completed
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build:
