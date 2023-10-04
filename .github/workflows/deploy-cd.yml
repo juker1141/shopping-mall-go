@@ -4,13 +4,17 @@ on:
   workflow_run:
     workflows:
       - "Deploy to production CI"
-    branches: [main]
+    branches: ["main"]
     types:
       - completed
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
-    name: Build image
+  deploy:
+    name: Deploy to EC2
     runs-on: ubuntu-latest
     env:
       AWS_URL: 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/
