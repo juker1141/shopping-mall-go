@@ -34,10 +34,10 @@ jobs:
         run: aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $AWS_URL
 
       - name: Pull AWS ECR images
-        run: sudo docker pull $AWS_URL/$CONTAINER_NAME:latest
+        run: sudo docker pull 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest
 
       - name: Delete Old Docker container
         run: sudo docker rm -f $CONTAINER_NAME || true
 
       - name: Run Docker container
-        run: sudo docker run -d -p 8080:8080 --name $CONTAINER_NAME $AWS_URL/$CONTAINER_NAME:latest
+        run: sudo docker run -d -p 8080:8080 --name $CONTAINER_NAME 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest
