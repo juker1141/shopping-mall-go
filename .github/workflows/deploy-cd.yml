@@ -1,21 +1,20 @@
 name: Deploy to production CD
 
 on:
-  push:
-    branches: ["main"]
   workflow_run:
-    workflows: ["Deploy to production CI"]
+    workflows:
+      - "Deploy to production CI"
+    branches: [main]
     types:
       - completed
-
-permissions:
-  id-token: write
-  contents: read
 
 jobs:
   build:
     name: Build image
     runs-on: ubuntu-latest
+    env:
+      AWS_URL: 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/
+      CONTAINER_NAME: shopping-mall-go
 
     steps:
       - name: Checkout repo
@@ -32,19 +31,10 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Pull AWS ECR images
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: shopping-mall-go
-          IMAGE_TAG: ${{ github.sha }}
-        run: sudo docker pull $REGISTRY/$REPOSITORY:latest
+        run: sudo docker pull $AWS_URL/$CONTAINER_NAME:latest
 
       - name: Delete Old Docker container
-        env:
-          REPOSITORY: shopping-mall-go
-        run: sudo docker rm -f $REPOSITORY || true
+        run: sudo docker rm -f $CONTAINER_NAME || true
 
       - name: Run Docker container
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: shopping-mall-go
-        run: sudo docker run -d -p 8080:8080 --name $REPOSITORY $REGISTRY/$REPOSITORY:latest
+        run: sudo docker run -d -p 8080:8080 --name $CONTAINER_NAME $AWS_URL/$CONTAINER_NAME:latest
