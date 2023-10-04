@@ -15,10 +15,11 @@ permissions:
 jobs:
   deploy:
     name: Deploy to EC2
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     env:
       AWS_URL: 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com
       CONTAINER_NAME: shopping-mall-go
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -30,8 +31,7 @@ jobs:
           aws-region: ap-northeast-1
 
       - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        run: aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $AWS_URL
 
       - name: Pull AWS ECR images
         run: sudo docker pull $AWS_URL/$CONTAINER_NAME:latest
