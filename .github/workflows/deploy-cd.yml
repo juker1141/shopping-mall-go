@@ -2,7 +2,9 @@ name: Deploy to production CD
 
 on:
   workflow_run:
-    workflows: ["Deploy to production CI"]
+    workflows:
+      - "Deploy to production CI"
+    branches: [main]
     types:
       - completed
 
