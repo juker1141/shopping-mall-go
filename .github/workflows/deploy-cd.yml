@@ -1,0 +1,44 @@
+name: Deploy to production CD
+
+on:
+  workflow_run:
+    workflows: ["Deploy to production CI"]
+    types:
+      - completed
+
+jobs:
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2 # More information on this action can be found below in the 'AWS Credentials' section
+        with:
+          role-to-assume: arn:aws:iam::617893088694:role/GitHubAction-AssumeRoleWithAction
+          aws-region: ap-northeast-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Pull AWS ECR images
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: shopping-mall-go
+          IMAGE_TAG: ${{ github.sha }}
+        run: sudo docker pull $REGISTRY/$REPOSITORY:latest
+
+      - name: Delete Old Docker container
+        env:
+          REPOSITORY: shopping-mall-go
+        run: sudo docker rm -f $REPOSITORY || true
+
+      - name: Run Docker container
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: shopping-mall-go
+        run: sudo docker run -d -p 8080:8080 --name $REPOSITORY $REGISTRY/$REPOSITORY:latest
