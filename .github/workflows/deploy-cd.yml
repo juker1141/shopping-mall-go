@@ -17,8 +17,9 @@ jobs:
     name: Deploy to EC2
     runs-on: ubuntu-latest
     env:
-      AWS_URL: 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com
-      CONTAINER_NAME: shopping-mall-go
+      AWS_USER: ${{ secrets.AWS_USER }}
+      AWS_SERVER: ${{ secrets.AWS_SERVER }}
+      AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
 
     steps:
       - name: Checkout repo
@@ -30,14 +31,10 @@ jobs:
           role-to-assume: arn:aws:iam::617893088694:role/GitHubAction-AssumeRoleWithAction
           aws-region: ap-northeast-1
 
-      - name: Login to Amazon ECR
-        run: aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin $AWS_URL
+      - name: COPY PrivateKey
+        run: |
+          cat $AWS_PRIVATE_KEY > private_key.pem
+          chmod 400 private_key.pem
 
-      - name: Pull AWS ECR images
-        run: sudo docker pull 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest
-
-      - name: Delete Old Docker container
-        run: sudo docker rm -f $CONTAINER_NAME || true
-
-      - name: Run Docker container
-        run: sudo docker run -d -p 8080:8080 --name $CONTAINER_NAME 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest
+      - name: connect SSH to AWS EC2
+        run: ssh -o StrictHostKeyChecking=no -i private_key.pem $AWS_USER@$AWS_SERVER "ls -al"
