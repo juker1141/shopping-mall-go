@@ -33,7 +33,7 @@ jobs:
 
       - name: COPY PrivateKey
         run: |
-          cat $AWS_PRIVATE_KEY > private_key.pem
+          cat "$AWS_PRIVATE_KEY" > private_key.pem
           chmod 400 private_key.pem
 
       - name: connect SSH to AWS EC2
