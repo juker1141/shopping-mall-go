@@ -47,5 +47,7 @@ jobs:
 
       - name: Setup docker compose
         run: |
+          pwd
           docker-compose -f docker-compose-production.yml down
           docker-compose -f docker-compose-production.yml up -d
+          docker-compose ps
