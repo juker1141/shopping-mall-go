@@ -27,5 +27,9 @@ jobs:
 
       - name: Connect to AWS EC2
         run: |
-          echo "$AWS_PRIVATE_KEY" > private_key && chmod 400 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} 'ls -al'
+          echo "$AWS_PRIVATE_KEY" > private_key && chmod 600 private_key
+          scp -o StrictHostKeyChecking=no -i private_key ./docker-compose.yml ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
+          ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} '
+            docker-compose down &&
+            docker-compose up
+          '
