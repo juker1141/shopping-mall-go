@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -78,6 +79,11 @@ func (server *Server) setupRouter() {
 func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
 	// 使用者登入網頁
 	router.POST("/login", server.loginUser)
+	router.GET("/ping", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": "OK",
+		})
+	})
 	// 登入後台
 	router.POST("/admin/login", server.loginAdminUser)
 	// Renew Token
