@@ -6,6 +6,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/juker1141/shopping-mall-go/db/sqlc"
 	"github.com/juker1141/shopping-mall-go/util"
+	"github.com/rs/zerolog/log"
 )
 
 var permssions = []string{"後台帳號管理", "會員管理", "商品管理", "訂單管理", "優惠卷管理", "最新消息管理"}
@@ -123,6 +124,8 @@ func (server *Server) InitProject() error {
 			return err
 		}
 	}
+
+	log.Info().Msg("success init project")
 
 	return nil
 }
