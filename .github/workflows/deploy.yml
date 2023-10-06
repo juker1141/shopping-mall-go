@@ -12,6 +12,10 @@ jobs:
   build:
     name: Build image
     runs-on: ubuntu-latest
+    env:
+      AWS_USER: ${{ secrets.AWS_USER }}
+      AWS_SERVER: ${{ secrets.AWS_SERVER }}
+      AWS_PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
 
     steps:
       - name: Checkout repo
@@ -36,6 +40,17 @@ jobs:
           REPOSITORY: shopping-mall-go
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -f Dockerfile-production.dockerfile -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
+          docker build -f Dockerfile-production.dockerfile --no-cache -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:latest
+
+      - name: Connect to AWS EC2
+        run: |
+          echo "$AWS_PRIVATE_KEY" > private_key && chmod 400 private_key
+
+          scp -o StrictHostKeyChecking=no -i private_key ./docker-compose-production.yml ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
+          ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} "
+            docker-compose -f docker-compose-production.yml down &&
+            docker-compose -f docker-compose-production.yml up -d &&
+            docker-compose ps
+          "
