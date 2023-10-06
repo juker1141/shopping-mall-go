@@ -1,11 +1,11 @@
 version: "3"
 services:
-  postgres:
-    image: postgres:15.3-alpine
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=shopping_mall
+  # postgres:
+  #   image: postgres:15.3-alpine
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=shopping_mall
 
   redis:
     image: redis:7-alpine
@@ -15,10 +15,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      # - postgres
       - redis
     environment:
-      - DB_SOURCE=postgresql://postgres:password@postgres:5432/shopping_mall?sslmode=disable
+      - DB_SOURCE=postgresql://postgres:lScagw1wOoHlroKNUBEv@shopping-mall.c4l5ilqti7tc.ap-northeast-1.rds.amazonaws.com:5432/shopping_mall
       - REDIS_ADDRESS=redis:6379
     entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
     command: ["/app/main"]
