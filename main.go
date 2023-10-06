@@ -66,6 +66,7 @@ func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store d
 }
 
 func runDBMigration(migrationURL string, dbSource string) {
+	log.Info().Msg(dbSource)
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create new migrate instance:")
