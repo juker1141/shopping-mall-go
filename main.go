@@ -40,6 +40,7 @@ func main() {
 	// }
 
 	// run db migration
+	log.Info().Msg(config.DBSource)
 	runDBMigration(config.MigrationURL, config.DBSource)
 
 	store := db.NewStore(connPool)
