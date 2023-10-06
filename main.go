@@ -4,6 +4,9 @@ import (
 	"context"
 	"os"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/hibiken/asynq"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/juker1141/shopping-mall-go/api"
@@ -36,6 +39,9 @@ func main() {
 	// 	return
 	// }
 
+	// run db migration
+	runDBMigration(config.MigrationURL, config.DBSource)
+
 	store := db.NewStore(connPool)
 
 	redisOpt := asynq.RedisClientOpt{
@@ -57,6 +63,19 @@ func runTaskProcessor(config util.Config, redisOpt asynq.RedisClientOpt, store d
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to start task processor")
 	}
+}
+
+func runDBMigration(migrationURL string, dbSource string) {
+	migration, err := migrate.New(migrationURL, dbSource)
+	if err != nil {
+		log.Fatal().Err(err).Msg("cannot create new migrate instance:")
+	}
+
+	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal().Err(err).Msg("failed to run migrate up:")
+	}
+
+	log.Info().Msg("db migrated successfully")
 }
 
 func runGinServer(config util.Config, store db.Store, taskDistributor worker.TaskDistributor) {
