@@ -20,5 +20,6 @@ services:
     environment:
       - DB_SOURCE=postgresql://postgres:password@postgres:5432/shopping_mall?sslmode=disable
       - REDIS_ADDRESS=redis:6379
+      - GIN_MODE=release
     entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
     command: ["/app/main"]

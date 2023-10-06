@@ -24,7 +24,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      
+
       - name: Connect to AWS EC2
         run: |
           echo "$AWS_PRIVATE_KEY" > private_key && chmod 600 private_key
@@ -34,4 +34,3 @@ jobs:
             docker compose -f docker-compose-production.yml up -d &&
             docker compose ps
           "
-          
