@@ -9,7 +9,11 @@ FROM alpine:3.18
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY app.env .
+COPY start.sh .
 COPY db/migration ./db/migration
 
 EXPOSE 8080
 CMD [ "/app/main" ]
+
+# entrypoint 會把 cmd 的指令帶入其中
+ENTRYPOINT [ "/app/start.sh" ]
