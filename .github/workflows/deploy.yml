@@ -40,6 +40,7 @@ jobs:
           REPOSITORY: shopping-mall-go
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          cat app.env
           docker build -f Dockerfile-production.dockerfile --no-cache -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:latest
