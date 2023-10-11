@@ -45,13 +45,16 @@ jobs:
           docker push $REGISTRY/$REPOSITORY:latest
 
       - name: Connect to AWS EC2
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: shopping-mall-go
         run: |
           echo "$AWS_PRIVATE_KEY" > private_key && chmod 400 private_key
 
           scp -o StrictHostKeyChecking=no -i private_key ./docker-compose-production.yml ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
           ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} "
             docker-compose -f docker-compose-production.yml down &&
-            sudo docker rmi 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest -f &&
+            docker pull $REGISTRY/$REPOSITORY:latest &&
             docker-compose -f docker-compose-production.yml up -d &&
             docker-compose ps
           "
