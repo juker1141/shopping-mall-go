@@ -12,4 +12,3 @@ services:
     environment:
       - DB_SOURCE=postgresql://postgres:lScagw1wOoHlroKNUBEv@shopping-mall.c4l5ilqti7tc.ap-northeast-1.rds.amazonaws.com:5432/shopping_mall
       - REDIS_ADDRESS=redis:6379
-      - GIN_MODE=release
