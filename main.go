@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -24,11 +23,12 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config:")
 	}
-	fmt.Println(config.DBSource)
+
 	if config.Environment == "development" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
 
+	log.Info().Msg(config.DBSource)
 	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot connect to db:")
