@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -23,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config:")
 	}
-
+	fmt.Println(config.DBSource)
 	if config.Environment == "development" {
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
