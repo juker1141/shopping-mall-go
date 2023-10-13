@@ -77,21 +77,21 @@ func (server *Server) setupRouter() {
 }
 
 func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
-	// 使用者登入網頁
-	router.POST("/login", server.loginUser)
 	router.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
-			"status": "OK",
+			"status": "pong",
 		})
 	})
+	// 使用者登入網頁
+	router.POST("/login", server.loginUser)
 	// 登入後台
 	router.POST("/admin/login", server.loginAdminUser)
 	// Renew Token
-	router.POST("/admin/tokens/renewAccess", server.renewAccessToken)
+	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
 	// 會員 註冊
-	router.POST("/user", server.createUser)
+	router.POST("/member_user", server.createUser)
 	// 會員註冊驗證信 驗證
-	router.GET("/user/verifyEmail", server.VerifyEmail)
+	router.GET("/member_user/verify_email", server.VerifyEmail)
 }
 
 func (server *Server) setupAdminRoutes(router *gin.Engine) {
@@ -112,20 +112,20 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 管理者
-	adminRoutes.POST("/managerUser", server.createAdminUser)
-	adminRoutes.GET("/managerUsers", server.listAdminUsers)
-	adminRoutes.GET("/managerUser/:id", server.getAdminUser)
-	adminRoutes.PATCH("/managerUser/:id", server.updateAdminUser)
-	adminRoutes.DELETE("/managerUser/:id", server.deleteAdminUser)
+	adminRoutes.POST("/manager_user", server.createAdminUser)
+	adminRoutes.GET("/manager_users", server.listAdminUsers)
+	adminRoutes.GET("/manager_user/:id", server.getAdminUser)
+	adminRoutes.PATCH("/manager_user/:id", server.updateAdminUser)
+	adminRoutes.DELETE("/manager_user/:id", server.deleteAdminUser)
 
 	// 管理者刷新權限
-	adminRoutes.GET("/managerUser/info", server.getAdminUserInfo)
+	adminRoutes.GET("/manager_user/info", server.getAdminUserInfo)
 
 	// 會員資料
-	adminRoutes.GET("/memberUsers", server.listUsersByAdmin)
-	adminRoutes.GET("/memberUser/:id", server.getUserByAdmin)
-	adminRoutes.PATCH("/memberUser/:id", server.updateUserByAdmin)
-	adminRoutes.DELETE("/memberUser/:id", server.deleteUserByAdmin)
+	adminRoutes.GET("/member_users", server.listUsersByAdmin)
+	adminRoutes.GET("/member_user/:id", server.getUserByAdmin)
+	adminRoutes.PATCH("/member_user/:id", server.updateUserByAdmin)
+	adminRoutes.DELETE("/member_user/:id", server.deleteUserByAdmin)
 
 	// 商品
 	adminRoutes.POST("/product", server.createProduct)
@@ -143,7 +143,7 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// 取得訂單狀態
 	adminRoutes.GET("/order/statuses/option", server.listOrderStatusesOption)
 	// 付款方式
-	adminRoutes.GET("/order/payMethods/option", server.listPayMethodsOption)
+	adminRoutes.GET("/order/pay_methods/option", server.listPayMethodsOption)
 
 	// 優惠卷
 	adminRoutes.POST("/coupon", server.createCoupon)
@@ -167,7 +167,7 @@ func (server *Server) setupAuthRoutes(router *gin.Engine) {
 	// 取得訂單狀態
 	authRoutes.GET("/order/statuses/option", server.listOrderStatusesOption)
 	// 付款方式
-	authRoutes.GET("/order/payMethods/option", server.listPayMethodsOption)
+	authRoutes.GET("/order/pay_methods/option", server.listPayMethodsOption)
 }
 
 // Start runs the HTTP server on a specific address

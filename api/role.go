@@ -12,7 +12,7 @@ import (
 
 type createRoleRequest struct {
 	Name          string  `json:"name" binding:"required"`
-	PermissionsID []int64 `json:"permissionsId" binding:"required"`
+	PermissionsID []int64 `json:"permissions_id" binding:"required"`
 }
 
 func (server *Server) createRole(ctx *gin.Context) {
@@ -42,7 +42,7 @@ type roleRoutesUri struct {
 
 type updateRoleRequest struct {
 	Name          string   `json:"name"`
-	PermissionsID *[]int64 `json:"permissionsId"`
+	PermissionsID *[]int64 `json:"permissions_id"`
 }
 
 func (server *Server) updateRole(ctx *gin.Context) {
@@ -91,12 +91,12 @@ func (server *Server) updateRole(ctx *gin.Context) {
 
 type listRolesQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 type RoleResponse struct {
 	db.Role
-	PermissionList []db.Permission `json:"permissionList"`
+	PermissionList []db.Permission `json:"permission_list"`
 }
 
 type listRolesResponse struct {

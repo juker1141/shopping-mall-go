@@ -23,23 +23,23 @@ var defaultAvaterPath = filepath.Join("static", "avatar_images", "default_avatar
 type createUserRequest struct {
 	Account         string                `form:"account" binding:"required,alphanum,min=8"`
 	Email           string                `form:"email" binding:"required,email"`
-	FullName        string                `form:"fullName" binding:"required,min=2,fullName"`
+	FullName        string                `form:"full_name" binding:"required,min=2,fullName"`
 	Password        string                `form:"password" binding:"required,min=8"`
-	GenderId        int32                 `form:"genderId" binding:"required,number"`
+	GenderId        int32                 `form:"gender_id" binding:"required,number"`
 	Cellphone       string                `form:"cellphone" binding:"required,cellPhone"`
 	Address         string                `form:"address" binding:"required"`
-	ShippingAddress string                `form:"shippingAddress" binding:"required"`
-	PostCode        string                `form:"postCode" binding:"required"`
+	ShippingAddress string                `form:"shipping_address" binding:"required"`
+	PostCode        string                `form:"post_code" binding:"required"`
 	Status          int32                 `form:"status" binding:"required,number"`
-	AvatarFile      *multipart.FileHeader `form:"avatarFile"`
+	AvatarFile      *multipart.FileHeader `form:"avatar_file"`
 }
 
 type userResponse struct {
 	ID        int64  `json:"id"`
 	Account   string `json:"account"`
 	Email     string `json:"email"`
-	FullName  string `json:"fullName"`
-	AvatarUrl string `json:"avatarUrl"`
+	FullName  string `json:"full_name"`
+	AvatarUrl string `json:"avatar_url"`
 }
 
 func newUserResponse(user db.User) userResponse {
@@ -98,7 +98,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 	}
 
 	if req.AvatarFile != nil {
-		file, err := ctx.FormFile("avatarFile")
+		file, err := ctx.FormFile("avatar_file")
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
@@ -165,17 +165,17 @@ type userResponseForAdmin struct {
 	ID                int64       `json:"id"`
 	Account           string      `json:"account"`
 	Email             string      `json:"email"`
-	FullName          string      `json:"fullName"`
-	GenderID          pgtype.Int4 `json:"genderId"`
+	FullName          string      `json:"full_name"`
+	GenderID          pgtype.Int4 `json:"gender_id"`
 	Cellphone         string      `json:"cellphone"`
 	Address           string      `json:"address"`
-	ShippingAddress   string      `json:"shippingAddress"`
-	PostCode          string      `json:"postCode"`
-	HashedPassword    string      `json:"hashedPassword"`
+	ShippingAddress   string      `json:"shipping_address"`
+	PostCode          string      `json:"post_code"`
+	HashedPassword    string      `json:"hashed_password"`
 	Status            int32       `json:"status"`
-	AvatarUrl         string      `json:"avatarUrl"`
-	PasswordChangedAt time.Time   `json:"passwordChangedAt"`
-	CreatedAt         time.Time   `json:"createdAt"`
+	AvatarUrl         string      `json:"avatar_url"`
+	PasswordChangedAt time.Time   `json:"password_changed_at"`
+	CreatedAt         time.Time   `json:"created_at"`
 }
 
 func newUserResponseForAdmin(user db.User) userResponseForAdmin {
@@ -201,15 +201,15 @@ type userRoutesUri struct {
 }
 
 type updateUserRequest struct {
-	FullName        string                `form:"fullName"`
-	OldPassword     string                `form:"oldPassword"`
-	NewPassword     string                `form:"newPassword"`
+	FullName        string                `form:"full_name"`
+	OldPassword     string                `form:"old_password"`
+	NewPassword     string                `form:"new_password"`
 	Cellphone       string                `form:"cellphone"`
 	Address         string                `form:"address"`
-	ShippingAddress string                `form:"shippingAddress"`
-	PostCode        string                `form:"postCode"`
+	ShippingAddress string                `form:"shipping_address"`
+	PostCode        string                `form:"post_code"`
 	Status          *int32                `form:"status"`
-	AvatarFile      *multipart.FileHeader `form:"avatarFile"`
+	AvatarFile      *multipart.FileHeader `form:"avatar_file"`
 }
 
 func (server *Server) updateUserByAdmin(ctx *gin.Context) {
@@ -319,7 +319,7 @@ func (server *Server) updateUserByAdmin(ctx *gin.Context) {
 	}
 
 	if req.AvatarFile != nil {
-		file, err := ctx.FormFile("avatarFile")
+		file, err := ctx.FormFile("avatar_file")
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
@@ -393,7 +393,7 @@ func (server *Server) getUserByAdmin(ctx *gin.Context) {
 
 type listUsersQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 type listUsersResponse struct {
@@ -468,8 +468,8 @@ type loginUserRequest struct {
 }
 
 type loginUserResponse struct {
-	AccessToken          string       `json:"accessToken"`
-	AccessTokenExpiresAt time.Time    `json:"accessTokenExpiresAt"`
+	AccessToken          string       `json:"access_token"`
+	AccessTokenExpiresAt time.Time    `json:"access_token_expires_at"`
 	User                 userResponse `json:"user"`
 }
 

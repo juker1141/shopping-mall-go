@@ -8,12 +8,12 @@ import (
 )
 
 type VerifyEmailQuery struct {
-	EmailID    int64  `form:"emailId" binding:"required,min=1"`
-	SecretCode string `form:"secretCode" binding:"required,min=32,max=128"`
+	EmailID    int64  `form:"email_id" binding:"required,min=1"`
+	SecretCode string `form:"secret_code" binding:"required,min=32,max=128"`
 }
 
 type VerifyEmailResponse struct {
-	IsVerified bool `json:"isVerified"`
+	IsVerified bool `json:"is_verified"`
 }
 
 func (server *Server) VerifyEmail(ctx *gin.Context) {

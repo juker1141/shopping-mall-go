@@ -12,13 +12,13 @@ import (
 )
 
 type createOrderRequest struct {
-	FullName        string                    `json:"fullName" binding:"required,fullName"`
+	FullName        string                    `json:"full_name" binding:"required,fullName"`
 	Email           string                    `json:"email" binding:"required"`
-	ShippingAddress string                    `json:"shippingAddress" binding:"required"`
+	ShippingAddress string                    `json:"shipping_address" binding:"required"`
 	Message         string                    `json:"message"`
-	PayMethodID     int64                     `json:"payMethodId" binding:"required"`
-	OrderProducts   []db.OrderTxProductParams `json:"orderProducts" binding:"required,min=1"`
-	CouponID        int64                     `json:"couponId"`
+	PayMethodID     int64                     `json:"pay_method_id" binding:"required"`
+	OrderProducts   []db.OrderTxProductParams `json:"order_products" binding:"required,min=1"`
+	CouponID        int64                     `json:"coupon_id"`
 }
 
 func (server *Server) createOrder(ctx *gin.Context) {
@@ -155,7 +155,7 @@ func (server *Server) getOrder(ctx *gin.Context) {
 
 type listOrdersQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 type listOrdersResponse struct {
@@ -272,13 +272,13 @@ func (server *Server) listOrders(ctx *gin.Context) {
 }
 
 type updateOrderRequest struct {
-	FullName        string                    `json:"fullName" binding:"required,fullName"`
+	FullName        string                    `json:"full_name" binding:"required,fullName"`
 	Email           string                    `json:"email" binding:"required"`
-	ShippingAddress string                    `json:"shippingAddress" binding:"required"`
+	ShippingAddress string                    `json:"shipping_address" binding:"required"`
 	Message         string                    `json:"message"`
-	PayMethodID     int64                     `json:"payMethodId" binding:"required"`
-	OrderProducts   []db.OrderTxProductParams `json:"orderProducts" binding:"required,min=1"`
-	CouponID        int64                     `json:"couponId"`
+	PayMethodID     int64                     `json:"pay_method_id" binding:"required"`
+	OrderProducts   []db.OrderTxProductParams `json:"order_products" binding:"required,min=1"`
+	CouponID        int64                     `json:"coupon_id"`
 }
 
 func (server *Server) updateOrder(ctx *gin.Context) {

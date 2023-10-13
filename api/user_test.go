@@ -85,16 +85,16 @@ func TestCreateUserAPI(t *testing.T) {
 	cart := randomCart(user.Account)
 
 	templateBody := gin.H{
-		"account":         user.Account,
-		"email":           user.Email,
-		"fullName":        user.FullName,
-		"password":        password,
-		"genderId":        user.GenderID.Int32,
-		"cellphone":       user.Cellphone,
-		"address":         user.Address,
-		"shippingAddress": user.ShippingAddress,
-		"postCode":        user.PostCode,
-		"status":          user.Status,
+		"account":          user.Account,
+		"email":            user.Email,
+		"full_name":        user.FullName,
+		"password":         password,
+		"gender_id":        user.GenderID.Int32,
+		"cellphone":        user.Cellphone,
+		"address":          user.Address,
+		"shipping_address": user.ShippingAddress,
+		"post_code":        user.PostCode,
+		"status":           user.Status,
 	}
 
 	testCases := []struct {
@@ -262,16 +262,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         "invalid-user#1",
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          "invalid-user#1",
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -292,16 +292,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        "invalid_FullName#@",
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        "invalid_FullName#@",
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -322,16 +322,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        "psw",
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         "psw",
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -352,16 +352,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           "invalidEmail",
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          user.Account,
+				"email":            "invalidEmail",
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -382,16 +382,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        4,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        4,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				arg := db.CreateUserTxParams{
@@ -431,16 +431,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       "123456789",
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          user.Status,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        "123456789",
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           user.Status,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -461,16 +461,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          "0",
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           "0",
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -491,16 +491,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.gif",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          1,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           1,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -521,16 +521,16 @@ func TestCreateUserAPI(t *testing.T) {
 			fileType:       "other",
 			fileName:       "fake_avatar.pdf",
 			body: gin.H{
-				"account":         user.Account,
-				"email":           user.Email,
-				"fullName":        user.FullName,
-				"password":        password,
-				"genderId":        user.GenderID.Int32,
-				"cellphone":       user.Cellphone,
-				"address":         user.Address,
-				"shippingAddress": user.ShippingAddress,
-				"postCode":        user.PostCode,
-				"status":          1,
+				"account":          user.Account,
+				"email":            user.Email,
+				"full_name":        user.FullName,
+				"password":         password,
+				"gender_id":        user.GenderID.Int32,
+				"cellphone":        user.Cellphone,
+				"address":          user.Address,
+				"shipping_address": user.ShippingAddress,
+				"post_code":        user.PostCode,
+				"status":           1,
 			},
 			buildStubs: func(store *mockdb.MockStore, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
@@ -578,9 +578,9 @@ func TestCreateUserAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "avatarFile", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "avatar_file", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("avatarFile", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("avatar_file", tc.fileName)
 				}
 
 				require.NoError(t, err)
@@ -593,7 +593,7 @@ func TestCreateUserAPI(t *testing.T) {
 			// 結束FormData
 			writer.Close()
 
-			url := "/user"
+			url := "/member_user"
 			request, err := http.NewRequest(http.MethodPost, url, body)
 			require.NoError(t, err)
 			request.Header.Set("Content-Type", writer.FormDataContentType())
@@ -660,14 +660,14 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 	invalidStatus := int32(3)
 
 	templateBody := gin.H{
-		"fullName":        newName,
-		"cellphone":       newPhone,
-		"address":         newAddress,
-		"shippingAddress": newAddress,
-		"postCode":        newPostCode,
-		"status":          newStatus,
-		"oldPassword":     password,
-		"newPassword":     newPassword,
+		"full_name":        newName,
+		"cellphone":        newPhone,
+		"address":          newAddress,
+		"shipping_address": newAddress,
+		"post_code":        newPostCode,
+		"status":           newStatus,
+		"old_password":     password,
+		"new_password":     newPassword,
 	}
 
 	testCases := []struct {
@@ -743,12 +743,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"fullName":        newName,
-				"cellphone":       newPhone,
-				"address":         newAddress,
-				"shippingAddress": newAddress,
-				"postCode":        newPostCode,
-				"status":          newStatus,
+				"full_name":        newName,
+				"cellphone":        newPhone,
+				"address":          newAddress,
+				"shipping_address": newAddress,
+				"post_code":        newPostCode,
+				"status":           newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -800,8 +800,8 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -860,12 +860,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"fullName":        newName,
-				"cellphone":       newPhone,
-				"address":         newAddress,
-				"shippingAddress": newAddress,
-				"postCode":        newPostCode,
-				"status":          newStatus,
+				"full_name":        newName,
+				"cellphone":        newPhone,
+				"address":          newAddress,
+				"shipping_address": newAddress,
+				"post_code":        newPostCode,
+				"status":           newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -885,12 +885,12 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"fullName":        newName,
-				"cellphone":       newPhone,
-				"address":         newAddress,
-				"shippingAddress": newAddress,
-				"postCode":        newPostCode,
-				"status":          newStatus,
+				"full_name":        newName,
+				"cellphone":        newPhone,
+				"address":          newAddress,
+				"shipping_address": newAddress,
+				"post_code":        newPostCode,
+				"status":           newStatus,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -936,7 +936,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"fullName": "invalid-name",
+				"full_name": "invalid-name",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1072,8 +1072,8 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			fileType:       "image",
 			fileName:       "fake_avatar.png",
 			body: gin.H{
-				"newPassword": "aa345678",
-				"oldPassword": "za345678",
+				"new_password": "aa345678",
+				"old_password": "za345678",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1126,9 +1126,9 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 				var err error
 
 				if tc.fileType == "image" {
-					fileWriter, err = CreateImageFormFile(writer, "avatarFile", tc.fileName)
+					fileWriter, err = CreateImageFormFile(writer, "avatar_file", tc.fileName)
 				} else {
-					fileWriter, err = writer.CreateFormFile("avatarFile", tc.fileName)
+					fileWriter, err = writer.CreateFormFile("avatar_file", tc.fileName)
 				}
 
 				require.NoError(t, err)
@@ -1141,7 +1141,7 @@ func TestUpdateUserByAdminAPI(t *testing.T) {
 			// 結束FormData
 			writer.Close()
 
-			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/member_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodPatch, url, body)
 			require.NoError(t, err)
 			request.Header.Set("Content-Type", writer.FormDataContentType())
@@ -1281,7 +1281,7 @@ func TestGetUserByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/member_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -1483,13 +1483,13 @@ func TestListUsersByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/memberUsers"
+			url := "/admin/member_users"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
@@ -1627,7 +1627,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/memberUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/member_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 

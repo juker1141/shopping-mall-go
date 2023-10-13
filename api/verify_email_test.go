@@ -106,13 +106,13 @@ func TestVerifyEmailAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := "/user/verifyEmail"
+			url := "/member_user/verify_email"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
 			q := request.URL.Query()
-			q.Add("emailId", fmt.Sprintf("%d", tc.query.emailId))
-			q.Add("secretCode", tc.query.secretCode)
+			q.Add("email_id", fmt.Sprintf("%d", tc.query.emailId))
+			q.Add("secret_code", tc.query.secretCode)
 			request.URL.RawQuery = q.Encode()
 
 			server.router.ServeHTTP(recorder, request)
