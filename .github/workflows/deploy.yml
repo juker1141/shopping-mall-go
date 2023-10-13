@@ -54,6 +54,6 @@ jobs:
           scp -o StrictHostKeyChecking=no -i private_key ./docker-compose-production.yml ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
           scp -o StrictHostKeyChecking=no -i private_key ./deploy-docker.sh ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
           ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} "
-            chmod +x ./deploy-docker.sh &&
+            sudo chmod +x ./deploy-docker.sh &&
             sudo ./deploy-docker.sh $REGISTRY $REPOSITORY
           "
