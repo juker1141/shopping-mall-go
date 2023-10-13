@@ -21,28 +21,14 @@ type createProductRequest struct {
 	Category    string                `form:"category" binding:"required"`
 	Description string                `form:"description" binding:"required"`
 	Content     string                `form:"content" binding:"required"`
-	OriginPrice int32                 `form:"originPrice" binding:"required"`
+	OriginPrice int32                 `form:"origin_price" binding:"required"`
 	Price       int32                 `form:"price" binding:"required"`
 	Unit        string                `form:"unit" binding:"required"`
 	Status      int32                 `form:"status" binding:"required"`
-	ImageFile   *multipart.FileHeader `form:"imageFile"`
-	ImageUrl    string                `form:"imageUrl"`
-	ImagesUrl   *[]string             `form:"imagesUrl"`
+	ImageFile   *multipart.FileHeader `form:"image_file"`
+	ImageUrl    string                `form:"image_url"`
+	ImagesUrl   *[]string             `form:"images_url"`
 }
-
-// type productResponse struct {
-// 	Title       string   `json:"title"`
-// 	Category    string   `json:"category"`
-// 	Description string   `json:"description"`
-// 	Content     string   `json:"content"`
-// 	OriginPrice int32    `json:"originPrice"`
-// 	Price       int32    `json:"price"`
-// 	Unit        string   `json:"unit"`
-// 	Status      int32    `json:"status"`
-// 	ImageUrl    string   `json:"imageUrl"`
-// 	ImagesUrl   []string `json:"imagesUrl"`
-// 	CreatedBy   string   `json:"createdBy"`
-// }
 
 func (server *Server) createProduct(ctx *gin.Context) {
 	var req createProductRequest
@@ -84,7 +70,7 @@ func (server *Server) createProduct(ctx *gin.Context) {
 	}
 
 	if req.ImageFile != nil {
-		file, err := ctx.FormFile("imageFile")
+		file, err := ctx.FormFile("image_file")
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return
@@ -135,7 +121,7 @@ func (server *Server) createProduct(ctx *gin.Context) {
 
 type listProductsQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 type listProductsResponse struct {
@@ -184,13 +170,13 @@ type updateProductRequest struct {
 	Category    string                `form:"category"`
 	Description string                `form:"description"`
 	Content     string                `form:"content"`
-	OriginPrice int32                 `form:"originPrice"`
+	OriginPrice int32                 `form:"origin_price"`
 	Price       int32                 `form:"price"`
 	Unit        string                `form:"unit"`
 	Status      *int32                `form:"status"`
-	ImageFile   *multipart.FileHeader `form:"imageFile"`
-	ImageUrl    string                `form:"imageUrl"`
-	ImagesUrl   *[]string             `form:"imagesUrl"`
+	ImageFile   *multipart.FileHeader `form:"image_file"`
+	ImageUrl    string                `form:"image_url"`
+	ImagesUrl   *[]string             `form:"images_url"`
 }
 
 func (server *Server) updateProduct(ctx *gin.Context) {
@@ -277,7 +263,7 @@ func (server *Server) updateProduct(ctx *gin.Context) {
 	}
 
 	if req.ImageFile != nil {
-		file, err := ctx.FormFile("imageFile")
+		file, err := ctx.FormFile("image_file")
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return

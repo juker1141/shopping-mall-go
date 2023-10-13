@@ -8,7 +8,7 @@ import (
 )
 
 type listPayMethodsOptionResponse struct {
-	PayMethods []db.PayMethod `json:"payMethods"`
+	PayMethods []db.PayMethod `json:"pay_methods"`
 }
 
 func (server *Server) listPayMethodsOption(ctx *gin.Context) {

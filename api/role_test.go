@@ -41,8 +41,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "OK",
 			body: gin.H{
-				"name":          role.Name,
-				"permissionsId": permissionsID,
+				"name":           role.Name,
+				"permissions_id": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -68,8 +68,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "NoAuthorization",
 			body: gin.H{
-				"name":          role.Name,
-				"permissionsId": permissionsID,
+				"name":           role.Name,
+				"permissions_id": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -85,8 +85,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "NoRequiredPermission",
 			body: gin.H{
-				"name":          role.Name,
-				"permissionsId": permissionsID,
+				"name":           role.Name,
+				"permissions_id": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -105,8 +105,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
-				"name":          role.Name,
-				"permissionsId": permissionsID,
+				"name":           role.Name,
+				"permissions_id": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -131,8 +131,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "InvalidJSONName",
 			body: gin.H{
-				"name":          "",
-				"permissionsId": permissionsID,
+				"name":           "",
+				"permissions_id": permissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -151,8 +151,8 @@ func TestCreateRoleAPI(t *testing.T) {
 		{
 			name: "InvalidJSONPermissionsID",
 			body: gin.H{
-				"name":          role.Name,
-				"permissionsId": nil,
+				"name":           role.Name,
+				"permissions_id": nil,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -222,8 +222,8 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "OK",
 			ID:   role.ID,
 			body: gin.H{
-				"name":          updateRoleName,
-				"permissionsId": updatedPermissionsID,
+				"name":           updateRoleName,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -251,8 +251,8 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "NoAuthorization",
 			ID:   role.ID,
 			body: gin.H{
-				"name":          updateRoleName,
-				"permissionsId": updatedPermissionsID,
+				"name":           updateRoleName,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -269,8 +269,8 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "NoRequiredPermission",
 			ID:   role.ID,
 			body: gin.H{
-				"name":          updateRoleName,
-				"permissionsId": updatedPermissionsID,
+				"name":           updateRoleName,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -317,7 +317,7 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "OnlyUpdateRolePermission",
 			ID:   role.ID,
 			body: gin.H{
-				"permissionsId": updatedPermissionsID,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -344,8 +344,8 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "InternalError",
 			ID:   role.ID,
 			body: gin.H{
-				"name":          updateRoleName,
-				"permissionsId": updatedPermissionsID,
+				"name":           updateRoleName,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -366,8 +366,8 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "ErrorID",
 			ID:   -1,
 			body: gin.H{
-				"name":          updateRoleName,
-				"permissionsId": updatedPermissionsID,
+				"name":           updateRoleName,
+				"permissions_id": updatedPermissionsID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -387,7 +387,7 @@ func TestUpdateRoleAPI(t *testing.T) {
 			name: "InvalidPermissionsIDLength",
 			ID:   role.ID,
 			body: gin.H{
-				"permissionsId": []int64{},
+				"permissions_id": []int64{},
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -612,7 +612,7 @@ func TestListRolesAPI(t *testing.T) {
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)

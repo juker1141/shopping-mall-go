@@ -107,7 +107,7 @@ func TestListPayMethodsOption(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/order/payMethods/option"
+			url := "/admin/order/pay_methods/option"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
