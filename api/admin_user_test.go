@@ -64,11 +64,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "OK",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -107,11 +107,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "NoAuthorization",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -127,11 +127,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "NoRequiredPermission",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -150,11 +150,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -178,11 +178,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "DuplicateAccount",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -207,11 +207,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "InvalidUsername",
 			body: gin.H{
-				"account":  "invalid-user#1",
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   "invalid-user#1",
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -234,11 +234,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "InvalidFullName",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": "invalid_FullName#@",
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": "invalid_FullName#@",
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -261,11 +261,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "TooShortPassword",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": "psw",
-				"status":   adminUser.Status,
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  "psw",
+				"status":    adminUser.Status,
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -288,11 +288,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "InvalidStatusInput",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   "1",
-				"roleId":   role.ID,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    "1",
+				"role_id":   role.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -315,11 +315,11 @@ func TestCreateAdminUserAPI(t *testing.T) {
 		{
 			name: "RoleIDNotFound",
 			body: gin.H{
-				"account":  adminUser.Account,
-				"fullName": adminUser.FullName,
-				"password": password,
-				"status":   adminUser.Status,
-				"roleId":   0,
+				"account":   adminUser.Account,
+				"full_name": adminUser.FullName,
+				"password":  password,
+				"status":    adminUser.Status,
+				"role_id":   0,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -357,7 +357,7 @@ func TestCreateAdminUserAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/admin/managerUser"
+			url := "/admin/manager_user"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -522,7 +522,7 @@ func TestGetAdminUserAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/managerUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -668,7 +668,7 @@ func TestGetAdminUserInfoAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/managerUser/info"
+			url := "/admin/manager_user/info"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
@@ -850,13 +850,13 @@ func TestListAdminUsersAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := "/admin/managerUsers"
+			url := "/admin/manager_users"
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
 			q := request.URL.Query()
 			q.Add("page", fmt.Sprintf("%d", tc.query.page))
-			q.Add("pageSize", fmt.Sprintf("%d", tc.query.pageSize))
+			q.Add("page_size", fmt.Sprintf("%d", tc.query.pageSize))
 			request.URL.RawQuery = q.Encode()
 
 			tc.setupAuth(t, request, server.tokenMaker)
@@ -925,11 +925,11 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "OK",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName":    newName,
-				"status":      newStatus,
-				"roleId":      int64(newRoleID.Int32),
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"full_name":    newName,
+				"status":       newStatus,
+				"role_id":      int64(newRoleID.Int32),
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -987,11 +987,11 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "NoAuthorization",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName":    newName,
-				"status":      &newStatus,
-				"roleId":      newRole.ID,
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"full_name":    newName,
+				"status":       &newStatus,
+				"role_id":      newRole.ID,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
@@ -1016,11 +1016,11 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "NoRequiredPermission",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName":    newName,
-				"status":      &newStatus,
-				"roleId":      newRole.ID,
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"full_name":    newName,
+				"status":       &newStatus,
+				"role_id":      newRole.ID,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1048,7 +1048,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "OnlyUpdateFullName",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName": newName,
+				"full_name": newName,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1119,7 +1119,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "OnlyUpdateRolesID",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"roleId": newRole.ID,
+				"role_id": newRole.ID,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1156,8 +1156,8 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "OnlyUpdatePassword",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1215,11 +1215,11 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "NotFoundWithPassword",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName":    newName,
-				"status":      &newStatus,
-				"roleId":      newRole.ID,
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"full_name":    newName,
+				"status":       &newStatus,
+				"role_id":      newRole.ID,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1244,11 +1244,11 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "InternalErrror",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName":    newName,
-				"status":      &newStatus,
-				"roleId":      role.ID,
-				"oldPassword": password,
-				"newPassword": newPassword,
+				"full_name":    newName,
+				"status":       &newStatus,
+				"role_id":      role.ID,
+				"old_password": password,
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1301,7 +1301,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "InvalidFullName",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"fullName": "Invalid$#123",
+				"full_name": "Invalid$#123",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1349,8 +1349,8 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			name: "WrongPassword",
 			ID:   adminUser.ID,
 			body: gin.H{
-				"oldPassword": "12345678",
-				"newPassword": newPassword,
+				"old_password": "12345678",
+				"new_password": newPassword,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 				addAuthorization(t, request, tokenMaker, authorizationTypeBearer, "user", time.Minute)
@@ -1397,7 +1397,7 @@ func TestUpdateAdminUserAPI(t *testing.T) {
 			jsonData, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := fmt.Sprintf("/admin/managerUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(jsonData))
 			require.NoError(t, err)
 
@@ -1520,7 +1520,7 @@ func TestDeleteAdminUserAPI(t *testing.T) {
 			server := newTestServer(t, store, nil)
 			recorder := httptest.NewRecorder()
 
-			url := fmt.Sprintf("/admin/managerUser/%d", tc.ID)
+			url := fmt.Sprintf("/admin/manager_user/%d", tc.ID)
 			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 
