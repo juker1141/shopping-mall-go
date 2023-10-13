@@ -55,9 +55,11 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} "
             sudo mkdir -p /home/ec2-user/shopping-mall-go &&
             sudo mv /home/ec2-user/docker-compose-production.yml /home/ec2-user/shopping-mall-go/docker-compose.yml &&
+            
+            sudo cd /home/ec2-user/shopping-mall-go &&
 
             aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com &&
             docker rmi $REGISTRY/$REPOSITORY:latest -f &&
-            docker-compose -f shopping-mall-go/docker-compose.yml down &&
-            docker-compose -f shopping-mall-go/docker-compose.yml up -d
+            docker-compose down &&
+            docker-compose up -d
           "
