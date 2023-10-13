@@ -2,6 +2,8 @@ version: "3"
 services:
   redis:
     image: redis:7-alpine
+    networks:
+      - ec2-network
 
   api:
     image: 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com/shopping-mall-go:latest
@@ -9,6 +11,8 @@ services:
       - "8080:8080"
     depends_on:
       - redis
+    networks:
+      - ec2-network
     environment:
       - REDIS_ADDRESS=redis:6379
       - GIN_MODE=release
