@@ -17,8 +17,8 @@ type createCouponRequest struct {
 	Title     string    `json:"title" binding:"required"`
 	Code      string    `json:"code" binding:"required"`
 	Percent   int32     `json:"percent" binding:"required"`
-	StartAt   time.Time `json:"startAt"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	StartAt   time.Time `json:"start_at"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 func (server *Server) createCoupon(ctx *gin.Context) {
@@ -83,8 +83,8 @@ type updateCouponRequest struct {
 	Title     string    `json:"title"`
 	Code      string    `json:"code"`
 	Percent   int32     `json:"percent"`
-	StartAt   time.Time `json:"startAt"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	StartAt   time.Time `json:"start_at"`
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 func (server *Server) updateCoupon(ctx *gin.Context) {
@@ -158,7 +158,7 @@ func (server *Server) updateCoupon(ctx *gin.Context) {
 
 type listCouponsQuery struct {
 	Page     int32 `form:"page" binding:"required,min=1"`
-	PageSize int32 `form:"pageSize" binding:"required,min=5,max=10"`
+	PageSize int32 `form:"page_size" binding:"required,min=5,max=10"`
 }
 
 type listCouponsResponse struct {

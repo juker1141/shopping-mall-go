@@ -89,9 +89,9 @@ func (server *Server) setupNoAuthRoutes(router *gin.Engine) {
 	// Renew Token
 	router.POST("/admin/tokens/renew_access", server.renewAccessToken)
 	// 會員 註冊
-	router.POST("/user", server.createUser)
+	router.POST("/member_user", server.createUser)
 	// 會員註冊驗證信 驗證
-	router.GET("/user/verify_email", server.VerifyEmail)
+	router.GET("/member_user/verify_email", server.VerifyEmail)
 }
 
 func (server *Server) setupAdminRoutes(router *gin.Engine) {
@@ -112,14 +112,14 @@ func (server *Server) setupAdminRoutes(router *gin.Engine) {
 	// adminRoutes.DELETE("/role/:id", server.deleteRole)
 
 	// 管理者
-	adminRoutes.POST("/member_user", server.createAdminUser)
-	adminRoutes.GET("/member_users", server.listAdminUsers)
-	adminRoutes.GET("/member_user/:id", server.getAdminUser)
-	adminRoutes.PATCH("/member_user/:id", server.updateAdminUser)
-	adminRoutes.DELETE("/member_user/:id", server.deleteAdminUser)
+	adminRoutes.POST("/manager_user", server.createAdminUser)
+	adminRoutes.GET("/manager_users", server.listAdminUsers)
+	adminRoutes.GET("/manager_user/:id", server.getAdminUser)
+	adminRoutes.PATCH("/manager_user/:id", server.updateAdminUser)
+	adminRoutes.DELETE("/manager_user/:id", server.deleteAdminUser)
 
 	// 管理者刷新權限
-	adminRoutes.GET("/member_user/info", server.getAdminUserInfo)
+	adminRoutes.GET("/manager_user/info", server.getAdminUserInfo)
 
 	// 會員資料
 	adminRoutes.GET("/member_users", server.listUsersByAdmin)
