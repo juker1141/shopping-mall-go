@@ -11,6 +11,7 @@ COPY --from=builder /app/main .
 COPY app.env .
 COPY start.sh .
 COPY wait-for.sh .
+COPY static/default_avatar.png ./static
 COPY db/migration ./db/migration
 
 EXPOSE 8080
