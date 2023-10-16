@@ -16,6 +16,8 @@ services:
     environment:
       - REDIS_ADDRESS=redis:6379
       - GIN_MODE=release
+    volumes:
+      - ./static:/app/static
 
 networks:
   ec2-network:
