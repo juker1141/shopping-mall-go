@@ -1,4 +1,4 @@
 .git
 *.DS_Store
 *.log
-static
+api/static
