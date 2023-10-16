@@ -10,7 +10,8 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY app.env .
 COPY start.sh .
-COPY temp/avatar_images/default_avatar.png ./static/avatar_images/default_avatar.png
+RUN mkdir -p ./static/avatar_images/
+COPY temp/default_avatar.png ./static/avatar_images/default_avatar.png
 COPY db/migration ./db/migration
 
 EXPOSE 8080

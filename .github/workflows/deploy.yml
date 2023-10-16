@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build image
+    name: Build image and Deploy on Ec2
     runs-on: ubuntu-latest
     env:
       AWS_USER: ${{ secrets.AWS_USER }}
