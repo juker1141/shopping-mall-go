@@ -52,9 +52,13 @@ jobs:
           echo "$AWS_PRIVATE_KEY" > private_key && chmod 400 private_key
 
           scp -o StrictHostKeyChecking=no -i private_key ./docker-compose-production.yml ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
+          scp -o StrictHostKeyChecking=no -i private_key ./temp/default_avatar.png ${AWS_USER}@${AWS_SERVER}:/home/ec2-user
+
           ssh -o StrictHostKeyChecking=no -i private_key ${AWS_USER}@${AWS_SERVER} "
             sudo mkdir -p /home/ec2-user/shopping-mall-go &&
+            sudo mkdir -p /home/ec2-user/shopping-mall-go/static/avatar_images &&
             sudo mv /home/ec2-user/docker-compose-production.yml /home/ec2-user/shopping-mall-go/docker-compose.yml &&
+            sudo mv /home/ec2-user/default_avatar.png /home/ec2-user/shopping-mall-go/static/avatar_images/default_avatar.png &&
 
             aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 617893088694.dkr.ecr.ap-northeast-1.amazonaws.com &&
             docker rmi $REGISTRY/$REPOSITORY:latest -f || true
