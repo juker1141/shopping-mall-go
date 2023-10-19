@@ -171,7 +171,6 @@ type userResponseForAdmin struct {
 	Address           string      `json:"address"`
 	ShippingAddress   string      `json:"shipping_address"`
 	PostCode          string      `json:"post_code"`
-	HashedPassword    string      `json:"hashed_password"`
 	Status            int32       `json:"status"`
 	AvatarUrl         string      `json:"avatar_url"`
 	PasswordChangedAt time.Time   `json:"password_changed_at"`
