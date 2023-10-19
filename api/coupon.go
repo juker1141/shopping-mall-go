@@ -16,7 +16,7 @@ import (
 type createCouponRequest struct {
 	Title     string    `json:"title" binding:"required"`
 	Code      string    `json:"code" binding:"required"`
-	Percent   int32     `json:"percent" binding:"required"`
+	Percent   int       `json:"percent" binding:"required"`
 	StartAt   time.Time `json:"start_at"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
@@ -45,7 +45,7 @@ func (server *Server) createCoupon(ctx *gin.Context) {
 	arg := db.CreateCouponParams{
 		Title:     req.Title,
 		Code:      req.Code,
-		Percent:   req.Percent,
+		Percent:   int32(req.Percent),
 		CreatedBy: typePayload.Account,
 	}
 
@@ -82,7 +82,7 @@ type couponRoutesUri struct {
 type updateCouponRequest struct {
 	Title     string    `json:"title"`
 	Code      string    `json:"code"`
-	Percent   int32     `json:"percent"`
+	Percent   int       `json:"percent"`
 	StartAt   time.Time `json:"start_at"`
 	ExpiresAt time.Time `json:"expires_at"`
 }
@@ -120,7 +120,7 @@ func (server *Server) updateCoupon(ctx *gin.Context) {
 
 	if req.Percent > 0 {
 		arg.Percent = pgtype.Int4{
-			Int32: req.Percent,
+			Int32: int32(req.Percent),
 			Valid: true,
 		}
 	}
