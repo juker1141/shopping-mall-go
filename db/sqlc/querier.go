@@ -35,6 +35,7 @@ type Querier interface {
 	DeleteCart(ctx context.Context, id int64) error
 	DeleteCartCouponByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartCouponByCouponId(ctx context.Context, couponID pgtype.Int4) error
+	DeleteCartProduct(ctx context.Context, arg DeleteCartProductParams) error
 	DeleteCartProductByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartProductByProductId(ctx context.Context, productID pgtype.Int4) error
 	DeleteCoupon(ctx context.Context, id int64) error

@@ -161,6 +161,8 @@ func (server *Server) setupAuthRoutes(router *gin.Engine) {
 	// 前台使用者
 	// authRoutes.PATCH("/user/:id", server.updateUser)
 
+	// 新增至購物車
+	authRoutes.PATCH("/cart", server.updateCart)
 	// 會員 下訂單
 	authRoutes.POST("/order", server.createOrder)
 

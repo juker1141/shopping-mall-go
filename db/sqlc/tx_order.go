@@ -35,6 +35,7 @@ type OrderTxResult struct {
 	Order
 	ProductList []OrderTxProductResult `json:"product_list"`
 	Status      OrderStatus            `json:"status"`
+	PayMethod   PayMethod              `json:"pay_method"`
 }
 
 // It creates a order, orderUser, orderProduct, orderCoupon, and get orderStatus within a single database trasaction
@@ -116,6 +117,11 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 
 		// 取得訂單狀態
 		result.Status, err = q.GetOrderStatus(ctx, arg.StatusID)
+		if err != nil {
+			return err
+		}
+
+		result.PayMethod, err = q.GetPayMethod(ctx, arg.PayMethodID)
 		if err != nil {
 			return err
 		}
@@ -280,6 +286,11 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 
 		// 取得訂單狀態
 		result.Status, err = q.GetOrderStatus(ctx, int64(result.Order.StatusID))
+		if err != nil {
+			return err
+		}
+
+		result.PayMethod, err = q.GetPayMethod(ctx, int64(result.Order.PayMethodID))
 		if err != nil {
 			return err
 		}

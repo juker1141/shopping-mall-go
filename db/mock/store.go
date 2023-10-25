@@ -423,6 +423,20 @@ func (mr *MockStoreMockRecorder) DeleteCartCouponByCouponId(arg0, arg1 interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCartCouponByCouponId", reflect.TypeOf((*MockStore)(nil).DeleteCartCouponByCouponId), arg0, arg1)
 }
 
+// DeleteCartProduct mocks base method.
+func (m *MockStore) DeleteCartProduct(arg0 context.Context, arg1 db.DeleteCartProductParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCartProduct", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCartProduct indicates an expected call of DeleteCartProduct.
+func (mr *MockStoreMockRecorder) DeleteCartProduct(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCartProduct", reflect.TypeOf((*MockStore)(nil).DeleteCartProduct), arg0, arg1)
+}
+
 // DeleteCartProductByCartId mocks base method.
 func (m *MockStore) DeleteCartProductByCartId(arg0 context.Context, arg1 pgtype.Int4) error {
 	m.ctrl.T.Helper()
@@ -1559,6 +1573,21 @@ func (m *MockStore) UpdateCartProduct(arg0 context.Context, arg1 db.UpdateCartPr
 func (mr *MockStoreMockRecorder) UpdateCartProduct(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCartProduct", reflect.TypeOf((*MockStore)(nil).UpdateCartProduct), arg0, arg1)
+}
+
+// UpdateCartTx mocks base method.
+func (m *MockStore) UpdateCartTx(arg0 context.Context, arg1 db.UpdateCartTxParams) (db.CartTxResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateCartTx", arg0, arg1)
+	ret0, _ := ret[0].(db.CartTxResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateCartTx indicates an expected call of UpdateCartTx.
+func (mr *MockStoreMockRecorder) UpdateCartTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateCartTx", reflect.TypeOf((*MockStore)(nil).UpdateCartTx), arg0, arg1)
 }
 
 // UpdateCoupon mocks base method.
