@@ -12,6 +12,7 @@ import (
 )
 
 type Querier interface {
+	CheckCartProductExists(ctx context.Context, arg CheckCartProductExistsParams) (bool, error)
 	CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) (AdminUser, error)
 	CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error)
 	CreateCartCoupon(ctx context.Context, arg CreateCartCouponParams) (CartCoupon, error)

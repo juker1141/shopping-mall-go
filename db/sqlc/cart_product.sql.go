@@ -11,6 +11,26 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const checkCartProductExists = `-- name: CheckCartProductExists :one
+SELECT EXISTS (
+    SELECT 1
+    FROM cart_products
+    WHERE cart_id = $1 AND product_id = $2
+)
+`
+
+type CheckCartProductExistsParams struct {
+	CartID    pgtype.Int4 `json:"cart_id"`
+	ProductID pgtype.Int4 `json:"product_id"`
+}
+
+func (q *Queries) CheckCartProductExists(ctx context.Context, arg CheckCartProductExistsParams) (bool, error) {
+	row := q.db.QueryRow(ctx, checkCartProductExists, arg.CartID, arg.ProductID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createCartProduct = `-- name: CreateCartProduct :one
 INSERT INTO cart_products (
   cart_id,
