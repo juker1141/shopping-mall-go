@@ -11,6 +11,21 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const checkCartCouponExists = `-- name: CheckCartCouponExists :one
+SELECT EXISTS (
+  SELECT 1
+  FROM cart_coupons
+  WHERE cart_id = $1
+)
+`
+
+func (q *Queries) CheckCartCouponExists(ctx context.Context, cartID pgtype.Int4) (bool, error) {
+	row := q.db.QueryRow(ctx, checkCartCouponExists, cartID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createCartCoupon = `-- name: CreateCartCoupon :one
 INSERT INTO cart_coupons (
   cart_id,

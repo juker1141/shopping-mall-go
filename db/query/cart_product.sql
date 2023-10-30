@@ -14,9 +14,9 @@ LIMIT 1;
 
 -- name: CheckCartProductExists :one
 SELECT EXISTS (
-    SELECT 1
-    FROM cart_products
-    WHERE cart_id = $1 AND product_id = $2
+  SELECT 1
+  FROM cart_products
+  WHERE cart_id = $1 AND product_id = $2
 );
 
 -- name: UpdateCartProduct :one

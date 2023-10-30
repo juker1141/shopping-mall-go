@@ -11,6 +11,13 @@ SELECT * FROM cart_coupons
 WHERE cart_id = $1 AND coupon_id = $2
 LIMIT 1;
 
+-- name: CheckCartCouponExists :one
+SELECT EXISTS (
+  SELECT 1
+  FROM cart_coupons
+  WHERE cart_id = $1
+);
+
 -- name: ListCartCouponByCartId :many
 SELECT * FROM cart_coupons
 WHERE cart_id = $1;

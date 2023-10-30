@@ -37,6 +37,36 @@ func (m *MockStore) EXPECT() *MockStoreMockRecorder {
 	return m.recorder
 }
 
+// CheckCartCouponExists mocks base method.
+func (m *MockStore) CheckCartCouponExists(arg0 context.Context, arg1 pgtype.Int4) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckCartCouponExists", arg0, arg1)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckCartCouponExists indicates an expected call of CheckCartCouponExists.
+func (mr *MockStoreMockRecorder) CheckCartCouponExists(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckCartCouponExists", reflect.TypeOf((*MockStore)(nil).CheckCartCouponExists), arg0, arg1)
+}
+
+// CheckCartProductExists mocks base method.
+func (m *MockStore) CheckCartProductExists(arg0 context.Context, arg1 db.CheckCartProductExistsParams) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CheckCartProductExists", arg0, arg1)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CheckCartProductExists indicates an expected call of CheckCartProductExists.
+func (mr *MockStoreMockRecorder) CheckCartProductExists(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CheckCartProductExists", reflect.TypeOf((*MockStore)(nil).CheckCartProductExists), arg0, arg1)
+}
+
 // CreateAdminUser mocks base method.
 func (m *MockStore) CreateAdminUser(arg0 context.Context, arg1 db.CreateAdminUserParams) (db.AdminUser, error) {
 	m.ctrl.T.Helper()

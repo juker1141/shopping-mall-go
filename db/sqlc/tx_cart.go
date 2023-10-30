@@ -13,11 +13,7 @@ type CartTxProductResult struct {
 }
 
 type UpdateCartTxParams struct {
-	Account    string `json:"account" binding:"required"`
-	Type       string `json:"type"`
-	ProductID  int64  `json:"product_id" binding:"required"`
-	Num        int32  `json:"num" binding:"required,gt=0"`
-	CouponCode string `json:"coupon_code"`
+	CartID int64 `json:"cart_id" binding:"required,gt=0"`
 }
 
 type CartTxResult struct {
@@ -31,91 +27,18 @@ func (store *SQLStore) UpdateCartTx(ctx context.Context, arg UpdateCartTxParams)
 
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
-
-		cart, err := q.GetCartByOwner(ctx, pgtype.Text{
-			String: arg.Account,
-			Valid:  true,
-		})
-		if err != nil {
-			fmt.Println(err, "getCart")
-			return err
-		}
-
-		err = q.DeleteCartProduct(context.Background(), DeleteCartProductParams{
-			CartID: pgtype.Int4{
-				Int32: int32(cart.ID),
-				Valid: true,
-			},
-			ProductID: pgtype.Int4{
-				Int32: int32(arg.ProductID),
-				Valid: true,
-			},
-		})
-
-		_, err = q.CreateCartProduct(ctx, CreateCartProductParams{
-			CartID: pgtype.Int4{
-				Int32: int32(cart.ID),
-				Valid: true,
-			},
-			ProductID: pgtype.Int4{
-				Int32: int32(arg.ProductID),
-				Valid: true,
-			},
-			Num: arg.Num,
-		})
-
-		if err != nil {
-			fmt.Println(err, "Create")
-			return err
-		}
-
-		// if reflect.DeepEqual(cartProduct, CartProduct{}) {
-
-		// 	_, err = q.CreateCartProduct(ctx, CreateCartProductParams{
-		// 		CartID: pgtype.Int4{
-		// 			Int32: int32(cart.ID),
-		// 			Valid: true,
-		// 		},
-		// 		ProductID: pgtype.Int4{
-		// 			Int32: int32(arg.ProductID),
-		// 			Valid: true,
-		// 		},
-		// 		Num: arg.Num,
-		// 	})
-		// } else {
-
-		// 	_, err = q.UpdateCartProduct(ctx, UpdateCartProductParams{
-		// 		CartID: pgtype.Int4{
-		// 			Int32: int32(cart.ID),
-		// 			Valid: true,
-		// 		},
-		// 		ProductID: pgtype.Int4{
-		// 			Int32: int32(arg.ProductID),
-		// 			Valid: true,
-		// 		},
-		// 		Num: pgtype.Int4{
-		// 			Int32: updateNum,
-		// 			Valid: true,
-		// 		},
-		// 	})
-		// 	if err != nil {
-		// 		fmt.Println(err, "updateCartP")
-		// 		return err
-		// 	}
-		// }
-
-		cartProducts, err := q.ListCartProductByCartId(ctx, pgtype.Int4{
-			Int32: int32(cart.ID),
-			Valid: true,
-		})
-		if err != nil {
-			fmt.Println(err, "ListCartProduct")
-			return err
-		}
-
 		var productList []CartTxProductResult
 		var totalPrice int32
 		var finalPrice int32
+
+		cartProducts, err := q.ListCartProductByCartId(ctx, pgtype.Int4{
+			Int32: int32(arg.CartID),
+			Valid: true,
+		})
+		if err != nil {
+			return err
+		}
+
 		for _, cartProduct := range cartProducts {
 			if cartProduct.Num <= 0 {
 				err := fmt.Errorf("product num must be positive")
@@ -124,7 +47,6 @@ func (store *SQLStore) UpdateCartTx(ctx context.Context, arg UpdateCartTxParams)
 			// 取得商品
 			product, err := q.GetProduct(ctx, int64(cartProduct.ProductID.Int32))
 			if err != nil {
-				fmt.Println(err, "getProduct")
 				return err
 			}
 			totalPrice = totalPrice + (int32(cartProduct.Num) * product.OriginPrice)
@@ -137,49 +59,42 @@ func (store *SQLStore) UpdateCartTx(ctx context.Context, arg UpdateCartTxParams)
 
 		result.ProductList = productList
 
+		cartCouponisExists, err := q.CheckCartCouponExists(context.Background(), pgtype.Int4{
+			Int32: int32(arg.CartID),
+			Valid: true,
+		})
+		if err != nil {
+			return err
+		}
+
 		var coupon Coupon
-		if arg.CouponCode != "" {
-			coupon, err = q.GetCouponByCode(ctx, arg.CouponCode)
+		if cartCouponisExists {
+			cartCoupons, err := q.ListCartCouponByCartId(context.Background(),
+				pgtype.Int4{
+					Int32: int32(arg.CartID),
+				})
 			if err != nil {
-				fmt.Println(err, "get Coupon")
+				return err
+			}
+
+			cartCoupon := cartCoupons[0]
+
+			coupon, err = q.GetCoupon(context.Background(), int64(cartCoupon.CouponID.Int32))
+			if err != nil {
 				return err
 			}
 			finalPrice = finalPrice * (100 - coupon.Percent) / 100
-
-			err = q.DeleteCartCouponByCartId(ctx, pgtype.Int4{
-				Int32: int32(cart.ID),
-				Valid: true,
-			})
-			if err != nil {
-				fmt.Println(err, "del Coupon")
-				return err
-			}
-
-			_, err = q.CreateCartCoupon(ctx, CreateCartCouponParams{
-				CartID: pgtype.Int4{
-					Int32: int32(cart.ID),
-					Valid: true,
-				},
-				CouponID: pgtype.Int4{
-					Int32: int32(coupon.ID),
-					Valid: true,
-				},
-			})
-			if err != nil {
-				fmt.Println(err, "cartCoupon")
-				return err
-			}
 		}
+		result.Coupon = coupon
 
 		cartArg := UpdateCartParams{
-			ID:         cart.ID,
+			ID:         arg.CartID,
 			TotalPrice: totalPrice,
 			FinalPrice: finalPrice,
 		}
 
 		result.Cart, err = q.UpdateCart(ctx, cartArg)
 		if err != nil {
-			fmt.Println(err, "updateCart")
 			return err
 		}
 
