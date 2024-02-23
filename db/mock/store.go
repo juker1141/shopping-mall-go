@@ -495,6 +495,20 @@ func (mr *MockStoreMockRecorder) DeleteCartProductByProductId(arg0, arg1 interfa
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCartProductByProductId", reflect.TypeOf((*MockStore)(nil).DeleteCartProductByProductId), arg0, arg1)
 }
 
+// DeleteCartTx mocks base method.
+func (m *MockStore) DeleteCartTx(arg0 context.Context, arg1 db.DeleteCartTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteCartTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteCartTx indicates an expected call of DeleteCartTx.
+func (mr *MockStoreMockRecorder) DeleteCartTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteCartTx", reflect.TypeOf((*MockStore)(nil).DeleteCartTx), arg0, arg1)
+}
+
 // DeleteCoupon mocks base method.
 func (m *MockStore) DeleteCoupon(arg0 context.Context, arg1 int64) error {
 	m.ctrl.T.Helper()

@@ -378,7 +378,7 @@ func (store *SQLStore) DeleteOrderTx(ctx context.Context, arg DeleteOrderTxParam
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
-		// 建立訂單跟會員的關聯
+		// 刪除訂單跟會員的關聯
 		err = q.DeleteOrderUserByOrderId(ctx, pgtype.Int4{
 			Int32: int32(arg.ID),
 			Valid: true,

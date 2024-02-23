@@ -148,3 +148,34 @@ func TestUpdateCartTxWithAddType(t *testing.T) {
 		},
 	})
 }
+
+func TestDeleteCartTx(t *testing.T) {
+	user := createRandomUser(t)
+
+	cartArg := CreateCartParams{
+		Owner: pgtype.Text{
+			String: user.Account,
+			Valid:  true,
+		},
+		TotalPrice: 0,
+		FinalPrice: 0,
+	}
+
+	cart1, err := testStore.CreateCart(context.Background(), cartArg)
+	require.NoError(t, err)
+	require.NotEmpty(t, cart1)
+
+	arg := DeleteCartTxParams{
+		Owner: user.Account,
+	}
+
+	err = testStore.DeleteCartTx(context.Background(), arg)
+	require.NoError(t, err)
+
+	cart2, err := testStore.GetCartByOwner(context.Background(), pgtype.Text{
+		String: user.Account,
+		Valid:  true,
+	})
+	require.Error(t, err)
+	require.Empty(t, cart2)
+}

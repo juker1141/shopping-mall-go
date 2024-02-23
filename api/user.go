@@ -444,7 +444,31 @@ func (server *Server) deleteUserByAdmin(ctx *gin.Context) {
 		return
 	}
 
-	err := server.store.DeleteUser(ctx, uri.ID)
+	user, err := server.store.GetUser(ctx, uri.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	arg := db.DeleteCartTxParams{
+		Owner: user.Account,
+	}
+
+	err = server.store.DeleteCartTx(ctx, arg)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	err = server.store.DeleteUser(ctx, uri.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))

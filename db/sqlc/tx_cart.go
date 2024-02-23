@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/jackc/pgx/v5/pgtype"
 )
@@ -101,4 +102,50 @@ func (store *SQLStore) UpdateCartTx(ctx context.Context, arg UpdateCartTxParams)
 		return nil
 	})
 	return result, err
+}
+
+type DeleteCartTxParams struct {
+	Owner string `json:"owner"`
+}
+
+func (store *SQLStore) DeleteCartTx(ctx context.Context, arg DeleteCartTxParams) error {
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		cart, err := store.GetCartByOwner(ctx, pgtype.Text{
+			String: arg.Owner,
+			Valid:  true,
+		})
+		if err != nil {
+			log.Println("GetCartByOwner", err)
+			return err
+		}
+
+		err = store.DeleteCartCouponByCartId(ctx, pgtype.Int4{
+			Int32: int32(cart.ID),
+			Valid: true,
+		})
+		if err != nil {
+			log.Println("DeleteCartCouponByCartId", err)
+			return err
+		}
+
+		err = store.DeleteCartProductByCartId(ctx, pgtype.Int4{
+			Int32: int32(cart.ID),
+			Valid: true,
+		})
+		if err != nil {
+			log.Println("DeleteCartProductByCartId", err)
+			return err
+		}
+
+		err = store.DeleteCart(ctx, cart.ID)
+		if err != nil {
+			log.Println("DeleteCart", err)
+			return err
+		}
+
+		return nil
+	})
+	return err
 }
