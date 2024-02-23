@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateUserTx(t *testing.T) {
+func createRandomUserTx(t *testing.T) UserTxResult {
 	hashedPassword, err := util.HashPassword(util.RandomString(8))
 	require.NoError(t, err)
 
@@ -50,4 +50,10 @@ func TestCreateUserTx(t *testing.T) {
 	require.Equal(t, arg.CreateUserParams.HashedPassword, txResult.User.HashedPassword)
 	require.Equal(t, arg.CreateUserParams.Status, txResult.User.Status)
 	require.Equal(t, arg.CreateUserParams.AvatarUrl, txResult.User.AvatarUrl)
+
+	return txResult
+}
+
+func TestCreateUserTx(t *testing.T) {
+	createRandomUserTx(t)
 }

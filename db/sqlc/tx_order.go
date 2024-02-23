@@ -35,6 +35,7 @@ type OrderTxResult struct {
 	Order
 	ProductList []OrderTxProductResult `json:"product_list"`
 	Status      OrderStatus            `json:"status"`
+	PayMethod   PayMethod              `json:"pay_method"`
 }
 
 // It creates a order, orderUser, orderProduct, orderCoupon, and get orderStatus within a single database trasaction
@@ -116,6 +117,11 @@ func (store *SQLStore) CreateOrderTx(ctx context.Context, arg CreateOrderTxParam
 
 		// 取得訂單狀態
 		result.Status, err = q.GetOrderStatus(ctx, arg.StatusID)
+		if err != nil {
+			return err
+		}
+
+		result.PayMethod, err = q.GetPayMethod(ctx, arg.PayMethodID)
 		if err != nil {
 			return err
 		}
@@ -284,6 +290,11 @@ func (store *SQLStore) UpdateOrderTx(ctx context.Context, arg UpdateOrderTxParam
 			return err
 		}
 
+		result.PayMethod, err = q.GetPayMethod(ctx, int64(result.Order.PayMethodID))
+		if err != nil {
+			return err
+		}
+
 		if arg.OrderProducts != nil && len(arg.OrderProducts) > 0 {
 			// 如果需要更新訂單商品，先把之前建立的關聯移除
 			err = q.DeleteOrderProductByOrderId(ctx, pgtype.Int4{
@@ -367,7 +378,7 @@ func (store *SQLStore) DeleteOrderTx(ctx context.Context, arg DeleteOrderTxParam
 	err := store.execTx(ctx, func(q *Queries) error {
 		var err error
 
-		// 建立訂單跟會員的關聯
+		// 刪除訂單跟會員的關聯
 		err = q.DeleteOrderUserByOrderId(ctx, pgtype.Int4{
 			Int32: int32(arg.ID),
 			Valid: true,

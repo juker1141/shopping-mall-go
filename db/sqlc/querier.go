@@ -12,6 +12,8 @@ import (
 )
 
 type Querier interface {
+	CheckCartCouponExists(ctx context.Context, cartID pgtype.Int4) (bool, error)
+	CheckCartProductExists(ctx context.Context, arg CheckCartProductExistsParams) (bool, error)
 	CreateAdminUser(ctx context.Context, arg CreateAdminUserParams) (AdminUser, error)
 	CreateCart(ctx context.Context, arg CreateCartParams) (Cart, error)
 	CreateCartCoupon(ctx context.Context, arg CreateCartCouponParams) (CartCoupon, error)
@@ -35,6 +37,7 @@ type Querier interface {
 	DeleteCart(ctx context.Context, id int64) error
 	DeleteCartCouponByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartCouponByCouponId(ctx context.Context, couponID pgtype.Int4) error
+	DeleteCartProduct(ctx context.Context, arg DeleteCartProductParams) error
 	DeleteCartProductByCartId(ctx context.Context, cartID pgtype.Int4) error
 	DeleteCartProductByProductId(ctx context.Context, productID pgtype.Int4) error
 	DeleteCoupon(ctx context.Context, id int64) error

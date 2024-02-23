@@ -1520,6 +1520,18 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
+					GetUser(gomock.Any(), gomock.Eq(user.ID)).
+					Times(1).
+					Return(user, nil)
+
+				store.EXPECT().
+					DeleteCartTx(gomock.Any(), gomock.Eq(db.DeleteCartTxParams{
+						Owner: user.Account,
+					})).
+					Times(1).
+					Return(nil)
+
+				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
 					Return(nil)
@@ -1569,9 +1581,9 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
-					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
+					GetUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
-					Return(sql.ErrConnDone)
+					Return(db.User{}, sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -1587,9 +1599,9 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
-					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
+					GetUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
-					Return(db.ErrRecordNotFound)
+					Return(db.User{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -1605,7 +1617,7 @@ func TestDeleteUserByAdminAPI(t *testing.T) {
 				addPermissionMiddleware(store, "user", memberPermissions)
 
 				store.EXPECT().
-					DeleteUser(gomock.Any(), gomock.Any()).
+					GetUser(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {

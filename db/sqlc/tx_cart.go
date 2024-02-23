@@ -1,58 +1,151 @@
 package db
 
-// type UpdateCartTxParams struct {
-// 	Name         string  `json:"name"`
-// 	categoriesID []int64 `json:"categories_id"`
-// }
+import (
+	"context"
+	"fmt"
+	"log"
 
-// type ProductTxResult struct {
-// 	Role           Role         `json:"role"`
-// 	PermissionList []Permission `json:"permission_list"`
-// }
+	"github.com/jackc/pgx/v5/pgtype"
+)
 
-// func (store *SQLStore) UpdateCartTx(ctx context.Context, arg CreateProductTxParams) (ProductTxResult, error) {
-// 	var result ProductTxResult
+type CartTxProductResult struct {
+	Product
+	Num int64 `json:"num"`
+}
 
-// 	err := store.execTx(ctx, func(q *Queries) error {
-// 		var err error
-// 		var permissionList []Permission
+type UpdateCartTxParams struct {
+	CartID int64 `json:"cart_id" binding:"required,gt=0"`
+}
 
-// 		if len(arg.PermissionsID) <= 0 {
-// 			err = fmt.Errorf("at least one permission is required")
-// 			return err
-// 		}
+type CartTxResult struct {
+	Cart
+	ProductList []CartTxProductResult `json:"product_list"`
+	Coupon      Coupon                `json:"coupon"`
+}
 
-// 		result.Role, err = q.CreateRole(ctx, arg.Name)
-// 		if err != nil {
-// 			return err
-// 		}
+func (store *SQLStore) UpdateCartTx(ctx context.Context, arg UpdateCartTxParams) (CartTxResult, error) {
+	var result CartTxResult
 
-// 		for _, permissionId := range arg.PermissionsID {
-// 			_, err := q.CreateRolePermission(ctx, CreateRolePermissionParams{
-// 				RoleID: pgtype.Int4{
-// 					Int32: int32(result.Role.ID),
-// 					Valid: true,
-// 				},
-// 				PermissionID: pgtype.Int4{
-// 					Int32: int32(permissionId),
-// 					Valid: true,
-// 				},
-// 			})
-// 			if err != nil {
-// 				return err
-// 			}
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+		var productList []CartTxProductResult
+		var totalPrice int32
+		var finalPrice int32
 
-// 			permission, err := q.GetPermission(ctx, permissionId)
-// 			if err != nil {
-// 				return err
-// 			}
-// 			permissionList = append(permissionList, permission)
-// 		}
+		cartProducts, err := q.ListCartProductByCartId(ctx, pgtype.Int4{
+			Int32: int32(arg.CartID),
+			Valid: true,
+		})
+		if err != nil {
+			return err
+		}
 
-// 		result.PermissionList = permissionList
+		for _, cartProduct := range cartProducts {
+			if cartProduct.Num <= 0 {
+				err := fmt.Errorf("product num must be positive")
+				return err
+			}
+			// 取得商品
+			product, err := q.GetProduct(ctx, int64(cartProduct.ProductID.Int32))
+			if err != nil {
+				return err
+			}
+			totalPrice = totalPrice + (int32(cartProduct.Num) * product.OriginPrice)
+			finalPrice = finalPrice + (int32(cartProduct.Num) * product.Price)
+			productList = append(productList, CartTxProductResult{
+				Product: product,
+				Num:     int64(cartProduct.Num),
+			})
+		}
 
-// 		return nil
-// 	})
+		result.ProductList = productList
 
-// 	return result, err
-// }
+		cartCouponisExists, err := q.CheckCartCouponExists(context.Background(), pgtype.Int4{
+			Int32: int32(arg.CartID),
+			Valid: true,
+		})
+		if err != nil {
+			return err
+		}
+
+		var coupon Coupon
+		if cartCouponisExists {
+			cartCoupons, err := q.ListCartCouponByCartId(context.Background(),
+				pgtype.Int4{
+					Int32: int32(arg.CartID),
+				})
+			if err != nil {
+				return err
+			}
+
+			cartCoupon := cartCoupons[0]
+
+			coupon, err = q.GetCoupon(context.Background(), int64(cartCoupon.CouponID.Int32))
+			if err != nil {
+				return err
+			}
+			finalPrice = finalPrice * (100 - coupon.Percent) / 100
+		}
+		result.Coupon = coupon
+
+		cartArg := UpdateCartParams{
+			ID:         arg.CartID,
+			TotalPrice: totalPrice,
+			FinalPrice: finalPrice,
+		}
+
+		result.Cart, err = q.UpdateCart(ctx, cartArg)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	return result, err
+}
+
+type DeleteCartTxParams struct {
+	Owner string `json:"owner"`
+}
+
+func (store *SQLStore) DeleteCartTx(ctx context.Context, arg DeleteCartTxParams) error {
+	err := store.execTx(ctx, func(q *Queries) error {
+		var err error
+
+		cart, err := store.GetCartByOwner(ctx, pgtype.Text{
+			String: arg.Owner,
+			Valid:  true,
+		})
+		if err != nil {
+			log.Println("GetCartByOwner", err)
+			return err
+		}
+
+		err = store.DeleteCartCouponByCartId(ctx, pgtype.Int4{
+			Int32: int32(cart.ID),
+			Valid: true,
+		})
+		if err != nil {
+			log.Println("DeleteCartCouponByCartId", err)
+			return err
+		}
+
+		err = store.DeleteCartProductByCartId(ctx, pgtype.Int4{
+			Int32: int32(cart.ID),
+			Valid: true,
+		})
+		if err != nil {
+			log.Println("DeleteCartProductByCartId", err)
+			return err
+		}
+
+		err = store.DeleteCart(ctx, cart.ID)
+		if err != nil {
+			log.Println("DeleteCart", err)
+			return err
+		}
+
+		return nil
+	})
+	return err
+}

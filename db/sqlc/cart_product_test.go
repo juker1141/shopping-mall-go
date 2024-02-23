@@ -58,6 +58,35 @@ func TestGetCartProduct(t *testing.T) {
 	require.Equal(t, cartProduct1.Num, cartProduct2.Num)
 }
 
+func TestCheckCartProductExists(t *testing.T) {
+	cartProduct1 := createRandomCartProduct(t)
+
+	arg := CheckCartProductExistsParams{
+		CartID:    cartProduct1.CartID,
+		ProductID: cartProduct1.ProductID,
+	}
+
+	isExists, err := testStore.CheckCartProductExists(context.Background(), arg)
+	require.NoError(t, err)
+	require.True(t, isExists)
+
+	err = testStore.DeleteCartProduct(context.Background(), DeleteCartProductParams{
+		CartID: pgtype.Int4{
+			Int32: cartProduct1.CartID.Int32,
+			Valid: true,
+		},
+		ProductID: pgtype.Int4{
+			Int32: cartProduct1.ProductID.Int32,
+			Valid: true,
+		},
+	})
+	require.NoError(t, err)
+
+	isExists, err = testStore.CheckCartProductExists(context.Background(), arg)
+	require.NoError(t, err)
+	require.False(t, isExists)
+}
+
 func TestUpdateCartProduct(t *testing.T) {
 	oldCartProduct := createRandomCartProduct(t)
 
@@ -83,6 +112,36 @@ func TestUpdateCartProduct(t *testing.T) {
 	require.Equal(t, oldCartProduct.CartID, newCartProduct.CartID)
 	require.Equal(t, oldCartProduct.ProductID, newCartProduct.ProductID)
 	require.NotEqual(t, oldCartProduct.Num, newCartProduct.Num)
+}
+
+func TestDeleteCartProduct(t *testing.T) {
+	cartProduct1 := createRandomCartProduct(t)
+
+	err := testStore.DeleteCartProduct(context.Background(), DeleteCartProductParams{
+		CartID: pgtype.Int4{
+			Int32: cartProduct1.CartID.Int32,
+			Valid: true,
+		},
+		ProductID: pgtype.Int4{
+			Int32: cartProduct1.ProductID.Int32,
+			Valid: true,
+		},
+	})
+	require.NoError(t, err)
+
+	cartProduct2, err := testStore.GetCartProduct(context.Background(), GetCartProductParams{
+		CartID: pgtype.Int4{
+			Int32: cartProduct1.CartID.Int32,
+			Valid: true,
+		},
+		ProductID: pgtype.Int4{
+			Int32: cartProduct1.ProductID.Int32,
+			Valid: true,
+		},
+	})
+
+	require.Error(t, err)
+	require.Empty(t, cartProduct2)
 }
 
 func TestDeleteCartProductByCartId(t *testing.T) {

@@ -12,6 +12,13 @@ SELECT * FROM cart_products
 WHERE cart_id = $1 AND product_id = $2
 LIMIT 1;
 
+-- name: CheckCartProductExists :one
+SELECT EXISTS (
+  SELECT 1
+  FROM cart_products
+  WHERE cart_id = $1 AND product_id = $2
+);
+
 -- name: UpdateCartProduct :one
 UPDATE cart_products
 SET 
@@ -27,6 +34,10 @@ WHERE cart_id = $1;
 -- name: ListCartProductByProductId :many
 SELECT * FROM cart_products
 WHERE product_id = $1;
+
+-- name: DeleteCartProduct :exec
+DELETE FROM cart_products
+WHERE cart_id = $1 AND product_id = $2;
 
 -- name: DeleteCartProductByCartId :exec
 DELETE FROM cart_products
